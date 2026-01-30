@@ -1,703 +1,1585 @@
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-<title>Emika's Hot Chicken</title>
  <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com" >
+    <title>Emika's Hot Chicken</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="shortcut icon" href="images/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --orange: #ff6a1a;
+            --orange-dark: #e2550f;
+            --bg: #0d0d0f;
+            --card: rgba(20, 20, 24, 0.8);
+            --text: #f5f5f5;
+            --muted: #c9c9ce;
+            --yellow: #ffd700;
+            --yellow-dark: #ffb700;
+        }
+
+        * { 
+            box-sizing: border-box;
+        }
+        
+        img, iframe {
+            max-width: 100%;
+        }
+        
+        video {
+            max-width: 100%;
+            height: auto;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: #000000;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
         body {
             margin: 0;
-            padding: 0;
-            padding-top: 60px;
             font-family: 'Roboto Slab', serif; 
-            color: #fff;
-            overflow-x: hidden;
-            background: url('images/background.jpg') no-repeat center center fixed;
+            color: var(--text);
+            background-color: #000000;
+            background-image: url('images/background.jpg');
+            background-position: center top;
             background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             position: relative;
-            z-index: -1;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
-.container {
-            width: 95%;
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,106,26,0.18), transparent 40%),
+                radial-gradient(circle at 78% 8%, rgba(255,106,26,0.14), transparent 34%),
+                linear-gradient(120deg, rgba(0,0,0,0.5), rgba(0,0,0,0.32), rgba(0,0,0,0.55));
+            z-index: 0;
+            mix-blend-mode: normal;
+            background-color: transparent;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(12px);
+            background: rgba(10,10,12,0.75);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        nav {
             max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-            background-color: rgba(0, 0, 0, 0.6);
-            position: relative;
-            z-index: 1;
-            border-radius: 10px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
         }
 
-        h1 {
-            text-align: center;
-            color: #ff6600;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            font-family: 'Merriweather', serif; /* Другой шрифт для заголовка */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
 
-        .image-section {
-            margin-bottom: 50px;
-            text-align: center;
-            padding: 50px 0;
+        .brand img { height: 42px; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+        }
+
+        .nav-links a {
+            padding: 8px 10px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            min-height: 36px;
+        }
+
+        .nav-links a:hover { background: rgba(255,255,255,0.08); }
+
+        .phone-link {
+            color: var(--orange);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 8px 10px;
+            border-radius: 8px;
+            transition: background 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            min-height: 36px;
+        }
+
+        .phone-link:hover {
+            background: rgba(255,106,26,0.15);
+            color: var(--orange-dark);
+        }
+
+        .cta {
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--orange);
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+            transition: background 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .cta:hover { background: var(--orange-dark); transform: translateY(-1px); }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .lang-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: transparent;
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: background 0.2s ease, border 0.2s ease, transform 0.2s ease, color 0.2s ease;
+        }
+
+        .lang-btn.active {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .lang-btn:not(.active):hover {
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        main { position: relative; z-index: 1; }
+
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 70px 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            align-items: center;
+            padding-top: 30px;
             position: relative;
             overflow: hidden;
         }
 
-        .fade-in-image {
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
-            max-width: 100%;
-            height: auto;
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: -40px -60px;
+            background: url('images/hyp.png') center/contain no-repeat;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-family: 'Merriweather', serif;
+            font-size: clamp(2.4rem, 4vw, 3.4rem);
+            margin: 0 0 18px;
+            color: #fff;
+        }
+
+        .highlight {
+            color: var(--orange);
+        }
+
+        .hero p { color: var(--muted); line-height: 1.7; margin: 0 0 22px; }
+
+        .spice-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 14px 0 24px;
+        }
+
+        .tag {
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 999px;
+            font-size: 0.85rem;
+        }
+
+        .hero-actions { display: flex; gap: 8px; flex-wrap: nowrap; }
+
+        .ghost-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: transparent;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: border 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .ghost-btn:hover { border-color: var(--orange); transform: translateY(-1px); }
+
+        .cta {
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--orange);
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+            transition: background 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .cta:hover { background: var(--orange-dark); transform: translateY(-1px); }
+
+        .social-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: transparent;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: border 0.2s ease, transform 0.2s ease, background 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .hero-visual {
+            position: relative;
+            min-height: 360px;
+        }
+
+        .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            transform: translate(-50%, -50%); 
+            filter: drop-shadow(0 18px 35px rgba(0,0,0,0.35));
+        }
+
+        .ring.r1 { animation: spin 28s linear infinite; }
+        .ring.r2 { animation: spin 22s linear infinite reverse; }
+
+        .hero-logo {
+            position: absolute;
+            inset: 50% auto auto 50%;
+            transform: translate(-50%, -50%);
+            width: min(260px, 55vw);
+            border-radius: 50%;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+        }
+
+        @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        .section-title {
+        display: flex;
+        align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .section-title h2 {
+            margin: 0;
+            font-size: 1.6rem;
+            letter-spacing: 0.5px;
+        }
+
+        .pill {
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .cards {
+            display: grid;
+            gap: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+            transition: transform 0.25s ease, border 0.25s ease;
+        }
+
+        .card:hover { transform: translateY(-4px); border-color: rgba(255,106,26,0.45); }
+
+        .card img {
+            width: 100%;
+            height: 220px;
+            border-radius: 12px;
             display: block;
+            object-fit: contain;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .card img:hover {
+            transform: scale(1.05);
+        }
+
+        .card h3 {
+            margin: 0 0 6px;
+            font-size: 1.05rem;
+            letter-spacing: 0.3px;
+        }
+
+        .card p {
+            margin: 0 0 12px 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .card-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--orange);
+            margin-bottom: 12px;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 8px;
+            background: var(--yellow);
+            color: #000;
+            font-weight: 700;
+            font-family: 'Roboto Slab', serif;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .add-to-cart-btn:hover {
+            background: var(--yellow-dark);
+            transform: translateY(-2px);
+        }
+
+        .add-to-cart-btn:active {
+            transform: translateY(0);
+        }
+
+        .about {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            align-items: center;
+            background: rgba(10,10,12,0.7);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 18px;
+            padding: 26px;
+        }
+
+        .about p { margin: 0 0 14px; color: var(--muted); line-height: 1.7; }
+        .about strong { color: #fff; }
+
+        .about .spice-levels { margin-top: 8px; }
+
+        .about-media {
+            display: flex;
+            justify-content: center;
+        }
+
+        .about-media img {
+            width: 100%;
+            max-width: min(520px, 50vw);
+            display: block;
+            border-radius: 16px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.55);
+            object-fit: cover;
+        }
+
+        .about-content {
+            max-width: 640px;
+            width: 100%;
             margin: 0 auto;
         }
 
-        .visible {
-            opacity: 1;
+        /* Видео баннер */
+        .video-banner-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 90px 20px 70px;
+            position: relative;
+            overflow: visible;
         }
 
-        .spacer {
-            height: 80vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2em;
-            color: #ccc;
-        }
-
-        .image-wrapper {
+        .video-banner-container {
             position: relative;
             width: 100%;
-            height: 400px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 50px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
         }
 
-     .text-content .photo {
-            display: block; /* Изображение как блочный элемент */
- margin: 0 auto 30px auto; /* Центрирование и отступ снизу */
-        max-width: 80%; /* Максимальная ширина картинки */
-        height: auto; /* Автоматическая высота для сохранения пропорций */
-        border-radius: 10px; /* Скругленные углы */
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Небольшая тень */
-    }
-
-    .text-content h2 {
-        font-family: 'Merriweather', serif; /* Заголовок внутри текста */
-        color: #ff6600;
-        margin-bottom: 20px;
-        font-size: 1.2em;
-    }
-
-    .text-content p {
-        margin-bottom: 20px; /* Отступ между параграфами */
-        color: #eee; /* Более светлый цвет текста */
-    }
-
-    .text-content .spice-levels {
-        margin-top: 25px;
-        font-size: 0.95em;
-        color: #ccc;
-    }
-
-    .text-content .spice-levels strong {
-        color: #ff6600; /* Цвет для выделения уровней остроты */
-    }
-
-    .text-content .instagram-link {
-        display: inline-block;
-        margin-top: 30px;
-        padding: 12px 25px;
-        background-color: #ff6600;
-        color: #fff;
-        text-decoration: none;
-        font-weight: bold;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-        font-size: 1.05em;
-    }
-
-    .text-content .instagram-link:hover {
-        background-color: #e65c00;
-    }
-
-
-<title>Emika's Hot Chicken</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            padding-top: 60px;
-            font-family: sans-serif; /* Добавим базовый шрифт */
-            color: #fff; /* Цвет текста по умолчанию для темного фона */
-            overflow-x: hidden; /* Скрываем горизонтальную прокрутку */
-            background: url('images/background.jpg') no-repeat center center fixed; /* Фон для всего body */
-            background-size: cover; /* Масштабируем фон, чтобы он покрывал весь экран */
-            position: relative; /* Для позиционирования элементов относительно body */
-            z-index: -1; /* Отправляем фон на задний план */
-        }
-
-        /* Параллакс эффект для фона */
-        body::before {
+        .video-banner-container::before {
             content: '';
-            position: fixed;
+            display: block;
+            padding-bottom: 31.03%;
+        }
+
+        .video-banner-container video {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('images/background.jpg') no-repeat center center fixed;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        .video-banner-section .logo-overlay {
+            position: absolute;
+            top: 15px;
+            right: -55px;
+            z-index: 10;
+            width: 150px;
+            height: 150px;
+        }
+
+        .video-banner-section .logo-overlay-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .video-banner-section .logo-overlay .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150px;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 9px 18px rgba(0,0,0,0.35));
+            z-index: 2;
+        }
+
+        .video-banner-section .logo-overlay .ring.r1 {
+            animation: spin 28s linear infinite;
+        }
+
+        .video-banner-section .logo-overlay .hero-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 130px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            z-index: 3;
+        }
+
+        /* Баннер Яндекс Еды */
+        .yandex-eda-banner {
+            max-width: 1200px;
+            width: 100%;
+            margin: -30px auto 0;
+            padding: 0 20px;
+            min-height: 120px;
+            background: url('https://taxi-uptime.ru/wp-content/uploads/2023/11/peshiy-courier-yandex-eda.jpg') no-repeat center center;
             background-size: cover;
-            z-index: -1;
-            transform: translateZ(-1px) scale(2); /* Движение в 2 раза медленнее */
-        }
-
-        .container {
-            width: 95%; /* Увеличим ширину контейнера для лучшего отображения на мобильных */
-            max-width: 1200px; /* Ограничим максимальную ширину на больших экранах */
-            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Более заметная тень */
-            background-color: rgba(0, 0, 0, 0.6); /* Полупрозрачный фон для содержимого */
-            position: relative; /* Для корректного позиционирования внутренних элементов */
-            z-index: 1; /* Чтобы содержимое было поверх фона */
-            border-radius: 10px; /* Скруглим углы контейнера */
         }
 
-        h1 {
-            text-align: center;
-            color: #ff6600; /* Яркий цвет для заголовка */
-            margin-bottom: 30px;
-            font-size: 2em; /* Увеличим размер заголовка */
+        .yandex-eda-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            z-index: 1;
         }
 
-        .image-section {
-            margin-bottom: 50px;
-            text-align: center;
-            padding: 100px 0; /* Увеличим отступы сверху и снизу */
-            position: relative; /* Для позиционирования изображений */
-            overflow: hidden; /* Скрываем выходящие за пределы изображения */
+        .yandex-eda-banner > a {
+            position: relative;
+            z-index: 2;
+            padding: 12px 24px;
+            background-color: var(--orange);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1em;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
         }
 
+        .yandex-eda-banner > a span {
+            display: block;
+        }
+
+        .yandex-eda-banner > a:hover {
+            background-color: var(--orange-dark);
+            transform: translateY(-1px);
+        }
+
+        .yandex-eda-banner .hero-actions {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Яндекс карта */
+        .yandex-map-container {
+            width: 100%;
+            max-height: 280px;
+            height: 280px;
+            margin: 0;
+            padding: 0;
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        .yandex-map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Кнопки соцсетей */
+        .social-btn.whatsapp:hover {
+            border-color: #25D366;
+            background: rgba(37, 211, 102, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .social-btn.telegram:hover {
+            border-color: #0088cc;
+            background: rgba(0, 136, 204, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .footer {
+            background: rgba(6,6,8,0.9);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px 32px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .footer small { color: var(--muted); }
+
+        /* Корзина */
+        .cart-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .cart-indicator:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .cart-icon {
+            font-size: 1.2rem;
+        }
+
+        .cart-total {
+            font-weight: 700;
+            color: var(--yellow);
+        }
+
+        /* Модальное окно */
         .fade-in-image {
             opacity: 0;
-            transition: opacity 1.5s ease-in-out; /* Немного увеличим время перехода */
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 0 auto;
+            transition: opacity 1.5s ease-in-out;
         }
 
-        .visible {
+        .fade-in-image.visible {
             opacity: 1;
         }
 
-        .spacer {
-            height: 80vh; /* Уменьшим высоту для лучшей адаптивности */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active {
             display: flex;
-            justify-content: center;
             align-items: center;
-            font-size: 1.7em;
-            color: #ccc;
-        }
-
-        .image-wrapper {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            display: flex;
             justify-content: center;
-            align-items: center;
-            margin-bottom: 50px;
+            opacity: 1;
         }
 
-        .static-image,
-        .rotating-image {
-            position: absolute;
-            top: 160;
-            left: 50%;
-            transform: translate(-50%, -50%); 
-            max-width: 200;
-            max-height: 200; 
-        }
-
-        .rotating-image {
-            animation: spin 15s linear infinite; /* Увеличим длительность анимации */
-            z-index: 2;
-	}
-	
-	 .static-image {
-        z-index: 1;
-    }
-
-    @keyframes spin {
-        0% {
-            transform: translate(-50%, -50%) rotate(0deg);
-        }
-        100% {
-            transform: translate(-50%, -50%) rotate(360deg);
-        }
-    }
-
-    /* Футер */
-    footer {
-        display: flex;
-        justify-content: space-between; /* Размещаем элементы по краям */
-        align-items: center;
-        padding: 20px;
-        background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный фон для футера */
-        color: #fff;
-        margin-top: 50px; /* Отступ сверху */
-        flex-wrap: wrap; /* Позволяет элементам переноситься на новую строку на маленьких экранах */
-        text-align: center; /* Центрируем текст на маленьких экранах */
-    }
-
-    footer .logo-footer {
-        flex-shrink: 0; /* Запрещаем сжимать логотип */
-        margin-right: 20px; /* Отступ справа от логотипа */
-    }
-
-    footer .logo-footer img {
-        height: 50px; /* Размер логотипа в футере */
-    }
-
-    footer .info-footer {
-        flex-grow: 1; /* Позволяем информационному блоку занимать доступное пространство */
-        text-align: center;
-    }
-
-    footer .info-footer p {
-        margin: 0 0 10px 0; /* Отступ для параграфа */
-    }
-
-    footer .info-footer a {
-        color: #ff6600; /* Цвет ссылки */
-        text-decoration: none; /* Убираем подчеркивание */
-        font-weight: bold;
-    }
-
-    footer .info-footer a:hover {
-        text-decoration: underline; /* Подчеркивание при наведении */
-    }
-
-    /* Верхнее меню */
-    .top-menu {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        background-color: rgba(0, 0, 0, 0.8);
-        padding: 15px 20px;
-        z-index: 1000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .top-menu .phone-link {
-        color: #ff6600;
-        text-decoration: none;
-        font-size: 1.2em;
-        font-weight: bold;
-        transition: color 0.3s ease;
-    }
-
-    .top-menu .phone-link:hover {
-        color: #e65c00;
-    }
-
-    /* Видео баннер контейнер */
-    .video-banner-container {
-        position: relative;
-        width: 90%;
-        max-width: 1200px;
-        margin: 100px auto 50px auto;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-    }
-
-    .video-banner-container video {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-
-    .video-banner-container .logo-overlay {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        z-index: 10;
-    }
-
-    .video-banner-container .logo-overlay img {
-        height: 25px;
-        width: auto;
-    }
-
-    /* Баннер Яндекс Еды */
-    .yandex-eda-banner {
-        width: 100%;
-        max-height: 96px;
-        height: 96px;
-        background: url('https://taxi-uptime.ru/wp-content/uploads/2023/11/peshiy-courier-yandex-eda.jpg') no-repeat center center;
-        background-size: cover;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 30px 0;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .yandex-eda-banner::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.3);
-        z-index: 1;
-    }
-
-    .yandex-eda-banner a {
-        position: relative;
-        z-index: 2;
-        padding: 15px 30px;
-        background-color: #ff6600;
-        color: #fff;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 1.1em;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    .yandex-eda-banner a:hover {
-        background-color: #e65c00;
-    }
-
-    /* Кнопки соцсетей */
-    .social-buttons {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-top: 20px;
-        flex-wrap: wrap;
-    }
-
-    .social-button {
-        display: inline-block;
-        padding: 12px 25px;
-        color: #fff;
-        text-decoration: none;
-        font-weight: bold;
-        border-radius: 5px;
-        transition: all 0.3s ease;
-        font-size: 1.05em;
-    }
-
-    .social-button.instagram {
-        background-color: #E4405F;
-    }
-
-    .social-button.instagram:hover {
-        background-color: #C13584;
-    }
-
-    .social-button.whatsapp {
-        background-color: #25D366;
-    }
-
-    .social-button.whatsapp:hover {
-        background-color: #128C7E;
-    }
-
-    .social-button.telegram {
-        background-color: #0088cc;
-    }
-
-    .social-button.telegram:hover {
-        background-color: #006699;
-    }
-
-    /* Медиа-запросы для адаптивности */
-    @media (max-width: 768px) {
-        h1 {
-            font-size: 1.6em;
-        }
-
-        .container {
+        .modal-content {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
             width: 90%;
-            padding: 15px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
 
-        .image-wrapper {
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .modal-image {
+            width: 100%;
             height: 300px;
+            object-fit: contain;
+            border-radius: 12px;
+            margin-bottom: 20px;
         }
 
-        .static-image,
-        .rotating-image {
-            max-width: 90%;
-            max-height: 90%;
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #fff;
         }
 
-        footer {
-            flex-direction: column; /* Элементы футера выстраиваются в столбец */
-            text-align: center;
+        .modal-description {
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
         }
 
-        footer .logo-footer {
-            margin-right: 0;
-            margin-bottom: 15px; /* Отступ снизу от логотипа */
+        .spice-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
         }
 
-        .video-banner-container {
-            width: 95%;
-            margin-top: 80px;
+        .spice-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+            min-width: 60px;
         }
 
-        .video-banner-container .logo-overlay img {
-            height: 20px;
+        .spice-icon {
+            font-size: 1.5rem;
+            min-width: 30px;
         }
 
-        .yandex-eda-banner {
-            height: 80px;
+        .spice-slider {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, var(--yellow) 0%, var(--orange) 100%);
+            outline: none;
+            -webkit-appearance: none;
         }
 
-        .yandex-eda-banner a {
-            font-size: 0.9em;
-            padding: 12px 20px;
+        .spice-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--yellow);
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
 
-        .top-menu .phone-link {
-            font-size: 1em;
+        .spice-slider::-webkit-slider-thumb:hover {
+            background: var(--orange);
+            transform: scale(1.1);
         }
-    }
-</style>
+
+        .spice-slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--yellow);
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .spice-slider::-moz-range-thumb:hover {
+            background: var(--orange);
+            transform: scale(1.1);
+        }
+
+        .spice-level-display {
+            min-width: 80px;
+            text-align: right;
+            font-weight: 700;
+            color: var(--orange);
+        }
+
+        .modal-add-btn {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 8px;
+            background: var(--yellow);
+            color: #000;
+            font-weight: 700;
+            font-family: 'Roboto Slab', serif;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-add-btn:hover {
+            background: var(--yellow-dark);
+            transform: translateY(-2px);
+        }
+
+        .modal-add-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 720px) {
+            body {
+                background-attachment: scroll;
+            }
+            
+            nav { 
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+            }
+            
+            nav > div {
+                width: auto;
+                flex-direction: row;
+                align-items: center;
+                gap: 12px;
+            }
+            
+            .header-actions {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                flex-shrink: 0;
+                width: auto;
+            }
+            
+            .nav-links { 
+                display: none;
+            }
+            
+            .phone-link {
+                font-size: 0.8rem;
+                padding: 6px 8px;
+            }
+            
+            .lang-switch {
+                flex-shrink: 0;
+            }
+            
+            .hero-visual { min-height: 260px; order: -1; }
+            .ring { width: 220px; }
+            .section { padding: 48px 16px; }
+            .hero { padding-top: 20px; }
+            .about { grid-template-columns: 1fr; }
+            .about-content { max-width: 100%; }
+            
+            .video-banner-section {
+                padding: 70px 16px 50px;
+                overflow: hidden;
+            }
+            
+            .video-banner-section .logo-overlay {
+                top: 5px;
+                right: -30px;
+                width: 100px;
+                height: 100px;
+            }
+            
+            .video-banner-section .logo-overlay .ring {
+                width: 100px;
+            }
+            
+            .video-banner-section .logo-overlay .hero-logo {
+                width: 85px;
+            }
+            
+            .yandex-eda-banner {
+                min-height: auto;
+                padding: 12px;
+                margin-top: -20px;
+                border-radius: 16px;
+            }
+            
+            .yandex-eda-banner > a {
+                font-size: 0.85em;
+                padding: 10px 16px;
+            }
+            
+            .yandex-eda-banner .hero-actions {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .yandex-eda-banner .cta,
+            .yandex-eda-banner .ghost-btn,
+            .yandex-eda-banner .social-btn {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+            
+            .yandex-map-container {
+                height: 240px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .phone-link {
+                font-size: 0.75rem;
+                padding: 5px 6px;
+            }
+            
+            .video-banner-section .logo-overlay {
+                right: -20px;
+                width: 80px;
+                height: 80px;
+            }
+            
+            .video-banner-section .logo-overlay .ring {
+                width: 80px;
+            }
+            
+            .video-banner-section .logo-overlay .hero-logo {
+                width: 70px;
+            }
+            
+            .yandex-eda-banner .hero-actions {
+                gap: 4px;
+            }
+            
+            .yandex-eda-banner .cta,
+            .yandex-eda-banner .ghost-btn,
+            .yandex-eda-banner .social-btn {
+                font-size: 0.75rem;
+                padding: 5px 10px;
+            }
+
+            .modal-content {
+                padding: 20px;
+                max-width: 95%;
+            }
+
+            .modal-image {
+                height: 200px;
+            }
+
+            .cart-indicator {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+        }
+    </style>
 </head>
-<body bgcolor="#000000" background="images/background.jpg" no-repeat>
+<body>
+    <header>
+        <nav>
+            <div class="brand">
+                <img src="images/logo.png" alt="Emika's Hot Chicken логотип">
+            </div>
+            <div style="display:flex;align-items:center;gap:20px;">
+                <div class="nav-links">
+                    <a href="#combos"><span class="lang-ru">Комбо</span><span class="lang-en">Combos</span></a>
+                    <a href="#bowls"><span class="lang-ru">Боулы</span><span class="lang-en">Bowls</span></a>
+                    <a href="#burgers"><span class="lang-ru">Бургеры</span><span class="lang-en">Burgers</span></a>
+                    <a href="#sides"><span class="lang-ru">Соусы</span><span class="lang-en">Sauces</span></a>
+                    <a href="#drinks"><span class="lang-ru">Напитки</span><span class="lang-en">Drinks</span></a>
+                    <a href="#about"><span class="lang-ru">О нас</span><span class="lang-en">About</span></a>
+                </div>
+                <div class="header-actions">
+                    <div class="cart-indicator" id="cartIndicator">
+                        <span class="cart-icon">🛒</span>
+                        <span class="cart-total" id="cartTotal">0 ₽</span>
+                    </div>
+                    <a href="tel:+79778389898" class="phone-link">+7 977 838 98 98</a>
+                    <div class="lang-switch">
+                        <button class="lang-btn active" data-lang="ru">RUS</button>
+                        <button class="lang-btn" data-lang="en">ENG</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-<!-- Верхнее меню с телефоном -->
-<div class="top-menu">
-    <a href="tel:+79778389898" class="phone-link">+7 977 838 98 98</a>
-</div>
+    <main>
+        <section class="video-banner-section">
+            <div class="video-banner-container">
+                <video autoplay muted loop playsinline>
+                    <source src="images/banner_1_720.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="logo-overlay">
+                <div class="logo-overlay-bg"></div>
+                <img class="ring r1 fade-in-image" src="images/circle1.png" alt="">
+                <img class="hero-logo fade-in-image" src="images/circle2.png" alt="Emika's Hot Chicken">
+            </div>
+        </section>
 
-<center>
+        <section class="section hero" id="top">
+            <div>
+                <h1 class="lang-ru">Острая курочка из <span class="highlight">Нэшвилла</span><br>— в <span class="highlight">Москве</span>!</h1>
+                <h1 class="lang-en">Nashville hot chicken<br>now in <span class="highlight">Moscow</span>!</h1>
+                <p class="lang-ru">
+                    Культовая курочка в Нэшвиллском стиле. Выбирайте свой уровень
+                    остроты и вы узнаете, почему наша курочка доминирует
+                    над вкусом из Кентукки!
+                </p>
+                <p class="lang-en">
+                    Iconic Nashville-style chicken. Choose your heat level
+                    and taste why our chicken leaves Kentucky in the dust.
+                </p>
+                <div class="spice-tags">
+                    <span class="tag lang-ru">без остроты</span>
+                    <span class="tag lang-ru">легкий</span>
+                    <span class="tag lang-ru">средний</span>
+                    <span class="tag lang-ru">острый</span>
+                    <span class="tag lang-ru">жгучий</span>
+                    <span class="tag lang-en">no spice</span>
+                    <span class="tag lang-en">mild</span>
+                    <span class="tag lang-en">medium</span>
+                    <span class="tag lang-en">hot</span>
+                    <span class="tag lang-en">supreme</span>
+                </div>
+            </div>
+        </section>
 
-<!-- Шапка с вращающимися логотипами -->
-<div class="image-wrapper">
-    <img src="images/circle2.png" alt="Emika's Hot Chicken" class="static-image">
-    <img src="images/circle1.png" class="rotating-image">
-</div>
+        <div class="yandex-eda-banner">
+            <a href="https://eda.yandex.ru/moscow/r/emika_s_hot_chicken" target="_blank" rel="noopener">
+                <span class="lang-ru">Закажи доставку на Яндекс Еде</span>
+                <span class="lang-en">Order delivery on Yandex Eda</span>
+            </a>
+            <div class="hero-actions">
+                <a class="cta" href="#combos">
+                    <span class="lang-ru">Посмотреть меню</span>
+                    <span class="lang-en">View menu</span>
+                </a>
+                <a class="ghost-btn" href="https://www.instagram.com/emikashotchicken/" target="_blank" rel="noopener">
+                    <span class="lang-ru">Мы в Instagram</span>
+                    <span class="lang-en">We're on Instagram</span>
+                </a>
+                <a class="social-btn telegram" href="https://t.me/+79778389898" target="_blank" rel="noopener">Telegram</a>
+                <a class="social-btn whatsapp" href="https://wa.me/79778389898" target="_blank" rel="noopener">WhatsApp</a>
+            </div>
+        </div>
 
-<!-- Видео баннер с логотипом -->
-<div class="video-banner-container">
-    <video autoplay muted loop playsinline>
-        <source src="images/banner_1_720.mp4" type="video/mp4">
-    </video>
-    <div class="logo-overlay">
-        <img src="images/logo.png" alt="Emika's Hot Chicken Logo">
+        <section class="section" id="about">
+            <div class="section-title">
+                <h2 class="lang-ru">Добро пожаловать в мир Нэшвиллской курицы</h2>
+                <h2 class="lang-en">Welcome to the world of Nashville hot chicken</h2>
+                <span class="pill lang-ru">Кухня с характером</span>
+                <span class="pill lang-en">Food with attitude</span>
+            </div>
+            <div class="about">
+                <div class="about-media">
+                    <img src="images/photo.png" alt="Горячая курица Emika's Hot Chicken">
+                </div>
+                <div class="about-content">
+                    <p class="lang-ru">Мы доставляем настоящий вкус Нэшвилла прямо к вашей тарелке, специализируясь на культовых бургерах и стрипсах горячей курицы в нэшвиллском стиле. Наш уникальный взгляд на эту любимую классику заставит вас захотеть добавки. Наше меню составлено с учётом разнообразных вкусов на любой вкус.</p>
+                    <p class="spice-levels lang-ru">Выбирайте из пяти уровней остроты: <strong>без остроты</strong> начальный уровень, <strong>легкий</strong> для тех, кто предпочитает лёгкую остроту, <strong>средний</strong> для более смелых, <strong>острый</strong> для любителей острых ощущений и <strong>жгучий</strong> для бесстрашных. Мы удовлетворим все ваши потребности в блюдах.</p>
+                    <p class="lang-ru">Emika’s Hot Chicken — это не просто еда, это создание незабываемых кулинарных впечатлений. Нас отличает сочетание традиционных вкусов и инновационных решений, подкрепленное стремлением к качеству.</p>
+                    <p class="lang-ru">Приглашаем вас присоединиться к нам и узнать почему! Мы больше, чем просто ресторан — мы являемся воплощением огненного духа Нэшвилла!</p>
+                    <p class="lang-ru">Выберите нас и почувствуйте разницу!</p>
+
+                    <p class="lang-en">We bring the true taste of Nashville straight to your plate, specializing in iconic hot chicken sandwiches and tenders. Our take on this classic will have you coming back for more, with something for every heat lover.</p>
+                    <p class="spice-levels lang-en">Choose from five spice levels: from <strong>No Spice</strong> to <strong>Supreme</strong> made with some of the world’s hottest peppers. Whether you want a gentle kick or full-on fire, we’ve got you.</p>
+                    <p class="lang-en">Emika’s Hot Chicken is about more than food — it’s about bold, memorable flavor. We combine classic Southern vibes with our own twist and an obsession with quality.</p>
+                    <p class="lang-en">Come by and see why we’re more than just another chicken spot — we’re Nashville heat brought to Moscow.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="combos">
+            <div class="section-title">
+                <h2 class="lang-ru">Комбо</h2>
+                <h2 class="lang-en">Combos</h2>
+                <span class="pill lang-ru">Все сразу</span>
+                <span class="pill lang-en">All-in one</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image" data-product="combo1">
+                    <img src="images/combo1.png" alt="Комбо 1" class="product-image" data-modal="combo1">
+                    <h3>Комбо 1 / Combo 1</h3>
+                    <p class="lang-ru">1 MC Сэндвич, 1 тендер, картофель фри, огурчики, MC соус.</p>
+                    <p class="lang-en">1 MC sandwich, 1 tender, seasoned fries, pickles, MC sauce.</p>
+                    <div class="card-price">777 ₽</div>
+                    <button class="add-to-cart-btn" data-product="combo1" data-price="777">
+                        <span class="lang-ru">Добавить в корзину</span>
+                        <span class="lang-en">Add to cart</span>
+                    </button>
+                </div>
+                <div class="card fade-in-image" data-product="combo2">
+                    <img src="images/combo2.png" alt="Комбо 2" class="product-image" data-modal="combo2">
+                    <h3>Комбо 2 / Combo 2</h3>
+                    <p class="lang-ru">3 тендера, картофель фри, огурчики, MC соус.</p>
+                    <p class="lang-en">3 tenders, seasoned fries, pickles, MC sauce.</p>
+                    <div class="card-price">777 ₽</div>
+                    <button class="add-to-cart-btn" data-product="combo2" data-price="777">
+                        <span class="lang-ru">Добавить в корзину</span>
+                        <span class="lang-en">Add to cart</span>
+                    </button>
+                </div>
+                <div class="card fade-in-image" data-product="combo3">
+                    <img src="images/combo3.png" alt="Комбо 3" class="product-image" data-modal="combo3">
+                    <h3>Комбо 3 / Combo 3</h3>
+                    <p class="lang-ru">2 MC Сэндвича, картофель фри, MC соус.</p>
+                    <p class="lang-en">2 MC sandwiches, seasoned fries, MC sauce.</p>
+                    <div class="card-price">777 ₽</div>
+                    <button class="add-to-cart-btn" data-product="combo3" data-price="777">
+                        <span class="lang-ru">Добавить в корзину</span>
+                        <span class="lang-en">Add to cart</span>
+                    </button>
+                </div>
+                <div class="card fade-in-image" data-product="combo4">
+                    <img src="images/combo4.png" alt="Комбо 4" class="product-image" data-modal="combo4">
+                    <h3>Комбо 4 / Combo 4</h3>
+                    <p class="lang-ru">6 тендеров, картофель фри, огурчики, 3 MC соуса.</p>
+                    <p class="lang-en">6 tenders, seasoned fries, pickles, 3 MC sauces.</p>
+                    <div class="card-price">777 ₽</div>
+                    <button class="add-to-cart-btn" data-product="combo4" data-price="777">
+                        <span class="lang-ru">Добавить в корзину</span>
+                        <span class="lang-en">Add to cart</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="bowls">
+            <div class="section-title">
+                <h2 class="lang-ru">Боулы</h2>
+                <h2 class="lang-en">Bowls</h2>
+                <span class="pill lang-ru">Плотно и сочно</span>
+                <span class="pill lang-en">Hearty & saucy</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image" data-product="bowl1">
+                    <img src="images/bowl1.png" alt="Emika's Боул" class="product-image" data-modal="bowl1">
+                    <h3>Emika's Боул / Emika's Bowl</h3>
+                    <p class="lang-ru">Нэшвилл курица, фирменные специи, добавьте свой уровень огня.</p>
+                    <p class="lang-en">Nashville chicken with our signature spice blend and your heat level.</p>
+                    <div class="card-price">777 ₽</div>
+                    <button class="add-to-cart-btn" data-product="bowl1" data-price="777">
+                        <span class="lang-ru">Добавить в корзину</span>
+                        <span class="lang-en">Add to cart</span>
+                    </button>
+                </div>
+                <div class="card fade-in-image" data-product="bowl2">
+                    <img src="images/bowl2.png" alt="Мак'н'Чиз Боул" class="product-image" data-modal="bowl2">
+                    <h3>Мак'н'Чиз Боул / Mac & Cheese Bowl</h3>
+                    <p class="lang-ru">Кремовый сырный мак-н-чиз и горячая курица — утешение в миске.</p>
+                    <p class="lang-en">Creamy mac & cheese topped with hot chicken — comfort in a bowl.</p>
+                    <div class="card-price">777 ₽</div>
+                    <button class="add-to-cart-btn" data-product="bowl2" data-price="777">
+                        <span class="lang-ru">Добавить в корзину</span>
+                        <span class="lang-en">Add to cart</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="burgers">
+            <div class="section-title">
+                <h2 class="lang-ru">Бургеры и фри</h2>
+                <h2 class="lang-en">Burgers & fries</h2>
+                <span class="pill lang-ru">Классика</span>
+                <span class="pill lang-en">Classics</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image" data-product="burger">
+                    <img src="images/burg1.png" alt="Бургер" class="product-image" data-modal="burger">
+                    <h3>Бургер / Sandwich</h3>
+                    <p class="lang-ru">Сочный хот-чикен в мягкой булочке, идеальный баланс огня и вкуса.</p>
+                    <p class="lang-en">Juicy hot chicken in a soft bun — the perfect fire/flavor balance.</p>
+                    <div class="card-price">777 ₽</div>
+                    <button class="add-to-cart-btn" data-product="burger" data-price="777">
+                        <span class="lang-ru">Добавить в корзину</span>
+                        <span class="lang-en">Add to cart</span>
+                    </button>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/burg2.png" alt="Картошка фри">
+                    <h3>Картошка фри / Fries</h3>
+                    <p class="lang-ru">Хрустящие, приправленные — лучшие друзья любого сэндвича.</p>
+                    <p class="lang-en">Crispy seasoned fries — the only right sidekick.</p>
+                </div>
+                <div class="card fade-in-image" data-product="tenders">
+                    <img src="images/burg3.png" alt="Стрипс" class="product-image" data-modal="tenders">
+                    <h3>Стрипс / Tenders</h3>
+                    <p class="lang-ru">Тендеры из сочной курицы с вашим уровнем остроты.</p>
+                    <p class="lang-en">Juicy tenders with your heat level of choice.</p>
+                    <div class="card-price">777 ₽</div>
+                    <button class="add-to-cart-btn" data-product="tenders" data-price="777">
+                        <span class="lang-ru">Добавить в корзину</span>
+                        <span class="lang-en">Add to cart</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="sides">
+            <div class="section-title">
+                <h2 class="lang-ru">Соусы и гарниры</h2>
+                <h2 class="lang-en">Sauces & sides</h2>
+                <span class="pill lang-ru">Идеальны к основным блюдам</span>
+                <span class="pill lang-en">Perfect with your mains</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image">
+                    <img src="images/sal1.png" alt="Соус Emika's">
+                    <h3>Соус Emika's / Emika's sauce</h3>
+                    <p class="lang-ru">Фирменный соус, который собирает все вкусы воедино.</p>
+                    <p class="lang-en">Our signature sauce tying every bite together.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/sal2.png" alt="Салат Коул Слоу">
+                    <h3>Салат Коул Слоу / Coleslaw</h3>
+                    <p class="lang-ru">Свежий хруст, чтобы сбалансировать остроту.</p>
+                    <p class="lang-en">Fresh crunch to balance the spice.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/sal3.png" alt="Огурчики">
+                    <h3>Огурчики / Pickles</h3>
+                    <p class="lang-ru">Классический акцент к горячей курице.</p>
+                    <p class="lang-en">Classic pickles to cut through the heat.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/sal4.png" alt="Мак'н'Чиз">
+                    <h3>Мак'н'Чиз / Mac & cheese</h3>
+                    <p class="lang-ru">Плотный сырный гарнир для настоящих фанатов комфорта.</p>
+                    <p class="lang-en">Rich cheesy side for true comfort fans.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="drinks">
+            <div class="section-title">
+                <h2 class="lang-ru">Напитки</h2>
+                <h2 class="lang-en">Drinks</h2>
+                <span class="pill lang-ru">Чтобы остудить жар во рту</span>
+                <span class="pill lang-en">Cool the fire</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image">
+                    <img src="images/drink3.png" alt="Милкшейк Шоколад">
+                    <h3>Милкшейк — Шоколад / Chocolate milkshake</h3>
+                    <p class="lang-ru">Плотный шоколадный шейк для десерта.</p>
+                    <p class="lang-en">Thick chocolate shake to finish strong.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/drink4.png" alt="Милкшейк Клубника">
+                    <h3>Милкшейк — Клубника / Strawberry milkshake</h3>
+                    <p class="lang-ru">Классика с ноткой свежих ягод.</p>
+                    <p class="lang-en">Classic strawberry with a fresh berry vibe.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/drink5.png" alt="Милкшейк Ваниль">
+                    <h3>Милкшейк — Ваниль / Vanilla milkshake</h3>
+                    <p class="lang-ru">Нежный ванильный вкус, чтобы сбалансировать огонь.</p>
+                    <p class="lang-en">Smooth vanilla to cool things down.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="yandex-map-container">
+            <iframe src="https://yandex.ru/map-widget/v1/-/CLDpiAJ1" width="100%" height="280" frameborder="0" allowfullscreen="true" style="pointer-events: auto;"></iframe>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="brand">
+                <img src="images/logo.png" alt="Emika's Hot Chicken логотип">
+            </div>
+            <div style="flex: 1; text-align: center;">
+                <small class="lang-ru">© 2025 Emika's Hot Chicken. Вкус Нэшвилла в Москве.</small>
+                <small class="lang-en">© 2025 Emika's Hot Chicken. Nashville heat in Moscow.</small>
+                <br>
+                <small class="lang-ru" style="display: block; margin-top: 8px;">Москва, Мичуринский проспект, 13А, стр. 1, метро «Ломоносовский проспект», ТЦ Арфа, 2 этаж</small>
+                <small class="lang-en" style="display: block; margin-top: 8px;">Moscow, Michurinsky Avenue, 13A, bld. 1, Lomonosovsky Prospekt metro, Arfa Shopping Center, 2nd floor</small>
+                <br>
+                <a href="tel:+79778389898" style="color: var(--orange); font-weight: 700; text-decoration: none;">+7 977 838 98 98</a>
+            </div>
+            <a class="ghost-btn" href="https://www.instagram.com/emikashotchicken/" target="_blank" rel="noopener">Instagram</a>
+        </div>
+    </footer>
+
+    <!-- Модальное окно продукта -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <img class="modal-image" id="modalImage" src="" alt="">
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <p class="modal-description" id="modalDescription"></p>
+            <div class="spice-control">
+                <span class="spice-label lang-ru">Острота</span>
+                <span class="spice-label lang-en">Spice</span>
+                <span class="spice-icon" id="spiceIcon">🌶️</span>
+                <input type="range" min="0" max="100" value="50" class="spice-slider" id="spiceSlider">
+                <span class="spice-level-display" id="spiceLevel">🌶️🌶️🌶️</span>
+            </div>
+            <button class="modal-add-btn" id="modalAddBtn">
+                <span class="lang-ru">Добавить в корзину</span>
+                <span class="lang-en">Add to cart</span>
+            </button>
+        </div>
     </div>
-</div>
-
-    <br><br><br><br><br>
-        <div class="text-content"><br><br><br><br><br>
-         <center>  <table width="70%"><tr><td> <img src="images/photo.png" alt="Горячая курица" class="fade-in-image" width="80%">
-            <h2>Добро пожаловать в мир Нэшвиллской курицы!</h2>
-<p>
-Мы доставляем настоящий вкус Нэшвилла прямо к вашей тарелке,
-специализируясь на культовых бургерах и стрипсах горячей курицей
-в нэшвиллском стиле. Наш уникальный взгляд
-на эту любимую классику заставит вас захотеть добавки.
-Наше меню составлено с учётом разнообразных вкусов на любой вкус.
-</p>
-<p class="spice-levels">
-Выбирайте из пяти уровней остроты: «без остроты» начальный уровень, «легкий»
-для тех, кто предпочитает лёгкую остроту, «средний» для более смелых,
-«острый» для любителей острых ощущений и «жгучий» для бесстрашных.
-Мы удовлетворим все ваши потребности в блюдах.
-</p>
-<p>
-EMIKA’S Hot Chicken — это не просто еда,
-это создание незабываемых кулинарных впечатлений.
-Нас отличает сочетание традиционных вкусов
-и инновационных решений, подкрепленное
-стремлением к качеству.
-</p>
-<p>
-Приглашаем вас присоединиться к нам и узнать почему!
-Мы больше, чем просто ресторан —
-мы являемся воплощением огненного духа Нэшвилла!
-</p>
-<p>
-Выберите нас и почувствуйте разницу!
-</p>    </div>
-</td></tr></table>
-
-
-<!-- Баннер Яндекс Еды -->
-<div class="yandex-eda-banner">
-    <a href="https://eda.yandex.ru/moscow/r/emika_s_hot_chicken" target="_blank">Закажи доставку на Яндекс Еде</a>
-</div>
-
-<img src="images/title1.png" >
-<table width="80%">
-<tr>
-<td><center>
- <img src="images/combo1.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Комбо 1</font></center></td>
-<td><center>
- <img src="images/combo2.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Комбо 2</font></center></td>
-</tr>
-<tr>
-<td><center>
- <img src="images/combo3.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Комбо 3</font></center></td>
-<td><center>
- <img src="images/combo4.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Комбо 4</font></center></td>
-</tr>
-</table>
-
-
-
-<br>
-
-<img src="images/title2.png" >
-<br> 
-
-
-
-
-<table width="80%">
-<tr>
-<td><center>
- <img src="images/bowl1.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Emika's Боул</font></center></td>
-<td><center>
- <img src="images/bowl2.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Мак'н'Чиз Боул</font></center></td>
-</tr>
-
-</table>
-<br>
-
-<img src="images/title3.png" >
-<br>  
-
-
-<table width="80%">
-<tr>
-<td><center>
- <img src="images/burg1.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Бургер</font></center></td>
-<td><center>
- <img src="images/burg2.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Картошка Фри</font></center></td>
-</tr>
-<tr>
-<td><center>
- <img src="images/burg3.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Стрипс</font></center></td>
-<td><center>
-</tr>
-</table>
-<br>
-
-<img src="images/title4.png" >
-<br>  
-<table width="80%">
-<td><center> <img src="images/sal1.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">Соус Emika's</font></center></td>
-<td><center>
- <img src="images/sal2.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">Салат Коул Слоу</font></center></td>
-</tr>
-<tr><td><center>
- <img src="images/sal3.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">Огурчики</font></center></td>
-<td><center>
- <img src="images/sal4.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">Мак'н'Чиз</font></center></td>
-
-</tr>
-</table>
-
-
-<img src="images/title5.png" >
-<br>  
-<table width="80%">
-<td><center> <img src="images/drink1.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">слаш<br>
-<font face="impact" size="4" color="#ffffff">Лесные ягоды</font></center></td>
-<td><center>
- <img src="images/drink2.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">слаш<br>
-<font face="impact" size="4" color="#ffffff">Клубника<br></td>
-<td><center>
- <img src="images/drink3.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">милкшейк<br>
-<font face="impact" size="4" color="#ffffff">Шоколад<br></td></tr><tr>
-<td><center>
- <img src="images/drink4.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">милкшейк<br>
-<font face="impact" size="4" color="#ffffff">Клубника<br></td>
-<td><center>
- <img src="images/drink5.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">милкшейк<br>
-<font face="impact" size="4" color="#ffffff">Ваниль<br></td>
-</tr>
-</table>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const images = document.querySelectorAll('.fade-in-image');
+        // Данные продуктов для модального окна
+        const productData = {
+            combo1: {
+                image: 'images/combo1.png',
+                titleRu: 'Комбо 1',
+                titleEn: 'Combo 1',
+                descriptionRu: '1 MC Сэндвич, 1 тендер, картофель фри, огурчики, MC соус.',
+                descriptionEn: '1 MC sandwich, 1 tender, seasoned fries, pickles, MC sauce.'
+            },
+            combo2: {
+                image: 'images/combo2.png',
+                titleRu: 'Комбо 2',
+                titleEn: 'Combo 2',
+                descriptionRu: '3 тендера, картофель фри, огурчики, MC соус.',
+                descriptionEn: '3 tenders, seasoned fries, pickles, MC sauce.'
+            },
+            combo3: {
+                image: 'images/combo3.png',
+                titleRu: 'Комбо 3',
+                titleEn: 'Combo 3',
+                descriptionRu: '2 MC Сэндвича, картофель фри, MC соус.',
+                descriptionEn: '2 MC sandwiches, seasoned fries, MC sauce.'
+            },
+            combo4: {
+                image: 'images/combo4.png',
+                titleRu: 'Комбо 4',
+                titleEn: 'Combo 4',
+                descriptionRu: '6 тендеров, картофель фри, огурчики, 3 MC соуса.',
+                descriptionEn: '6 tenders, seasoned fries, pickles, 3 MC sauces.'
+            },
+            bowl1: {
+                image: 'images/bowl1.png',
+                titleRu: 'Emika\'s Боул',
+                titleEn: 'Emika\'s Bowl',
+                descriptionRu: 'Нэшвилл курица, фирменные специи, добавьте свой уровень огня.',
+                descriptionEn: 'Nashville chicken with our signature spice blend and your heat level.'
+            },
+            bowl2: {
+                image: 'images/bowl2.png',
+                titleRu: 'Мак\'н\'Чиз Боул',
+                titleEn: 'Mac & Cheese Bowl',
+                descriptionRu: 'Кремовый сырный мак-н-чиз и горячая курица — утешение в миске.',
+                descriptionEn: 'Creamy mac & cheese topped with hot chicken — comfort in a bowl.'
+            },
+            burger: {
+                image: 'images/burg1.png',
+                titleRu: 'Бургер',
+                titleEn: 'Sandwich',
+                descriptionRu: 'Сочный хот-чикен в мягкой булочке, идеальный баланс огня и вкуса.',
+                descriptionEn: 'Juicy hot chicken in a soft bun — the perfect fire/flavor balance.'
+            },
+            tenders: {
+                image: 'images/burg3.png',
+                titleRu: 'Стрипс',
+                titleEn: 'Tenders',
+                descriptionRu: 'Тендеры из сочной курицы с вашим уровнем остроты.',
+                descriptionEn: 'Juicy tenders with your heat level of choice.'
+            }
+        };
 
-            const observer = new IntersectionObserver(function(entries, observer) {
-                entries.forEach(function(entry) {
-                    // entry.isIntersecting === true, если элемент виден в области просмотра
+        // Корзина
+        let cartTotal = 0;
+        const cartTotalElement = document.getElementById('cartTotal');
+
+        function updateCart() {
+            cartTotalElement.textContent = `${cartTotal} ₽`;
+        }
+
+        function addToCart(price) {
+            cartTotal += price;
+            updateCart();
+        }
+
+        // Модальное окно
+        const modal = document.getElementById('productModal');
+        const modalClose = document.getElementById('modalClose');
+        const modalImage = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const spiceSlider = document.getElementById('spiceSlider');
+        const spiceIcon = document.getElementById('spiceIcon');
+        const spiceLevel = document.getElementById('spiceLevel');
+        const modalAddBtn = document.getElementById('modalAddBtn');
+        let currentProduct = null;
+
+        function getSpiceEmojis(value) {
+            if (value === 0) return '';
+            if (value <= 20) return '🌶️';
+            if (value <= 40) return '🌶️🌶️';
+            if (value <= 60) return '🌶️🌶️🌶️';
+            if (value <= 80) return '🌶️🌶️🌶️🌶️';
+            return '🌶️🌶️🌶️🌶️🌶️';
+        }
+
+        function updateSpiceDisplay(value) {
+            const emojis = getSpiceEmojis(value);
+            spiceLevel.textContent = emojis;
+        }
+
+        function openModal(productId) {
+            const product = productData[productId];
+            if (!product) return;
+
+            currentProduct = productId;
+            modalImage.src = product.image;
+            const lang = document.querySelector('.lang-btn.active')?.dataset.lang || 'ru';
+            modalTitle.textContent = lang === 'ru' ? product.titleRu : product.titleEn;
+            modalDescription.textContent = lang === 'ru' ? product.descriptionRu : product.descriptionEn;
+            spiceSlider.value = 50;
+            updateSpiceDisplay(50);
+            
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        // Обработчики событий
+        document.querySelectorAll('.product-image').forEach(img => {
+            img.addEventListener('click', () => {
+                const productId = img.dataset.modal;
+                openModal(productId);
+            });
+        });
+
+        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const price = parseInt(btn.dataset.price);
+                addToCart(price);
+            });
+        });
+
+        modalAddBtn.addEventListener('click', () => {
+            if (currentProduct) {
+                addToCart(777);
+                closeModal();
+            }
+        });
+
+        spiceSlider.addEventListener('input', (e) => {
+            updateSpiceDisplay(parseInt(e.target.value));
+        });
+
+        modalClose.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Инициализация при загрузке
+        updateCart();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const images = document.querySelectorAll('.fade-in-image');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
-                        // Отключаем наблюдение за этим элементом после того, как он стал видимым
                         observer.unobserve(entry.target);
                     }
                 });
-            }, {
-                // rootMargin: '0px 0px -100px 0px' // Опционально: можно настроить, когда элемент считается видимым
+            }, { rootMargin: '0px 0px -80px 0px' });
+
+            images.forEach((image) => observer.observe(image));
+
+            const switchLanguage = (lang) => {
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === lang);
+                });
+                document.querySelectorAll('.lang-ru').forEach(el => {
+                    el.style.display = lang === 'ru' ? '' : 'none';
+                });
+                document.querySelectorAll('.lang-en').forEach(el => {
+                    el.style.display = lang === 'en' ? '' : 'none';
+                });
+                
+                // Обновляем модальное окно при смене языка
+                if (currentProduct && modal.classList.contains('active')) {
+                    const product = productData[currentProduct];
+                    if (product) {
+                        modalTitle.textContent = lang === 'ru' ? product.titleRu : product.titleEn;
+                        modalDescription.textContent = lang === 'ru' ? product.descriptionRu : product.descriptionEn;
+                    }
+                }
+            };
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchLanguage(btn.dataset.lang);
+                });
             });
 
-            images.forEach(function(image) {
-                observer.observe(image);
-            });
+            switchLanguage('ru');
+        });
+
+        window.addEventListener('scroll', () => {
+            const offset = window.pageYOffset * 0.15;
+            document.body.style.backgroundPositionY = `-${offset}px`;
         });
     </script>
-
-<footer>
-    <div class="logo-footer">
-        <img src="images/logo.png" alt="Emika's Hot Chicken Logo">
-    </div>
-    <div class="info-footer">
-        <p>&copy; 2025 Emika's Hot Chicken. Все права защищены.</p>
-        <p>Вкус Нешвилла в Москве</p>
-        <p>Москва, Мичуринский проспект, 13А, стр. 1, метро «Ломоносовский проспект», ТЦ Арфа, 2 этаж</p>
-        <p><a href="tel:+79778389898">+7 977 838 98 98</a></p>
-        <p>Следите за нами в <a href="https://www.instagram.com/emikashotchicken/" target="_blank">Instagram</a></p>
-        <div class="social-buttons">
-            <a href="https://wa.me/79778389898" target="_blank" class="social-button whatsapp">WhatsApp</a>
-            <a href="https://t.me/+79778389898" target="_blank" class="social-button telegram">Telegram</a>
-        </div>
-    </div>
-</footer>
 </body>
 </html>

@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+ <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emika's Hot Chicken</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="shortcut icon" href="images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #ff6a1a;
+            --orange-dark: #e2550f;
+            --bg: #0d0d0f;
+            --card: rgba(20, 20, 24, 0.8);
+            --text: #f5f5f5;
+            --muted: #c9c9ce;
+        }
+
+        * { 
+            box-sizing: border-box;
+        }
+        
+        img, iframe {
+            max-width: 100%;
+        }
+        
+        video {
+            max-width: 100%;
+            height: auto;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: #000000;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Roboto Slab', serif; 
+            color: var(--text);
+            background-color: #000000;
+            background-image: url('images/background.jpg');
+            background-position: center top;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,106,26,0.18), transparent 40%),
+                radial-gradient(circle at 78% 8%, rgba(255,106,26,0.14), transparent 34%),
+                linear-gradient(120deg, rgba(0,0,0,0.5), rgba(0,0,0,0.32), rgba(0,0,0,0.55));
+            z-index: 0;
+            mix-blend-mode: normal;
+            background-color: transparent;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(12px);
+            background: rgba(10,10,12,0.75);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .brand img { height: 42px; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+        }
+
+        .nav-links a {
+            padding: 8px 10px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            min-height: 36px;
+        }
+
+        .nav-links a:hover { background: rgba(255,255,255,0.08); }
+
+        .phone-link {
+            color: var(--orange);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 8px 10px;
+            border-radius: 8px;
+            transition: background 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            min-height: 36px;
+        }
+
+        .phone-link:hover {
+            background: rgba(255,106,26,0.15);
+            color: var(--orange-dark);
+        }
+
+        .cta {
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--orange);
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+            transition: background 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .cta:hover { background: var(--orange-dark); transform: translateY(-1px); }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .lang-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: transparent;
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: background 0.2s ease, border 0.2s ease, transform 0.2s ease, color 0.2s ease;
+        }
+
+        .lang-btn.active {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .lang-btn:not(.active):hover {
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        main { position: relative; z-index: 1; }
+
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 70px 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            align-items: center;
+            padding-top: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: -40px -60px;
+            background: url('images/hyp.png') center/contain no-repeat;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-family: 'Merriweather', serif;
+            font-size: clamp(2.4rem, 4vw, 3.4rem);
+            margin: 0 0 18px;
+        color: #fff;
+        }
+
+        .highlight {
+            color: var(--orange);
+        }
+
+        .hero p { color: var(--muted); line-height: 1.7; margin: 0 0 22px; }
+
+        .spice-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 14px 0 24px;
+        }
+
+        .tag {
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 999px;
+            font-size: 0.85rem;
+        }
+
+        .hero-actions { display: flex; gap: 8px; flex-wrap: nowrap; }
+
+        .ghost-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: transparent;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: border 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .ghost-btn:hover { border-color: var(--orange); transform: translateY(-1px); }
+
+        .cta {
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--orange);
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+            transition: background 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .cta:hover { background: var(--orange-dark); transform: translateY(-1px); }
+
+        .social-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: transparent;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: border 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .hero-visual {
+            position: relative;
+            min-height: 360px;
+        }
+
+        .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            transform: translate(-50%, -50%); 
+            filter: drop-shadow(0 18px 35px rgba(0,0,0,0.35));
+        }
+
+        .ring.r1 { animation: spin 28s linear infinite; }
+        .ring.r2 { animation: spin 22s linear infinite reverse; }
+
+        .hero-logo {
+            position: absolute;
+            inset: 50% auto auto 50%;
+            transform: translate(-50%, -50%);
+            width: min(260px, 55vw);
+            border-radius: 50%;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+        }
+
+        @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        .section-title {
+        display: flex;
+        align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .section-title h2 {
+            margin: 0;
+            font-size: 1.6rem;
+            letter-spacing: 0.5px;
+        }
+
+        .pill {
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .cards {
+            display: grid;
+            gap: 18px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            align-items: stretch;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+            transition: transform 0.25s ease, border 0.25s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover { transform: translateY(-4px); border-color: rgba(255,106,26,0.45); }
+
+        .card img {
+            width: 100%;
+            height: 220px;
+            border-radius: 12px;
+            display: block;
+            object-fit: contain;
+            margin-bottom: 12px;
+        }
+
+        .card h3 {
+            margin: 0 0 6px;
+            font-size: 1.05rem;
+            letter-spacing: 0.3px;
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .about {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: center;
+            background: rgba(10,10,12,0.7);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 18px;
+            padding: 26px;
+        }
+
+        .about p { margin: 0 0 14px; color: var(--muted); line-height: 1.7; }
+        .about strong { color: #fff; }
+
+        .about .spice-levels { margin-top: 8px; }
+
+        .about-media {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .about-media img {
+            width: 100%;
+            max-width: min(520px, 50vw);
+            display: block;
+            border-radius: 16px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.55);
+            object-fit: cover;
+        }
+
+        .about-media video {
+            width: 100%;
+            max-width: min(520px, 50vw);
+            display: block;
+            border-radius: 16px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.55);
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        /* About preview: "graphics button" */
+        .about-media video.about-reels-preview {
+            width: 170px;
+            max-width: 88vw;
+            height: auto;
+            aspect-ratio: 9/16;
+            object-fit: cover;
+            transform: scale(1);
+            transition: transform 0.6s ease, box-shadow 0.6s ease;
+        }
+
+        .about-media video.about-reels-preview:hover {
+            transform: scale(1.04);
+            box-shadow: 0 22px 55px rgba(0,0,0,0.65);
+        }
+
+        .about-stories-btn {
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,106,26,0.35);
+            background: rgba(255,106,26,0.14);
+            color: var(--text);
+            font-weight: 900;
+            cursor: pointer;
+            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+            text-decoration: none;
+        }
+
+        .about-stories-btn:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255,106,26,0.55);
+            background: rgba(255,106,26,0.18);
+        }
+
+        .about-content {
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* "Stories" popup for about videos */
+        .stories-popup {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.78);
+            z-index: 2500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stories-popup.open {
+            display: flex;
+        }
+
+        .stories-popup-inner {
+            position: relative;
+            width: min(420px, 100vw);
+            height: 100vh;
+            overflow: hidden;
+            touch-action: pan-y;
+            user-select: none;
+        }
+
+        .stories-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .stories-progress {
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+            z-index: 3;
+        }
+
+        .stories-progress-bar {
+            flex: 1;
+            height: 3px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .stories-progress-bar .fill {
+            height: 100%;
+            width: 0%;
+            background: var(--orange);
+            border-radius: 999px;
+        }
+
+        .stories-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 4;
+            width: 38px;
+            height: 38px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(0,0,0,0.25);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .stories-close:hover {
+            border-color: rgba(255,106,26,0.55);
+        }
+
+        .stories-scrub-wrap {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 14px;
+            z-index: 4;
+        }
+
+        .stories-scrub {
+            width: 100%;
+        }
+
+        .stories-first-link {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 54px;
+            z-index: 4;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(0,0,0,0.25);
+            color: #fff;
+            font-weight: 900;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .stories-first-link:hover {
+            border-color: rgba(255,106,26,0.55);
+            background: rgba(0,0,0,0.35);
+        }
+
+        @media (max-width: 480px) {
+            .stories-popup-inner {
+                width: 100vw;
+                height: 100vh;
+            }
+        }
+
+        /* Слайдер баннер */
+        .video-banner-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 90px 20px 70px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .slider-container {
+            position: relative;
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+        }
+
+        .slider-container::before {
+            content: '';
+            display: block;
+            padding-bottom: 31.03%;
+        }
+
+        .slider-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            cursor: pointer;
+        }
+
+        .slider-slide.active {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .slider-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        .slider-slide video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        .video-banner-section .logo-overlay {
+            position: absolute;
+            top: 15px;
+            right: -55px;
+            z-index: 10;
+            width: 150px;
+            height: 150px;
+        }
+
+        .video-banner-section .logo-overlay-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .video-banner-section .logo-overlay .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150px;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 9px 18px rgba(0,0,0,0.35));
+            z-index: 2;
+        }
+
+        .video-banner-section .logo-overlay .ring.r1 {
+            animation: spin 28s linear infinite;
+        }
+
+        .video-banner-section .logo-overlay .hero-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 130px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            z-index: 3;
+        }
+
+        /* Баннер Яндекс Еды */
+        .yandex-eda-banner {
+            max-width: 1200px;
+            width: 100%;
+            margin: -30px auto 0;
+            padding: 0 20px;
+            min-height: 120px;
+            background: url('https://taxi-uptime.ru/wp-content/uploads/2023/11/peshiy-courier-yandex-eda.jpg') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .yandex-eda-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        .yandex-eda-banner > a {
+            position: relative;
+            z-index: 2;
+            padding: 12px 24px;
+            background-color: var(--orange);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1em;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .yandex-eda-banner > a span {
+            display: block;
+        }
+
+        .yandex-eda-banner > a:hover {
+            background-color: var(--orange-dark);
+            transform: translateY(-1px);
+        }
+
+        .yandex-eda-banner .hero-actions {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Яндекс карта */
+        .yandex-map-container {
+            width: 100%;
+            max-height: 280px;
+            height: 280px;
+            margin: 0;
+            padding: 0;
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        .yandex-map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Кнопки соцсетей */
+        .social-btn.whatsapp:hover {
+            border-color: #25D366;
+            background: rgba(37, 211, 102, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .social-btn.telegram:hover {
+            border-color: #0088cc;
+            background: rgba(0, 136, 204, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .footer {
+            background: rgba(6,6,8,0.9);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px 32px;
+        display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        align-items: center;
+            justify-content: space-between;
+        }
+
+        .footer small { color: var(--muted); }
+
+        @media (max-width: 720px) {
+            body {
+                background-attachment: scroll;
+            }
+            
+            nav { 
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+            }
+            
+            nav > div {
+                width: auto;
+                flex-direction: row;
+                align-items: center;
+                gap: 12px;
+            }
+            
+            .header-actions {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                flex-shrink: 0;
+                width: auto;
+            }
+            
+            .nav-links { 
+                display: none;
+            }
+            
+            .phone-link {
+                font-size: 0.8rem;
+                padding: 6px 8px;
+            }
+            
+            .lang-switch {
+                flex-shrink: 0;
+            }
+            
+            .hero-visual { min-height: 260px; order: -1; }
+            .ring { width: 220px; }
+            .section { padding: 48px 16px; }
+            .hero { padding-top: 20px; }
+            .about { grid-template-columns: 1fr; }
+            .about-content { max-width: 100%; }
+            .about-media { justify-content: center; }
+            
+            .video-banner-section {
+                padding: 70px 16px 50px;
+                overflow: hidden;
+            }
+            
+            .video-banner-section .logo-overlay {
+                top: 5px;
+                right: -30px;
+                width: 100px;
+                height: 100px;
+            }
+            
+            .video-banner-section .logo-overlay .ring {
+                width: 100px;
+            }
+            
+            .video-banner-section .logo-overlay .hero-logo {
+                width: 85px;
+            }
+            
+            .yandex-eda-banner {
+                min-height: auto;
+                padding: 12px;
+                margin-top: -20px;
+                border-radius: 16px;
+            }
+            
+            .yandex-eda-banner > a {
+                font-size: 0.85em;
+                padding: 10px 16px;
+            }
+            
+            .yandex-eda-banner .hero-actions {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .yandex-eda-banner .cta,
+            .yandex-eda-banner .ghost-btn,
+            .yandex-eda-banner .social-btn {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+            
+            .yandex-map-container {
+                height: 240px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+            text-align: center;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        
+        @media (max-width: 820px) {
+            .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        
+        @media (max-width: 480px) {
+            .cards { grid-template-columns: 1fr; }
+            .card img { height: 200px; }
+        }
+        
+        @media (max-width: 480px) {
+            .phone-link {
+                font-size: 0.75rem;
+                padding: 5px 6px;
+            }
+            
+            .video-banner-section .logo-overlay {
+                right: -20px;
+                width: 80px;
+                height: 80px;
+            }
+            
+            .video-banner-section .logo-overlay .ring {
+                width: 80px;
+            }
+            
+            .video-banner-section .logo-overlay .hero-logo {
+                width: 70px;
+            }
+            
+            .yandex-eda-banner .hero-actions {
+                gap: 4px;
+            }
+            
+            .yandex-eda-banner .cta,
+            .yandex-eda-banner .ghost-btn,
+            .yandex-eda-banner .social-btn {
+                font-size: 0.75rem;
+                padding: 5px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="brand">
+                <img src="images/logo.png" alt="Emika's Hot Chicken логотип">
+    </div>
+            <div style="display:flex;align-items:center;gap:20px;">
+                <div class="nav-links">
+                    <a href="#combos"><span class="lang-ru">Комбо</span><span class="lang-en">Combos</span></a>
+                    <a href="#mains"><span class="lang-ru">Курица и Боулы</span><span class="lang-en">Chicken & Bowls</span></a>
+                    <a href="#sides"><span class="lang-ru">Соусы</span><span class="lang-en">Sauces</span></a>
+                    <a href="#drinks"><span class="lang-ru">Напитки</span><span class="lang-en">Drinks</span></a>
+                    <a href="#about"><span class="lang-ru">О нас</span><span class="lang-en">About</span></a>
+                </div>
+                <div class="header-actions">
+                    <a href="tel:+79778389898" class="phone-link">+7 977 838 98 98</a>
+                    <div class="lang-switch">
+                        <button class="lang-btn active" data-lang="ru">RUS</button>
+                        <button class="lang-btn" data-lang="en">ENG</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="video-banner-section">
+            <div class="slider-container">
+                <div class="slider-slide active" data-slide="0" data-action="scroll">
+                    <img src="images/banner1.jpg" alt="Banner 1">
+                </div>
+                <div class="slider-slide" data-slide="1" data-action="next">
+                    <video muted loop playsinline>
+                        <source src="images/banner_1_720.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="slider-slide" data-slide="2" data-action="franchise">
+                    <img src="images/banner2.jpg" alt="Banner 2">
+                </div>
+            </div>
+            <div class="logo-overlay">
+                <div class="logo-overlay-bg"></div>
+                <img class="ring r1 fade-in-image" src="images/circle1.png" alt="">
+                <img class="hero-logo fade-in-image" src="images/circle2.png" alt="Emika's Hot Chicken">
+            </div>
+        </section>
+
+        <section class="section hero" id="top">
+            <div>
+                <h1 class="lang-ru">Острая курочка из <span class="highlight">Нэшвилла</span><br>— в <span class="highlight">Москве</span>!</h1>
+                <h1 class="lang-en">Nashville hot chicken<br>now in <span class="highlight">Moscow</span>!</h1>
+                <p class="lang-ru">
+                    Культовая курочка в Нэшвиллском стиле. Выбирайте свой уровень
+                    остроты и вы узнаете, почему наша курочка доминирует
+                    над вкусом из Кентукки!
+                </p>
+                <p class="lang-en">
+                    Iconic Nashville-style chicken. Choose your heat level
+                    and taste why our chicken leaves Kentucky in the dust.
+                </p>
+                <div class="spice-tags">
+                    <span class="tag lang-ru">без остроты</span>
+                    <span class="tag lang-ru">легкий</span>
+                    <span class="tag lang-ru">средний</span>
+                    <span class="tag lang-ru">острый</span>
+                    <span class="tag lang-ru">жгучий</span>
+                    <span class="tag lang-en">no spice</span>
+                    <span class="tag lang-en">mild</span>
+                    <span class="tag lang-en">medium</span>
+                    <span class="tag lang-en">hot</span>
+                    <span class="tag lang-en">supreme</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="yandex-eda-banner">
+            <a href="https://eda.yandex.ru/moscow/r/emika_s_hot_chicken" target="_blank" rel="noopener">
+                <span class="lang-ru">Закажи доставку на Яндекс Еде</span>
+                <span class="lang-en">Order delivery on Yandex Eda</span>
+            </a>
+            <div class="hero-actions">
+                <a class="cta" href="#combos">
+                    <span class="lang-ru">Посмотреть меню</span>
+                    <span class="lang-en">View menu</span>
+                </a>
+                <a class="ghost-btn" href="https://www.instagram.com/emikashotchicken/" target="_blank" rel="noopener">
+                    <span class="lang-ru">Мы в Instagram</span>
+                    <span class="lang-en">We're on Instagram</span>
+                </a>
+                <a class="social-btn telegram" href="https://t.me/+79778389898" target="_blank" rel="noopener">Telegram</a>
+                <a class="social-btn whatsapp" href="https://wa.me/79778389898" target="_blank" rel="noopener">WhatsApp</a>
+            </div>
+        </div>
+
+        <section class="section" id="about">
+            <div class="section-title">
+                <h2 class="lang-ru">Добро пожаловать в мир Нэшвиллской курицы</h2>
+                <h2 class="lang-en">Welcome to the world of Nashville hot chicken</h2>
+                <span class="pill lang-ru">Кухня с характером</span>
+                <span class="pill lang-en">Food with attitude</span>
+            </div>
+            <div class="about">
+                <div class="about-content">
+                    <p class="lang-ru">Мы доставляем настоящий вкус Нэшвилла, специализируясь на культовой горячей курице. Наше меню составлено с учётом разнообразных вкусов.</p>
+                    <p class="lang-ru">Выбирайте из пяти уровней остроты: без остроты начальный уровень, легкий для тех, кто предпочитает лёгкую остроту, средний для более смелых, острый для любителей острых ощущений и жгучий для бесстрашных. Мы удовлетворим все ваши потребности в блюдах.</p>
+                    <p class="lang-ru">Emika’s Hot Chicken — это не просто еда, это создание незабываемых кулинарных впечатлений. Нас отличает сочетание традиционных вкусов и инновационных решений, подкреплённое стремлением к качеству.</p>
+
+                    <p class="lang-en">We bring the true taste of Nashville with our iconic hot chicken. Our menu is built to match a wide variety of tastes.</p>
+                    <p class="lang-en">Choose from five heat levels: no spice (starter), mild (for those who like a gentle kick), medium (for bolder choices), hot (for lovers of spicy sensations), and supreme (for the fearless). We’ll satisfy all your cravings.</p>
+                    <p class="lang-en">Emika’s Hot Chicken is more than just food — it’s unforgettable culinary impressions. We’re driven by a mix of classic flavors and innovative solutions, supported by a relentless focus on quality.</p>
+
+                    <a id="aboutStoriesLink" class="about-stories-btn" href="#">
+                        <span class="lang-ru">Вместо слов - посмотрите ролики о нас!</span>
+                        <span class="lang-en">Instead of words - watch videos about us!</span>
+                    </a>
+                </div>
+
+                <div class="about-media">
+                    <video
+                        id="aboutReelsPreview"
+                        class="about-reels-preview"
+                        src="images/reels.mp4"
+                        muted
+                        loop
+                        autoplay
+                        playsinline
+                        preload="metadata"
+                        aria-label="About preview video"
+                    ></video>
+                </div>
+            </div>
+        </section>
+
+        <!-- About videos popup (Instagram stories style) -->
+        <div id="storiesPopup" class="stories-popup" aria-hidden="true">
+            <div class="stories-popup-inner" role="dialog" aria-modal="true" aria-label="About videos">
+                <div class="stories-progress" aria-hidden="true">
+                    <div class="stories-progress-bar"><div class="fill"></div></div>
+                    <div class="stories-progress-bar"><div class="fill"></div></div>
+                </div>
+                <button id="storiesCloseBtn" class="stories-close" type="button" aria-label="Close">×</button>
+           
+                <video id="storiesVideo" class="stories-video" playsinline preload="metadata"></video>
+                <div class="stories-scrub-wrap">
+                    <input id="storiesScrub" class="stories-scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek video">
+                </div>
+            </div>
+        </div>
+
+        <section class="section" id="combos">
+            <div class="section-title">
+                <h2 class="lang-ru">Комбо</h2>
+                <h2 class="lang-en">Combos</h2>
+                <span class="pill lang-ru">Все сразу</span>
+                <span class="pill lang-en">All-in one</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image">
+                    <img src="images/combo1.png" alt="Комбо 1">
+                    <h3>Комбо 1 / Combo 1</h3>
+                    <p class="lang-ru">1 MC Сэндвич, 1 тендер, картофель фри, огурчики, MC соус.</p>
+                    <p class="lang-en">1 MC sandwich, 1 tender, seasoned fries, pickles, MC sauce.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/combo2.png" alt="Комбо 2">
+                    <h3>Комбо 2 / Combo 2</h3>
+                    <p class="lang-ru">3 тендера, картофель фри, огурчики, MC соус.</p>
+                    <p class="lang-en">3 tenders, seasoned fries, pickles, MC sauce.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/combo3.png" alt="Комбо 3">
+                    <h3>Комбо 3 / Combo 3</h3>
+                    <p class="lang-ru">2 MC Сэндвича, картофель фри, MC соус.</p>
+                    <p class="lang-en">2 MC sandwiches, seasoned fries, MC sauce.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/combo4.png" alt="Комбо 4">
+                    <h3>Комбо 4 / Combo 4</h3>
+                    <p class="lang-ru">6 тендеров, картофель фри, огурчики, 3 MC соуса.</p>
+                    <p class="lang-en">6 tenders, seasoned fries, pickles, 3 MC sauces.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/combo5.png" alt="Байтсы и картошка Фри">
+                    <h3>Байтсы и картошка Фри / Bites & Fries</h3>
+                    <p class="lang-ru">Байтсы и картофель фри — идеальный комбо-набор для перекуса.</p>
+                    <p class="lang-en">Bites and fries — the perfect combo for a quick bite.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="mains">
+            <div class="section-title">
+                <h2 class="lang-ru">Курица и боулы</h2>
+                <h2 class="lang-en">Chicken & bowls</h2>
+                <span class="pill lang-ru">Главное</span>
+                <span class="pill lang-en">Mains</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image">
+                    <img src="images/bowl1.png" alt="Emika's Боул">
+                    <h3>Emika's Боул / Emika's Bowl</h3>
+                    <p class="lang-ru">Нэшвилл курица, фирменные специи, добавьте свой уровень огня.</p>
+                    <p class="lang-en">Nashville chicken with our signature spice blend and your heat level.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/bowl2.png" alt="Мак'н'Чиз Боул">
+                    <h3>Мак'н'Чиз Боул / Mac & Cheese Bowl</h3>
+                    <p class="lang-ru">Кремовый сырный мак-н-чиз и горячая курица — утешение в миске.</p>
+                    <p class="lang-en">Creamy mac & cheese topped with hot chicken — comfort in a bowl.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/burg1.png" alt="Бургер">
+                    <h3>Бургер / Sandwich</h3>
+                    <p class="lang-ru">Сочный хот-чикен в мягкой булочке, идеальный баланс огня и вкуса.</p>
+                    <p class="lang-en">Juicy hot chicken in a soft bun — the perfect fire/flavor balance.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/burg3.png" alt="Стрипс">
+                    <h3>Стрипс / Tenders</h3>
+                    <p class="lang-ru">Тендеры из сочной курицы с вашим уровнем остроты.</p>
+                    <p class="lang-en">Juicy tenders with your heat level of choice.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/bites.png" alt="Байтсы">
+                    <h3>Байтсы / Bites</h3>
+                    <p class="lang-ru">Небольшие порции нэшвилловской курицы для легкого перекуса.</p>
+                    <p class="lang-en">Small portions of Nashville chicken for a light snack.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="sides">
+            <div class="section-title">
+                <h2 class="lang-ru">Соусы и гарниры</h2>
+                <h2 class="lang-en">Sauces & sides</h2>
+                <span class="pill lang-ru">Идеальны к основным блюдам</span>
+                <span class="pill lang-en">Perfect with your mains</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image">
+                    <img src="images/sal1.png" alt="Соус Emika's">
+                    <h3>Соус Emika's / Emika's sauce</h3>
+                    <p class="lang-ru">Фирменный соус, который собирает все вкусы воедино.</p>
+                    <p class="lang-en">Our signature sauce tying every bite together.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/sal2.png" alt="Салат Коул Слоу">
+                    <h3>Салат Коул Слоу / Coleslaw</h3>
+                    <p class="lang-ru">Свежий хруст, чтобы сбалансировать остроту.</p>
+                    <p class="lang-en">Fresh crunch to balance the spice.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/sal3.png" alt="Огурчики">
+                    <h3>Огурчики / Pickles</h3>
+                    <p class="lang-ru">Классический акцент к горячей курице.</p>
+                    <p class="lang-en">Classic pickles to cut through the heat.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/sal4.png" alt="Мак'н'Чиз">
+                    <h3>Мак'н'Чиз / Mac & cheese</h3>
+                    <p class="lang-ru">Плотный сырный гарнир для настоящих фанатов комфорта.</p>
+                    <p class="lang-en">Rich cheesy side for true comfort fans.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/burg2.png" alt="Картошка фри">
+                    <h3>Картошка фри / Fries</h3>
+                    <p class="lang-ru">Хрустящие, приправленные — лучшие друзья любого сэндвича.</p>
+                    <p class="lang-en">Crispy seasoned fries — the only right sidekick.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="drinks">
+            <div class="section-title">
+                <h2 class="lang-ru">Напитки</h2>
+                <h2 class="lang-en">Drinks</h2>
+                <span class="pill lang-ru">Чтобы остудить жар во рту</span>
+                <span class="pill lang-en">Cool the fire</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image">
+                    <img src="images/drink3.png" alt="Милкшейк Шоколад">
+                    <h3>Милкшейк — Шоколад / Chocolate milkshake</h3>
+                    <p class="lang-ru">Плотный шоколадный шейк для десерта.</p>
+                    <p class="lang-en">Thick chocolate shake to finish strong.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/drink4.png" alt="Милкшейк Клубника">
+                    <h3>Милкшейк — Клубника / Strawberry milkshake</h3>
+                    <p class="lang-ru">Классика с ноткой свежих ягод.</p>
+                    <p class="lang-en">Classic strawberry with a fresh berry vibe.</p>
+                </div>
+                <div class="card fade-in-image">
+                    <img src="images/drink5.png" alt="Милкшейк Ваниль">
+                    <h3>Милкшейк — Ваниль / Vanilla milkshake</h3>
+                    <p class="lang-ru">Нежный ванильный вкус, чтобы сбалансировать огонь.</p>
+                    <p class="lang-en">Smooth vanilla to cool things down.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="yandex-map-container">
+            <iframe src="https://yandex.ru/map-widget/v1/-/CLDpiAJ1" width="100%" height="280" frameborder="0" allowfullscreen="true" style="pointer-events: auto;"></iframe>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="brand">
+                <img src="images/logo.png" alt="Emika's Hot Chicken логотип">
+            </div>
+            <div style="flex: 1; text-align: center;">
+                <small class="lang-ru">© 2025 Emika's Hot Chicken. Вкус Нэшвилла в Москве.</small>
+                <small class="lang-en">© 2025 Emika's Hot Chicken. Nashville heat in Moscow.</small>
+                <br>
+                <small class="lang-ru" style="display: block; margin-top: 8px;">Москва, Мичуринский проспект, 13А, стр. 1, метро «Ломоносовский проспект», ТЦ Арфа, 2 этаж</small>
+                <small class="lang-en" style="display: block; margin-top: 8px;">Moscow, Michurinsky Avenue, 13A, bld. 1, Lomonosovsky Prospekt metro, Arfa Shopping Center, 2nd floor</small>
+                <br>
+                <a href="tel:+79778389898" style="color: var(--orange); font-weight: 700; text-decoration: none;">+7 977 838 98 98</a>
+            </div>
+            <div style="display: flex; gap: 12px; flex-direction: column;">
+                <a class="ghost-btn" href="https://www.instagram.com/emikashotchicken/" target="_blank" rel="noopener">Instagram</a>
+                <a class="ghost-btn" href="https://emikashotchicken.ru/franchise" target="_blank" rel="noopener">
+                    <span class="lang-ru">Франшиза Emika's</span>
+                    <span class="lang-en">Emika's Franchise</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const images = document.querySelectorAll('.fade-in-image');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '0px 0px -80px 0px' });
+
+            images.forEach((image) => observer.observe(image));
+
+            const switchLanguage = (lang) => {
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === lang);
+                });
+                document.querySelectorAll('.lang-ru').forEach(el => {
+                    el.style.display = lang === 'ru' ? '' : 'none';
+                });
+                document.querySelectorAll('.lang-en').forEach(el => {
+                    el.style.display = lang === 'en' ? '' : 'none';
+                });
+            };
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchLanguage(btn.dataset.lang);
+                });
+            });
+
+            switchLanguage('ru');
+
+            // Popup "stories" for about videos
+            const aboutPreview = document.getElementById('aboutReelsPreview');
+            const aboutStoriesLink = document.getElementById('aboutStoriesLink');
+            const storiesPopup = document.getElementById('storiesPopup');
+            const storiesVideo = document.getElementById('storiesVideo');
+            const storiesScrub = document.getElementById('storiesScrub');
+            const storiesCloseBtn = document.getElementById('storiesCloseBtn');
+            const storiesFirstLink = document.getElementById('storiesFirstLink');
+            const storiesInner = document.querySelector('.stories-popup-inner');
+            const storyProgressFills = storiesPopup
+                ? Array.from(storiesPopup.querySelectorAll('.stories-progress-bar .fill'))
+                : [];
+
+            const storySources = ['images/about_us.mp4', 'images/fran.mp4'];
+            let storyIndex = 0;
+            let isScrubbing = false;
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let isPreviewHeld = false;
+
+            function buildAboutStoryLink(index) {
+                try {
+                    const url = new URL(window.location.href);
+                    url.hash = `aboutStory=${index}`;
+                    return url.toString();
+                } catch (e) {
+                    // Fallback for environments without URL constructor
+                    return `${window.location.pathname || 'index.html'}#aboutStory=${index}`;
+                }
+            }
+
+            function syncStoriesFirstLink() {
+                if (!storiesFirstLink) return;
+                const linkHref = buildAboutStoryLink(0);
+                storiesFirstLink.href = linkHref;
+                storiesFirstLink.style.display = storyIndex === 0 ? 'flex' : 'none';
+            }
+
+            function updateFromTime() {
+                if (!storiesVideo || !storiesScrub) return;
+                const dur = storiesVideo.duration;
+                if (!dur || !isFinite(dur)) return;
+
+                const pct = Math.max(0, Math.min(100, (storiesVideo.currentTime / dur) * 100));
+                if (storyProgressFills[storyIndex]) {
+                    storyProgressFills[storyIndex].style.width = pct + '%';
+                }
+
+                if (!isScrubbing) {
+                    storiesScrub.value = String(Math.round((storiesVideo.currentTime / dur) * 1000));
+                }
+            }
+
+            function resetProgress(targetIndex) {
+                storyProgressFills.forEach((fill, i) => {
+                    fill.style.width = i < targetIndex ? '100%' : '0%';
+                });
+                if (storiesScrub) storiesScrub.value = '0';
+            }
+
+            function loadStory(index) {
+                if (!storiesVideo) return;
+                storyIndex = index;
+
+                resetProgress(storyIndex);
+                storiesVideo.pause();
+                storiesVideo.src = storySources[storyIndex];
+                storiesVideo.currentTime = 0;
+
+                syncStoriesFirstLink();
+
+                const playPromise = storiesVideo.play();
+                if (playPromise && typeof playPromise.catch === 'function') {
+                    playPromise.catch(() => {});
+                }
+            }
+
+            function openStories(startIndex = 0) {
+                if (!storiesPopup || !storiesVideo) return;
+                storyIndex = startIndex;
+
+                storiesPopup.classList.add('open');
+                storiesPopup.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+
+                loadStory(storyIndex);
+            }
+
+            function closeStories() {
+                if (!storiesPopup || !storiesVideo) return;
+                storiesPopup.classList.remove('open');
+                storiesPopup.setAttribute('aria-hidden', 'true');
+                storiesVideo.pause();
+                storiesVideo.currentTime = 0;
+                document.body.style.overflow = '';
+
+                // Clean deep-link hash so refreshing doesn't re-open the popup
+                try {
+                    const h = window.location.hash || '';
+                    if (h.startsWith('#aboutStory=')) window.location.hash = '';
+                } catch (e) {}
+
+                // Resume preview if user closed the popup
+                try {
+                    if (aboutPreview && !isPreviewHeld) aboutPreview.play();
+                } catch (e) {}
+            }
+
+            // Deep link: open first about story automatically
+            try {
+                const match = (window.location.hash || '').match(/aboutStory=(\d+)/);
+                if (match) {
+                    const idx = Math.max(0, Math.min(Number(match[1]) || 0, storySources.length - 1));
+                    openStories(idx);
+                }
+            } catch (e) {}
+
+            // Click on the overlay (outside the video area) closes the popup
+            if (storiesPopup) {
+                storiesPopup.addEventListener('click', (e) => {
+                    if (e.target === storiesPopup) closeStories();
+                });
+            }
+
+            function goNext() {
+                if (storyIndex < storySources.length - 1) loadStory(storyIndex + 1);
+                else closeStories();
+            }
+
+            function goPrev() {
+                if (storyIndex > 0) loadStory(storyIndex - 1);
+                else if (storiesVideo) storiesVideo.currentTime = 0;
+            }
+
+            if (aboutPreview) {
+                aboutPreview.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openStories(0);
+                });
+
+                const safePlay = () => {
+                    try {
+                        const p = aboutPreview.play();
+                        if (p && typeof p.catch === 'function') p.catch(() => {});
+                    } catch (err) {
+                        // Ignore autoplay/play restrictions
+                    }
+                };
+
+                // Hold to pause preview
+                aboutPreview.addEventListener('pointerdown', (e) => {
+                    isPreviewHeld = true;
+                    try { aboutPreview.pause(); } catch (err) {}
+                });
+
+                const resumePreview = () => {
+                    isPreviewHeld = false;
+                    // Don't fight with popup playback
+                    const popupOpen = storiesPopup && storiesPopup.classList.contains('open');
+                    if (!popupOpen) safePlay();
+                };
+
+                aboutPreview.addEventListener('pointerup', resumePreview);
+                aboutPreview.addEventListener('pointercancel', resumePreview);
+
+                // Ensure it starts at least once (some browsers need explicit play)
+                aboutPreview.addEventListener('loadedmetadata', () => {
+                    safePlay();
+                });
+                aboutPreview.addEventListener('canplay', () => {
+                    safePlay();
+                });
+            }
+
+            if (aboutStoriesLink) {
+                aboutStoriesLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openStories(0);
+                });
+            }
+
+            if (storiesCloseBtn) storiesCloseBtn.addEventListener('click', closeStories);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeStories();
+            });
+
+            if (storiesVideo) {
+                storiesVideo.addEventListener('timeupdate', () => {
+                    if (isScrubbing) return;
+                    updateFromTime();
+                });
+
+                storiesVideo.addEventListener('loadedmetadata', () => {
+                    updateFromTime();
+                });
+
+                storiesVideo.addEventListener('ended', () => {
+                    if (storyIndex < storySources.length - 1) loadStory(storyIndex + 1);
+                    else closeStories();
+                });
+            }
+
+            if (storiesScrub) {
+                storiesScrub.addEventListener('pointerdown', () => { isScrubbing = true; });
+                storiesScrub.addEventListener('pointerup', () => { isScrubbing = false; });
+
+                storiesScrub.addEventListener('input', () => {
+                    if (!storiesVideo) return;
+                    const dur = storiesVideo.duration;
+                    if (!dur || !isFinite(dur)) return;
+
+                    const value = Number(storiesScrub.value);
+                    const nextTime = (value / 1000) * dur;
+                    storiesVideo.currentTime = nextTime;
+
+                    // Update progress immediately (timeupdate can lag a bit)
+                    const pct = Math.max(0, Math.min(100, (nextTime / dur) * 100));
+                    if (storyProgressFills[storyIndex]) {
+                        storyProgressFills[storyIndex].style.width = pct + '%';
+                    }
+                });
+            }
+
+            if (storiesInner) {
+                storiesInner.addEventListener('pointerdown', (e) => {
+                    const target = e.target;
+                    if (target && target.closest) {
+                        if (target.closest('#storiesScrub')) return;
+                        if (target.closest('#storiesCloseBtn')) return;
+                        if (target.closest('#storiesFirstLink')) return;
+                        if (target.closest('.stories-progress')) return;
+                    }
+                    touchStartX = e.clientX;
+                    touchStartY = e.clientY;
+                });
+
+                storiesInner.addEventListener('pointerup', (e) => {
+                    const target = e.target;
+                    if (target && target.closest) {
+                        if (target.closest('#storiesScrub')) return;
+                        if (target.closest('#storiesCloseBtn')) return;
+                        if (target.closest('#storiesFirstLink')) return;
+                        if (target.closest('.stories-progress')) return;
+                    }
+
+                    const dx = e.clientX - touchStartX;
+                    const dy = e.clientY - touchStartY;
+
+                    const absDx = Math.abs(dx);
+                    const absDy = Math.abs(dy);
+
+                    // Vertical swipe: close popup
+                    if (absDy > 90 && absDy > absDx) {
+                        closeStories();
+                        return;
+                    }
+
+                    // Tap (no big movement): left/right triggers prev/next
+                    const isTap = absDx < 40 && absDy < 40;
+                    if (!isTap) return;
+
+                    const rect = storiesInner.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+
+                    if (x > rect.width / 2) goNext();
+                    else goPrev();
+                });
+            }
+
+            // Слайдер баннеров
+            const slides = document.querySelectorAll('.slider-slide');
+            let currentSlide = 0; // Начинаем с Баннера 1 (индекс 0)
+            let slideInterval;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.remove('active');
+                    const video = slide.querySelector('video');
+                    if (video) {
+                        if (i === index) {
+                            video.play();
+                        } else {
+                            video.pause();
+                            video.currentTime = 0;
+                        }
+                    }
+                    if (i === index) {
+                        slide.classList.add('active');
+                    }
+                });
+                currentSlide = index;
+            }
+
+            function nextSlide() {
+                const next = (currentSlide + 1) % slides.length;
+                showSlide(next);
+            }
+
+            function startSlider() {
+                slideInterval = setInterval(nextSlide, 6000); // 6 секунд
+            }
+
+            function stopSlider() {
+                clearInterval(slideInterval);
+            }
+
+            // Обработчики кликов на слайды
+            slides.forEach((slide, index) => {
+                slide.addEventListener('click', (e) => {
+                    const action = slide.dataset.action;
+                    
+                    if (action === 'scroll') {
+                        // Banner1 - прокрутка к меню
+                        e.preventDefault();
+                        const menuSection = document.querySelector('#combos');
+                        if (menuSection) {
+                            menuSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } else if (action === 'next') {
+                        // Видео - следующий слайд
+                        e.preventDefault();
+                        stopSlider();
+                        nextSlide();
+                        startSlider();
+                    } else if (action === 'franchise') {
+                        // Banner2 - открыть франшизу
+                        e.preventDefault();
+                        window.open('https://emikashotchicken.ru/franchise', '_blank');
+                    }
+                });
+            });
+
+            // Инициализируем показ первого слайда
+            showSlide(currentSlide);
+            
+            // Запускаем слайдер
+            startSlider();
+
+            // Останавливаем при наведении мыши
+            const sliderContainer = document.querySelector('.slider-container');
+            if (sliderContainer) {
+                sliderContainer.addEventListener('mouseenter', stopSlider);
+                sliderContainer.addEventListener('mouseleave', startSlider);
+            }
+        });
+
+        window.addEventListener('scroll', () => {
+            const offset = window.pageYOffset * 0.15;
+            document.body.style.backgroundPositionY = `-${offset}px`;
+        });
+    </script>
+</body>
+</html>

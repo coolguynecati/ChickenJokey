@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: emikashotchicken
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: CRM_PASSWORD
+        generateValue: true

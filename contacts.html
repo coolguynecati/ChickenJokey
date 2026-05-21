@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты — Emika's Hot Chicken</title>
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #ff6a1a;
+            --orange-dark: #e2550f;
+            --bg: #0d0d0f;
+            --card: rgba(20, 20, 24, 0.88);
+            --text: #f5f5f5;
+            --muted: #c9c9ce;
+        }
+
+        html[data-theme="light"] {
+            --bg: #f6f6f7;
+            --card: rgba(255, 255, 255, 0.96);
+            --text: #121316;
+            --muted: #545863;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text);
+            background: #000 url('images/background.jpg') center top / cover no-repeat fixed;
+            min-height: 100vh;
+        }
+
+        html[data-theme="light"] body {
+            background-color: var(--bg);
+            background-image: none;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(12px);
+            background: rgba(10, 10, 12, 0.75);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        html[data-theme="light"] header {
+            background: rgba(255, 255, 255, 0.85);
+            border-bottom-color: rgba(10, 10, 12, 0.1);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand img {
+            height: 42px;
+            width: auto;
+            display: block;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .top-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-link {
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .top-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        html[data-theme="light"] .top-link:hover {
+            background: rgba(10, 10, 12, 0.06);
+        }
+
+        .top-link.is-current {
+            color: var(--orange);
+        }
+
+        .phone-link {
+            color: var(--orange);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 8px 10px;
+            border-radius: 8px;
+        }
+
+        .phone-link:hover {
+            background: rgba(255, 106, 26, 0.15);
+        }
+
+        .lang-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.92);
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .lang-opt { color: rgba(0, 0, 0, 0.5); }
+        .lang-opt.is-active { color: var(--orange); }
+        .lang-sep { color: rgba(0, 0, 0, 0.35); }
+
+        .theme-toggle {
+            width: 40px;
+            height: 36px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        html[data-theme="light"] .theme-toggle {
+            border-color: rgba(10, 10, 12, 0.18);
+        }
+
+        main {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 32px 20px 48px;
+        }
+
+        h1 {
+            font-family: 'Dela Gothic One', sans-serif;
+            font-weight: 400;
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            margin: 0 0 24px;
+            line-height: 1.1;
+        }
+
+        .contacts-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .contact-card {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 20px 22px;
+        }
+
+        html[data-theme="light"] .contact-card {
+            border-color: rgba(10, 10, 12, 0.1);
+        }
+
+        .contact-card h2 {
+            font-family: 'Dela Gothic One', sans-serif;
+            font-weight: 400;
+            font-size: 1.15rem;
+            margin: 0 0 12px;
+        }
+
+        .contact-card p {
+            margin: 0 0 10px;
+            line-height: 1.65;
+            color: var(--muted);
+        }
+
+        .contact-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-card a {
+            color: var(--orange);
+            font-weight: 700;
+        }
+
+        .contact-card a:hover {
+            color: var(--orange-dark);
+        }
+
+        .contact-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+            font-size: 0.88rem;
+            transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        }
+
+        html[data-theme="light"] .contact-btn {
+            border-color: rgba(10, 10, 12, 0.14);
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-1px);
+            border-color: var(--orange);
+        }
+
+        .contact-btn.whatsapp:hover { border-color: #25d366; }
+        .contact-btn.telegram:hover { border-color: #0088cc; }
+
+        .map-wrap {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            height: 320px;
+        }
+
+        .map-wrap iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+
+        .back-home {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--orange);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .back-home:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 720px) {
+            nav {
+                padding: 8px 12px 10px;
+                justify-content: center;
+            }
+
+            .brand {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+            }
+
+            .brand img {
+                height: 34px;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .top-links {
+                flex: 1 1 100%;
+                justify-content: center;
+            }
+
+            main {
+                padding: 24px 16px 40px;
+            }
+
+            .map-wrap {
+                height: 260px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a class="brand" href="index.html">
+                <img src="images/logo.png" alt="Emika's Hot Chicken">
+            </a>
+            <div class="header-actions">
+                <div class="top-links">
+                    <a class="top-link" href="index.html#menuTabs"><span class="lang-ru">Меню</span><span class="lang-en">Menu</span></a>
+                    <a class="top-link is-current" href="contacts.html"><span class="lang-ru">Контакты</span><span class="lang-en">Contacts</span></a>
+                </div>
+                <a href="tel:+79778389898" class="phone-link">+7 977 838 98 98</a>
+                <button type="button" class="lang-toggle" id="langToggle" aria-label="Переключить язык">
+                    <span class="lang-opt is-active" data-lang="ru">RU</span>
+                    <span class="lang-sep" aria-hidden="true">/</span>
+                    <span class="lang-opt" data-lang="en">EN</span>
+                </button>
+                <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">
+                    <span id="themeIcon">🌙</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <a class="back-home" href="index.html"><span class="lang-ru">← На главную</span><span class="lang-en">← Back to home</span></a>
+
+        <h1><span class="lang-ru">Контакты</span><span class="lang-en">Contacts</span></h1>
+
+        <div class="contacts-grid">
+            <section class="contact-card">
+                <h2><span class="lang-ru">Ресторан</span><span class="lang-en">Restaurant</span></h2>
+                <p class="lang-ru">Москва, Мичуринский проспект, 13А, стр. 1<br>метро «Ломоносовский проспект», Eat Arena, 2 этаж</p>
+                <p class="lang-en">Moscow, Michurinsky Avenue, 13A, bld. 1<br>Lomonosovsky Prospekt metro, Eat Arena, 2nd floor</p>
+                <p>
+                    <span class="lang-ru">Телефон: </span><span class="lang-en">Phone: </span>
+                    <a href="tel:+79778389898">+7 977 838 98 98</a>
+                </p>
+                <div class="contact-actions">
+                    <a class="contact-btn whatsapp" href="https://wa.me/79778389898" target="_blank" rel="noopener">WhatsApp</a>
+                    <a class="contact-btn telegram" href="https://t.me/+79778389898" target="_blank" rel="noopener">Telegram</a>
+                    <a class="contact-btn" href="https://www.instagram.com/emikashotchicken/" target="_blank" rel="noopener">Instagram</a>
+                    <a class="contact-btn" href="https://eda.yandex.ru/moscow/r/emika_s_hot_chicken" target="_blank" rel="noopener">
+                        <span class="lang-ru">Яндекс Еда</span><span class="lang-en">Yandex Eda</span>
+                    </a>
+                </div>
+            </section>
+
+            <section class="contact-card">
+                <h2><span class="lang-ru">Скоро откроемся</span><span class="lang-en">Opening soon</span></h2>
+                <p class="lang-ru">Проектируемый пр. № 5539, 10В, посёлок Развилка</p>
+                <p class="lang-en">Planned address: 10V, Razvilka village</p>
+                <p>
+                    <a href="https://yandex.ru/navi/org/ageva/230515854150?si=3qht15cpg13frarn1n412z92zr" target="_blank" rel="noopener">
+                        <span class="lang-ru">Открыть на карте</span><span class="lang-en">Open on map</span>
+                    </a>
+                </p>
+            </section>
+
+            <section class="map-wrap" aria-label="Карта">
+                <iframe src="https://yandex.ru/map-widget/v1/-/CLDpiAJ1" allowfullscreen="true" title="Emika's Hot Chicken на карте"></iframe>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const root = document.documentElement;
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const headerLogo = document.querySelector('.brand img');
+        const savedTheme = localStorage.getItem('emika-theme');
+        const initialTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
+
+        function applyTheme(theme) {
+            root.setAttribute('data-theme', theme);
+            if (themeIcon) themeIcon.textContent = theme === 'light' ? '☀️' : '🌙';
+            if (headerLogo) {
+                headerLogo.src = theme === 'light' ? 'images/logo_white.png' : 'images/logo.png';
+            }
+        }
+
+        applyTheme(initialTheme);
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                root.setAttribute('data-theme', next);
+                localStorage.setItem('emika-theme', next);
+                applyTheme(next);
+            });
+        }
+
+        const getActiveLang = () => document.querySelector('.lang-opt.is-active')?.dataset.lang || 'ru';
+
+        function switchLanguage(lang) {
+            document.querySelectorAll('.lang-opt').forEach((opt) => {
+                opt.classList.toggle('is-active', opt.dataset.lang === lang);
+            });
+            document.querySelectorAll('.lang-ru').forEach((el) => {
+                el.style.display = lang === 'ru' ? '' : 'none';
+            });
+            document.querySelectorAll('.lang-en').forEach((el) => {
+                el.style.display = lang === 'en' ? '' : 'none';
+            });
+            localStorage.setItem('emika-lang', lang);
+        }
+
+        const langToggle = document.getElementById('langToggle');
+        if (langToggle) {
+            langToggle.addEventListener('click', (e) => {
+                const opt = e.target.closest('.lang-opt');
+                if (opt?.dataset.lang) {
+                    switchLanguage(opt.dataset.lang);
+                    return;
+                }
+                switchLanguage(getActiveLang() === 'ru' ? 'en' : 'ru');
+            });
+        }
+
+        const savedLang = localStorage.getItem('emika-lang');
+        switchLanguage(savedLang === 'en' ? 'en' : 'ru');
+    </script>
+</body>
+</html>

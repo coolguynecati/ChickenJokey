@@ -1,703 +1,4201 @@
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-<title>Emika's Hot Chicken</title>
  <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com" >
+    <title>Emika's Hot Chicken</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="shortcut icon" href="images/favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --orange: #ff6a1a;
+            --orange-dark: #e2550f;
+            --bg: #0d0d0f;
+            --card: rgba(20, 20, 24, 0.8);
+            --text: #f5f5f5;
+            --muted: #c9c9ce;
+        }
+
+        /* Light theme (optional) */
+        html[data-theme="light"] {
+            --bg: #f6f6f7;
+            --card: rgba(255,255,255,0.92);
+            --text: #121316;
+            --muted: #545863;
+        }
+
+        * { 
+            box-sizing: border-box;
+        }
+        
+        img, iframe {
+            max-width: 100%;
+        }
+        
+        video {
+            max-width: 100%;
+            height: auto;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: #000000;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
         body {
             margin: 0;
-            padding: 0;
-            padding-top: 60px;
-            font-family: 'Roboto Slab', serif; 
-            color: #fff;
-            overflow-x: hidden;
-            background: url('images/background.jpg') no-repeat center center fixed;
+            font-family: 'Montserrat', sans-serif; 
+            color: var(--text);
+            background-color: #000000;
+            background-image: url('images/background.jpg');
+            background-position: center top;
             background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             position: relative;
-            z-index: -1;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
-.container {
-            width: 95%;
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,106,26,0.18), transparent 40%),
+                radial-gradient(circle at 78% 8%, rgba(255,106,26,0.14), transparent 34%),
+                linear-gradient(120deg, rgba(0,0,0,0.5), rgba(0,0,0,0.32), rgba(0,0,0,0.55));
+            z-index: 0;
+            mix-blend-mode: normal;
+            background-color: transparent;
+        }
+
+        html[data-theme="light"] body::before {
+            background:
+                radial-gradient(circle at 18% 14%, rgba(255,106,26,0.16), transparent 42%),
+                radial-gradient(circle at 86% 0%, rgba(255,106,26,0.10), transparent 38%),
+                linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.86));
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(12px);
+            background: rgba(10,10,12,0.75);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        html[data-theme="light"] header {
+            background: rgba(255,255,255,0.85);
+            border-bottom-color: rgba(10,10,12,0.10);
+        }
+
+        nav {
             max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-            background-color: rgba(0, 0, 0, 0.6);
-            position: relative;
-            z-index: 1;
-            border-radius: 10px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
         }
 
-        h1 {
-            text-align: center;
-            color: #ff6600;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            font-family: 'Merriweather', serif; /* Другой шрифт для заголовка */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
 
-        .image-section {
-            margin-bottom: 50px;
-            text-align: center;
-            padding: 50px 0;
+        .brand img {
+            height: 42px;
+            width: auto;
+            max-width: none;
+            object-fit: contain;
+            flex: 0 0 auto;
+            display: block;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+        }
+
+        .nav-links a {
+            padding: 8px 10px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            min-height: 36px;
+        }
+
+        .nav-links a:hover { background: rgba(255,255,255,0.08); }
+
+        .phone-link {
+            color: var(--orange);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 8px 10px;
+            border-radius: 8px;
+            transition: background 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            min-height: 36px;
+        }
+
+        .phone-link:hover {
+            background: rgba(255,106,26,0.15);
+            color: var(--orange-dark);
+        }
+
+        .cta {
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--orange);
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+            transition: background 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .cta:hover { background: var(--orange-dark); transform: translateY(-1px); }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .lang-switch {
+            display: flex;
+            align-items: center;
+        }
+
+        .lang-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.92);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lang-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+        }
+
+        html[data-theme="light"] .lang-toggle {
+            border-color: rgba(10, 10, 12, 0.14);
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        .lang-opt {
+            color: rgba(0, 0, 0, 0.5);
+            transition: color 0.2s ease;
+            line-height: 1;
+        }
+
+        .lang-opt.is-active {
+            color: var(--orange);
+        }
+
+        .lang-sep {
+            color: rgba(0, 0, 0, 0.35);
+            font-weight: 600;
+            user-select: none;
+        }
+
+        /* Theme icon toggle */
+        .theme-toggle {
+            width: 40px;
+            height: 36px;
+            padding: 0;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease, border 0.2s ease, transform 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            background: rgba(255,255,255,0.08);
+        }
+
+        html[data-theme="light"] .theme-toggle {
+            border-color: rgba(10,10,12,0.18);
+        }
+
+        main { position: relative; z-index: 1; }
+
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 26px;
+            align-items: center;
+            padding-top: 16px;
             position: relative;
             overflow: hidden;
         }
 
-        .fade-in-image {
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
-            max-width: 100%;
-            height: auto;
-            display: block;
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: -40px -60px;
+            background: url('images/hyp.png') center/contain no-repeat;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-family: 'Dela Gothic One', sans-serif;
+            font-weight: 400;
+            font-size: clamp(1.65rem, 3.2vw, 2.35rem);
+            margin: 0 0 18px;
+            color: #fff;
+            letter-spacing: 0.1px;
+            line-height: 1.12;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 720px) {
+            .hero h1 {
+                white-space: normal;
+            }
+        }
+
+        .highlight {
+            color: var(--orange);
+        }
+
+        .hero p { color: var(--muted); line-height: 1.7; margin: 0 0 22px; }
+
+        .hero-top-stack {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 66px 20px 0;
+            overflow: visible;
+        }
+
+        .hero-top-stack .welcome-marquee-section {
+            padding: 0 0 10px;
+            max-width: none;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-top-stack .welcome-marquee-section .section-title {
+            margin-bottom: 0;
+            padding-right: 0;
+        }
+
+        .hero-top-stack .marquee-head {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-top-stack .video-banner-section {
+            max-width: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .welcome-marquee-section .section-title {
+            margin-bottom: 0;
+        }
+
+        .menu-start-section.section {
+            padding-top: 32px;
+            padding-bottom: 0;
+        }
+
+        .menu-start-section .section-title {
+            margin-bottom: 0;
+        }
+
+        .menu-spice-block {
+            padding: 8px 0 12px;
+            max-width: 720px;
             margin: 0 auto;
         }
 
-        .visible {
+        .spice-global-title {
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: clamp(0.72rem, 1.4vw, 0.84rem);
+            margin: 0 0 8px;
+            color: var(--muted);
+            letter-spacing: 0.02em;
+        }
+
+        .spice-global-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .spice-global-btn {
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.06);
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: clamp(0.65rem, 1.2vw, 0.74rem);
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+            line-height: 1.2;
+        }
+
+        html[data-theme="light"] .spice-global-btn {
+            border-color: rgba(10,10,12,0.14);
+            background: rgba(10,10,12,0.05);
+        }
+
+        .spice-global-btn:hover {
+            border-color: var(--orange);
+        }
+
+        .spice-global-btn.is-active {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: #fff;
+        }
+
+        .spice-global-btn.is-active:hover {
+            background: var(--orange-dark);
+            border-color: var(--orange-dark);
+        }
+
+        .hero-actions { display: flex; gap: 8px; flex-wrap: nowrap; }
+
+        .ghost-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: transparent;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: border 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .ghost-btn:hover { border-color: var(--orange); transform: translateY(-1px); }
+
+        .cta {
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--orange);
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+            transition: background 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .cta:hover { background: var(--orange-dark); transform: translateY(-1px); }
+
+        .social-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: transparent;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: border 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .hero-visual {
+            position: relative;
+            min-height: 360px;
+        }
+
+        .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            transform: translate(-50%, -50%); 
+            filter: drop-shadow(0 18px 35px rgba(0,0,0,0.35));
+        }
+
+        .ring.r1 { animation: spin 28s linear infinite; }
+        .ring.r2 { animation: spin 22s linear infinite reverse; }
+
+        .hero-logo {
+            position: absolute;
+            inset: 50% auto auto 50%;
+            transform: translate(-50%, -50%);
+            width: min(260px, 55vw);
+            border-radius: 50%;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+        }
+
+        @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        .section-title {
+        display: flex;
+        align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+
+        .section-title h2 {
+            margin: 0;
+            font-size: 1.6rem;
+            letter-spacing: 0.2px;
+            font-family: 'Dela Gothic One', sans-serif;
+            font-weight: 400;
+        }
+
+        .marquee-head {
+            width: 100%;
+            overflow: hidden;
+            border-radius: 10px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            padding: 6px 0;
+            position: relative;
+        }
+
+        .marquee-rail {
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            color: #ffd700;
+            font-family: 'Dela Gothic One', sans-serif;
+            font-weight: 400;
+            font-size: 1.15rem;
+            will-change: transform;
+            animation: marquee-left 18s linear infinite;
+        }
+
+        .marquee-track {
+            display: inline-flex;
+            align-items: center;
+            gap: 22px;
+            flex-shrink: 0;
+            padding-right: 22px;
+        }
+
+        .marquee-head.menu .marquee-rail {
+            font-size: 1.55rem;
+            animation-duration: 14s;
+        }
+
+        @keyframes marquee-left {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        .pill {
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .cards {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            align-items: stretch;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+            transition: transform 0.25s ease, border 0.25s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover { transform: translateY(-4px); border-color: rgba(255,106,26,0.45); }
+
+        .card img {
+            width: 100%;
+            height: 205px;
+            border-radius: 12px;
+            display: block;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .card h3 {
+            margin: 0 0 6px;
+            font-size: 1.05rem;
+            letter-spacing: 0.1px;
+            font-family: 'Dela Gothic One', sans-serif;
+            font-weight: 400;
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        /* Menu cards (frontend) */
+        .card-footer {
+            margin-top: auto;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .card-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--orange);
+            margin-bottom: 0;
+        }
+
+        .add-to-cart-btn {
+            width: auto;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: #ffd700;
+            color: #000;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-width: 150px;
+        }
+
+        .add-to-cart-btn:hover {
+            background: #ffb700;
+            transform: translateY(-2px);
+        }
+
+        .add-to-cart-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Cart in header (frontend) */
+        .cart-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .cart-indicator:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .cart-icon { font-size: 1.2rem; }
+
+        .cart-total {
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .header-actions { position: relative; }
+
+        .cart-preview {
+            position: absolute;
+            right: 120px;
+            top: calc(100% + 10px);
+            width: min(360px, 90vw);
+            background: rgba(20, 20, 24, 0.98);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            box-shadow: 0 18px 44px rgba(0,0,0,0.45);
+            padding: 10px;
+            z-index: 2300;
+            display: none;
+        }
+
+        .cart-preview.open { display: block; }
+
+        .cart-preview-items {
+            display: grid;
+            gap: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .cart-preview-item {
+            display: grid;
+            grid-template-columns: 44px 1fr auto;
+            gap: 8px;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 6px;
+        }
+
+        .cart-preview-item img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .cart-preview-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        /* Cart drawer mock */
+        .cart-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: min(420px, 100vw);
+            height: 100vh;
+            background: rgba(20, 20, 24, 0.98);
+            border-left: 1px solid rgba(255,255,255,0.08);
+            z-index: 2300;
+            transform: translateX(100%);
+            transition: transform 0.25s ease;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        html[data-theme="light"] .cart-drawer {
+            background: rgba(255,255,255,0.98);
+            border-left-color: rgba(10,10,12,0.12);
+        }
+
+        .cart-drawer.open {
+            transform: translateX(0);
+        }
+
+        .cart-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.48);
+            z-index: 2290;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .cart-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .cart-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        html[data-theme="light"] .cart-head {
+            border-bottom-color: rgba(10,10,12,0.10);
+        }
+
+        .cart-head h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .cart-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.22);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .cart-items {
+            overflow-y: auto;
+            padding: 12px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .cart-item {
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+            transition: transform 0.25s ease, opacity 0.25s ease, filter 0.25s ease;
+        }
+
+        .cart-item.removing {
+            transform: translateX(30px) rotate(6deg) scale(0.94);
+            opacity: 0;
+            filter: blur(1px);
+        }
+
+        .qty {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty button {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .cart-footer {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 12px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .promo-input {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.16);
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            padding: 10px 12px;
+        }
+
+        .payment-options {
+            display: grid;
+            gap: 6px;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .cart-inline-error {
+            color: #ff8080;
+            font-size: 0.82rem;
+            display: none;
+        }
+
+        /* Header menu dropdown (instead of stripe) */
+        .menu-hover {
+            position: relative;
+        }
+
+        .menu-hover-panel {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            display: none;
+            gap: 6px;
+            width: min(280px, 92vw);
+            padding: 8px 10px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(20,20,24,0.98);
+            box-shadow: 0 18px 44px rgba(0,0,0,0.45);
+            z-index: 2300;
+            flex-direction: column;
+        }
+
+        .menu-hover:hover .menu-hover-panel,
+        .menu-hover:focus-within .menu-hover-panel {
+            display: flex;
+        }
+
+        .menu-hover-panel .menu-tab,
+        .menu-hover-panel .menu-tab.primary {
+            padding: 6px 2px;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 0.92rem;
+            letter-spacing: 0.1px;
+        }
+
+        .menu-hover-panel .menu-tab:hover {
+            transform: none;
+            color: var(--orange);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .menu-tab {
+            flex: 0 0 auto;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+            font-weight: 800;
+            font-size: 0.9rem;
+            letter-spacing: 0.2px;
+            transition: transform 0.18s ease, border 0.18s ease, background 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .menu-tab:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255,106,26,0.45);
+        }
+
+        .menu-tab.primary {
+            background: rgba(255,106,26,0.14);
+            border-color: rgba(255,106,26,0.35);
+        }
+
+        /* Top links */
+        .top-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-right: 6px;
+            border-right: 1px solid rgba(255,255,255,0.10);
+            margin-right: 6px;
+        }
+
+        .top-link {
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+            font-weight: 800;
+            font-size: 0.9rem;
+            letter-spacing: 0.2px;
+            transition: transform 0.18s ease, border 0.18s ease, background 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .top-link:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255,106,26,0.45);
+        }
+
+        .about {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            align-items: center;
+            background: rgba(10,10,12,0.7);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 18px;
+            padding: 18px;
+        }
+
+        .about p { margin: 0 0 14px; color: var(--muted); line-height: 1.7; }
+        .about strong { color: #fff; }
+
+        /* About block must stay black in all themes */
+        #about .about {
+            background: #000;
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        #about .about p {
+            color: #d6d6d9;
+        }
+
+        #about .about strong {
+            color: #fff;
+        }
+
+        .about .spice-levels { margin-top: 8px; }
+
+        .about-media {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .about-media img {
+            width: 100%;
+            max-width: min(520px, 50vw);
+            display: block;
+            border-radius: 16px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.55);
+            object-fit: cover;
+        }
+
+        .about-media video {
+            width: 100%;
+            max-width: min(520px, 50vw);
+            display: block;
+            border-radius: 16px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.55);
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        /* About preview: "graphics button" */
+        .about-media video.about-reels-preview {
+            width: 170px;
+            max-width: 88vw;
+            height: auto;
+            aspect-ratio: 9/16;
+            object-fit: cover;
+            transform: scale(1);
+            transition: transform 0.6s ease, box-shadow 0.6s ease;
+        }
+
+        .about-media video.about-reels-preview:hover {
+            transform: scale(1.04);
+            box-shadow: 0 22px 55px rgba(0,0,0,0.65);
+        }
+
+        .about-stories-btn {
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,106,26,0.35);
+            background: rgba(255,106,26,0.14);
+            color: var(--text);
+            font-weight: 900;
+            cursor: pointer;
+            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+            text-decoration: none;
+        }
+
+        .about-stories-btn:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255,106,26,0.55);
+            background: rgba(255,106,26,0.18);
+        }
+
+        .about-content {
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* "Stories" popup for about videos */
+        .stories-popup {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.78);
+            z-index: 2500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stories-popup.open {
+            display: flex;
+        }
+
+        .stories-popup-inner {
+            position: relative;
+            width: min(420px, 100vw);
+            height: 100vh;
+            overflow: hidden;
+            touch-action: pan-y;
+            user-select: none;
+        }
+
+        .stories-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .stories-progress {
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+            z-index: 3;
+        }
+
+        .stories-progress-bar {
+            flex: 1;
+            height: 3px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .stories-progress-bar .fill {
+            height: 100%;
+            width: 0%;
+            background: var(--orange);
+            border-radius: 999px;
+        }
+
+        .stories-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 4;
+            width: 38px;
+            height: 38px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(0,0,0,0.25);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .stories-close:hover {
+            border-color: rgba(255,106,26,0.55);
+        }
+
+        .stories-scrub-wrap {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 14px;
+            z-index: 4;
+        }
+
+        .stories-scrub {
+            width: 100%;
+        }
+
+        /* Product modal (frontend) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2200;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             opacity: 1;
         }
 
-        .spacer {
-            height: 80vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2em;
-            color: #ccc;
+        .modal-content {
+            background: rgba(20, 20, 24, 0.92);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
 
-        .image-wrapper {
+        html[data-theme="light"] .modal-content {
+            background: rgba(255,255,255,0.96);
+            border-color: rgba(10,10,12,0.12);
+        }
+
+        .product-modal-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .product-modal-right {
+            min-width: 0;
+            display: grid;
+            gap: 12px;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 300px;
+            object-fit: contain;
+            border-radius: 12px;
+            margin-bottom: 0;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 12px;
+            color: var(--text);
+            font-family: 'Dela Gothic One', sans-serif;
+            letter-spacing: 0.1px;
+        }
+
+        .modal-description {
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .modal-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: -8px 0 18px 0;
+        }
+
+        .meta-chip {
+            padding: 8px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: var(--text);
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        #modalPrice {
+            color: var(--orange);
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: rgba(255,106,26,0.14);
+            border-color: rgba(255,106,26,0.35);
+        }
+
+        .spice-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+        }
+
+        .spice-control-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .spice-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            min-width: 60px;
+        }
+
+        .spice-slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #ffd700 0%, var(--orange) 100%);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .spice-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ffd700;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .spice-slider::-webkit-slider-thumb:hover {
+            background: var(--orange);
+            transform: scale(1.1);
+        }
+
+        .spice-level-display {
+            min-width: 110px;
+            text-align: right;
+            font-weight: 800;
+            color: var(--orange);
+            white-space: nowrap;
+        }
+
+        .spice-video-wrap {
+            width: 70px;
+            height: 70px;
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(0,0,0,0.25);
+            flex: 0 0 auto;
+            display: grid;
+            place-items: center;
+            transition: width 1s ease, height 1s ease, transform 1s ease;
+        }
+
+        /* No "growing chicken face" in modal */
+        .spice-control:hover .spice-video-wrap {
+            width: 70px;
+            height: 70px;
+        }
+
+        .spice-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .modal-pack-control {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+        }
+
+        .modal-pack-control.is-visible {
+            display: flex;
+        }
+
+        .modal-pack-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .modal-pack-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .modal-pack-btn {
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+            color: var(--text);
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.88rem;
+        }
+
+        .modal-pack-btn:hover {
+            border-color: rgba(255,106,26,0.35);
+        }
+
+        .modal-pack-btn.is-active {
+            background: rgba(255,106,26,0.22);
+            border-color: rgba(255,106,26,0.45);
+        }
+
+        html[data-theme="light"] .modal-pack-control {
+            background: rgba(0,0,0,0.04);
+        }
+
+        html[data-theme="light"] .modal-pack-btn {
+            background: rgba(0,0,0,0.04);
+            border-color: rgba(0,0,0,0.12);
+            color: #111;
+        }
+
+        html[data-theme="light"] .modal-pack-btn.is-active {
+            background: rgba(255,106,26,0.18);
+            border-color: rgba(255,106,26,0.4);
+        }
+
+        .modal-add-btn {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 8px;
+            background: #ffd700;
+            color: #000;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-add-btn:hover {
+            background: #ffb700;
+            transform: translateY(-2px);
+        }
+
+        .modal-add-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Desktop: wider product modal, clearer layout */
+        @media (min-width: 1024px) {
+            .modal-content {
+                width: min(96vw, 980px);
+                max-width: 980px;
+                padding: 24px 24px 20px;
+            }
+
+            .product-modal-grid {
+                grid-template-columns: 360px 1fr;
+                gap: 24px;
+                align-items: start;
+            }
+
+            .modal-image {
+                height: 360px;
+            }
+
+            .product-modal-right {
+                gap: 10px;
+            }
+
+            .modal-description {
+                margin-bottom: 10px;
+            }
+
+            .spice-control {
+                margin-bottom: 12px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .product-modal-grid {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "image"
+                    "content";
+                gap: 12px;
+            }
+
+            .modal-image {
+                grid-area: image;
+                width: 100%;
+                height: 180px;
+            }
+
+            .product-modal-right {
+                grid-area: content;
+            }
+
+            #productModal .modal-image {
+                height: 130px;
+            }
+
+            #productModal .product-modal-right {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .modal-overlay.active {
+                align-items: flex-start;
+                padding: 10px;
+            }
+
+            #productModal .modal-content {
+                width: 100%;
+                max-height: calc(92dvh - 20px);
+                margin-top: 4px;
+                padding: 14px 12px 12px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .modal-title {
+                font-size: 1.15rem;
+                margin-bottom: 6px;
+            }
+
+            #productModal .modal-description {
+                margin-bottom: 6px;
+                font-size: 0.84rem;
+                line-height: 1.35;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .pin-info-modal .modal-description {
+                display: block;
+                font-size: 0.9rem;
+                line-height: 1.6;
+                overflow: visible;
+                -webkit-line-clamp: unset;
+                line-clamp: unset;
+                -webkit-box-orient: unset;
+                margin-bottom: 16px;
+            }
+
+            .pin-info-modal .modal-content {
+                max-height: 88vh;
+                overflow-y: auto;
+            }
+
+            .modal-meta {
+                margin: 0;
+                gap: 6px;
+            }
+
+            .meta-chip {
+                padding: 6px 8px;
+                font-size: 0.78rem;
+            }
+
+            .spice-control {
+                flex-wrap: nowrap;
+                align-items: center;
+                margin: 0 0 4px;
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .spice-label {
+                min-width: 0;
+                font-size: 0.8rem;
+                flex: 0 0 auto;
+            }
+
+            .spice-control-main {
+                flex: 1 1 auto;
+                width: auto;
+                min-width: 0;
+                display: grid;
+                grid-template-columns: 1fr auto;
+                grid-template-rows: auto auto;
+                gap: 4px 8px;
+                align-items: center;
+            }
+
+            .spice-slider {
+                grid-column: 1;
+                grid-row: 1;
+                width: 100%;
+                min-width: 0;
+                max-width: none;
+            }
+
+            .spice-level-display {
+                grid-column: 1;
+                grid-row: 2;
+                min-width: 0;
+                max-width: none;
+                text-align: left;
+                font-size: 0.76rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .spice-video-wrap {
+                grid-column: 2;
+                grid-row: 1 / span 2;
+                width: 52px;
+                height: 52px;
+                flex: 0 0 52px;
+                margin: 0;
+                align-self: center;
+            }
+
+            #productModal .modal-add-btn {
+                position: sticky;
+                bottom: 0;
+                z-index: 6;
+                margin-top: 10px;
+                padding: 13px 14px;
+                font-size: 0.92rem;
+                box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        .stories-first-link {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 54px;
+            z-index: 4;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(0,0,0,0.25);
+            color: #fff;
+            font-weight: 900;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .stories-first-link:hover {
+            border-color: rgba(255,106,26,0.55);
+            background: rgba(0,0,0,0.35);
+        }
+
+        @media (max-width: 480px) {
+            .stories-popup-inner {
+                width: 100vw;
+                height: 100vh;
+            }
+        }
+
+        /* Слайдер баннер */
+        .video-banner-section {
+            position: relative;
+            overflow: visible;
+        }
+
+        .slider-container {
             position: relative;
             width: 100%;
-            height: 400px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 50px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+            transform: translateY(-15px);
         }
 
-     .text-content .photo {
-            display: block; /* Изображение как блочный элемент */
- margin: 0 auto 30px auto; /* Центрирование и отступ снизу */
-        max-width: 80%; /* Максимальная ширина картинки */
-        height: auto; /* Автоматическая высота для сохранения пропорций */
-        border-radius: 10px; /* Скругленные углы */
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Небольшая тень */
-    }
-
-    .text-content h2 {
-        font-family: 'Merriweather', serif; /* Заголовок внутри текста */
-        color: #ff6600;
-        margin-bottom: 20px;
-        font-size: 1.2em;
-    }
-
-    .text-content p {
-        margin-bottom: 20px; /* Отступ между параграфами */
-        color: #eee; /* Более светлый цвет текста */
-    }
-
-    .text-content .spice-levels {
-        margin-top: 25px;
-        font-size: 0.95em;
-        color: #ccc;
-    }
-
-    .text-content .spice-levels strong {
-        color: #ff6600; /* Цвет для выделения уровней остроты */
-    }
-
-    .text-content .instagram-link {
-        display: inline-block;
-        margin-top: 30px;
-        padding: 12px 25px;
-        background-color: #ff6600;
-        color: #fff;
-        text-decoration: none;
-        font-weight: bold;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-        font-size: 1.05em;
-    }
-
-    .text-content .instagram-link:hover {
-        background-color: #e65c00;
-    }
-
-
-<title>Emika's Hot Chicken</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            padding-top: 60px;
-            font-family: sans-serif; /* Добавим базовый шрифт */
-            color: #fff; /* Цвет текста по умолчанию для темного фона */
-            overflow-x: hidden; /* Скрываем горизонтальную прокрутку */
-            background: url('images/background.jpg') no-repeat center center fixed; /* Фон для всего body */
-            background-size: cover; /* Масштабируем фон, чтобы он покрывал весь экран */
-            position: relative; /* Для позиционирования элементов относительно body */
-            z-index: -1; /* Отправляем фон на задний план */
-        }
-
-        /* Параллакс эффект для фона */
-        body::before {
+        .slider-container::before {
             content: '';
-            position: fixed;
+            display: block;
+            padding-bottom: 28.01%;
+        }
+
+        /* Закреплённые плитки (как в макете) */
+        .pinned-section {
+            max-width: 1200px;
+            margin: 10px auto 0;
+            padding: 0 20px 22px;
+            position: relative;
+            z-index: 2;
+            overflow: visible;
+        }
+
+        .pinned-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            width: 100%;
+            overflow: visible;
+        }
+
+        @keyframes pin-scooter-ride {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-5px) translateX(2px); }
+            50% { transform: translateY(-2px) translateX(4px); }
+            75% { transform: translateY(-4px) translateX(1px); }
+        }
+
+        .pin-tile {
+            width: 100%;
+            height: 110px;
+            min-height: 110px;
+            display: grid;
+            grid-template-columns: 40% 60%;
+            align-items: center;
+            border: none;
+            border-radius: 16px;
+            overflow: visible;
+            cursor: pointer;
+            position: relative;
+            padding: 0;
+            text-align: left;
+            text-decoration: none;
+            color: inherit;
+            font-family: 'Montserrat', sans-serif;
+            opacity: 0.9;
+            transform: scale(1);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .pin-tile:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .pin-tile::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 0;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.28);
+        }
+
+        .pin-tile--1::before { background-image: url('images/zkrp1.png'); }
+        .pin-tile--2::before { background-image: url('images/zkrp2.png'); }
+        .pin-tile--3::before { background-image: url('images/zkrp3.png'); }
+        .pin-tile--4::before { background-image: url('images/zkrp4.png'); }
+
+        html[data-theme="light"] .pin-tile--1::before { background-image: url('images/wkrp1.png'); }
+        html[data-theme="light"] .pin-tile--2::before { background-image: url('images/wkrp2.png'); }
+        html[data-theme="light"] .pin-tile--3::before { background-image: url('images/wkrp3.png'); }
+
+        .pin-tile__media {
+            grid-column: 1;
+            grid-row: 1;
+            position: relative;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            pointer-events: none;
+            padding: 0 4px;
+            align-self: stretch;
+            min-width: 0;
+            height: 100%;
+        }
+
+        .pin-tile__media img:not(.pin-yeda),
+        .pin-tile__media video {
+            display: block;
+            position: relative;
+            z-index: 3;
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            border: none;
+            outline: none;
+            box-shadow: none;
+            border-radius: 0;
+            transform: scale(1.1);
+            transform-origin: center center;
+            transition: transform 0.35s ease;
+            object-fit: contain;
+            object-position: center center;
+        }
+
+        .pin-tile:hover .pin-tile__media img:not(.pin-yeda) {
+            transform: scale(1.155) rotate(10deg);
+        }
+
+        .pin-tile:hover .pin-tile__media video {
+            transform: scale(1.155);
+        }
+
+        .pin-tile--3 {
+            overflow: hidden;
+        }
+
+        .pin-tile--3 .pin-tile__media {
+            width: 100%;
+            justify-content: flex-start;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .pin-tile--3 .pin-tile__media video {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            object-position: left center;
+        }
+
+        .pin-tile--4 {
+            overflow: visible;
+        }
+
+        .pin-tile--4 .pin-tile__media {
+            width: 100%;
+            justify-content: flex-start;
+            padding: 0;
+            overflow: visible;
+        }
+
+        .pin-tile--4 .pin-kurica-bob {
+            display: block;
+            width: 100%;
+            height: 121px;
+            max-height: 100%;
+            overflow: visible;
+            animation: none;
+        }
+
+        .pin-tile--4 .pin-kurica-bob img {
+            display: block;
+            width: auto;
+            height: 121px;
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+            object-position: left center;
+            transform: scale(1.1);
+            transform-origin: left center;
+            transition: transform 0.35s ease;
+        }
+
+        .pin-tile--4:hover {
+            z-index: 6;
+        }
+
+        .pin-tile--4:hover .pin-kurica-bob {
+            animation: pin-scooter-ride 0.5s ease-in-out infinite;
+            z-index: 6;
+        }
+
+        .pin-tile--4:hover .pin-kurica-bob img {
+            transform: scale(1.155) rotate(10deg);
+        }
+
+        .pin-tile__text-wrap {
+            grid-column: 2;
+            grid-row: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            min-width: 0;
+            padding: 0 14px 0 6px;
+        }
+
+        .pin-tile__text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            margin: 0;
+            color: #fff;
+        }
+
+        .pin-tile__text strong {
+            font-family: 'Dela Gothic One', sans-serif;
+            font-size: clamp(1.05rem, 1.85vw, 1.28rem);
+            font-weight: 400;
+            line-height: 1.08;
+            letter-spacing: 0.02em;
+        }
+
+        .pin-tile__text span {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(0.88rem, 1.45vw, 1.02rem);
+            line-height: 1.25;
+            font-weight: 600;
+            opacity: 0.95;
+        }
+
+        .pin-tile--4 .pin-tile__text,
+        .pin-tile--4 .pin-tile__text span {
+            color: #141414;
+            opacity: 1;
+        }
+
+        .pin-tile--4 .pin-tile__text strong {
+            color: #141414;
+        }
+
+        html[data-theme="light"] .pin-tile:not(.pin-tile--4) .pin-tile__text,
+        html[data-theme="light"] .pin-tile:not(.pin-tile--4) .pin-tile__text span,
+        html[data-theme="light"] .pin-tile:not(.pin-tile--4) .pin-tile__text strong {
+            color: #141414;
+            opacity: 1;
+        }
+
+        .pin-delivery-line {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            text-transform: lowercase;
+        }
+
+        .pin-tile__text .pin-yeda {
+            height: 24px;
+            width: auto;
+            margin: 0;
+            display: inline-block;
+            vertical-align: middle;
+            border: none;
+            box-shadow: none;
+            border-radius: 0;
+            opacity: 1;
+            transform: none;
+        }
+
+        .pin-tile--4:hover .pin-yeda {
+            transform: none;
+        }
+
+        .pin-info-modal .modal-content {
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .pin-info-modal .modal-description {
+            display: block;
+            white-space: pre-line;
+            line-height: 1.65;
+            overflow: visible;
+            -webkit-line-clamp: unset;
+            line-clamp: unset;
+            -webkit-box-orient: unset;
+        }
+
+        .pin-info-modal .pin-map-link {
+            display: inline-block;
+            margin-top: 14px;
+            color: var(--orange);
+            font-weight: 700;
+        }
+
+        .hero-top-stack + .pinned-section {
+            margin-top: 10px;
+        }
+
+        .pinned-section + .section.hero {
+            padding-top: 12px;
+        }
+
+        @media (max-width: 720px) {
+            .pinned-section {
+                padding: 0 16px 18px;
+                margin-top: 6px;
+            }
+
+            .video-banner-section {
+                padding-bottom: 0;
+            }
+
+            .pinned-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .pin-tile {
+                height: clamp(88px, 28vw, 104px);
+                min-height: 88px;
+                border-radius: 14px;
+            }
+
+            .pin-tile__media img,
+            .pin-tile__media video {
+                max-height: 130px;
+            }
+
+            .pin-tile--3 .pin-tile__media video {
+                height: 100%;
+                max-height: 100%;
+            }
+
+            .pin-tile--4 .pin-kurica-bob,
+            .pin-tile--4 .pin-kurica-bob img {
+                height: 100%;
+                max-height: 100%;
+            }
+
+            .pin-tile__text strong {
+                font-size: clamp(0.94rem, 3.8vw, 1.1rem);
+            }
+
+            .pin-tile__text span {
+                font-size: clamp(0.8rem, 3.2vw, 0.92rem);
+            }
+
+            .pin-tile__text .pin-yeda {
+                height: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pinned-section {
+                padding: 0 12px 16px;
+            }
+
+            .pinned-grid {
+                gap: 8px;
+            }
+
+            .pin-tile {
+                border-radius: 12px;
+            }
+
+            .pin-tile__media {
+                padding-left: 6px;
+            }
+        }
+
+        .slider-slide {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('images/background.jpg') no-repeat center center fixed;
-            background-size: cover;
-            z-index: -1;
-            transform: translateZ(-1px) scale(2); /* Движение в 2 раза медленнее */
-        }
-
-        .container {
-            width: 95%; /* Увеличим ширину контейнера для лучшего отображения на мобильных */
-            max-width: 1200px; /* Ограничим максимальную ширину на больших экранах */
-            margin: 20px auto;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Более заметная тень */
-            background-color: rgba(0, 0, 0, 0.6); /* Полупрозрачный фон для содержимого */
-            position: relative; /* Для корректного позиционирования внутренних элементов */
-            z-index: 1; /* Чтобы содержимое было поверх фона */
-            border-radius: 10px; /* Скруглим углы контейнера */
-        }
-
-        h1 {
-            text-align: center;
-            color: #ff6600; /* Яркий цвет для заголовка */
-            margin-bottom: 30px;
-            font-size: 2em; /* Увеличим размер заголовка */
-        }
-
-        .image-section {
-            margin-bottom: 50px;
-            text-align: center;
-            padding: 100px 0; /* Увеличим отступы сверху и снизу */
-            position: relative; /* Для позиционирования изображений */
-            overflow: hidden; /* Скрываем выходящие за пределы изображения */
-        }
-
-        .fade-in-image {
             opacity: 0;
-            transition: opacity 1.5s ease-in-out; /* Немного увеличим время перехода */
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 0 auto;
+            transition: opacity 1s ease-in-out;
+            cursor: pointer;
         }
 
-        .visible {
+        .slider-slide.active {
             opacity: 1;
-        }
-
-        .spacer {
-            height: 80vh; /* Уменьшим высоту для лучшей адаптивности */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.7em;
-            color: #ccc;
-        }
-
-        .image-wrapper {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 50px;
-        }
-
-        .static-image,
-        .rotating-image {
-            position: absolute;
-            top: 160;
-            left: 50%;
-            transform: translate(-50%, -50%); 
-            max-width: 200;
-            max-height: 200; 
-        }
-
-        .rotating-image {
-            animation: spin 15s linear infinite; /* Увеличим длительность анимации */
             z-index: 2;
-	}
-	
-	 .static-image {
-        z-index: 1;
-    }
-
-    @keyframes spin {
-        0% {
-            transform: translate(-50%, -50%) rotate(0deg);
         }
-        100% {
-            transform: translate(-50%, -50%) rotate(360deg);
-        }
-    }
 
-    /* Футер */
-    footer {
+        .slider-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        .slider-slide video {
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            max-height: none;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        .hero-top-stack .logo-overlay {
+            position: absolute;
+            top: 15px;
+            right: -55px;
+            z-index: 12;
+            width: 150px;
+            height: 150px;
+            pointer-events: none;
+        }
+
+        .hero-top-stack .logo-overlay-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .hero-top-stack .logo-overlay .ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150px;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 9px 18px rgba(0,0,0,0.35));
+            z-index: 2;
+        }
+
+        .hero-top-stack .logo-overlay .ring.r1 {
+            animation: spin 28s linear infinite;
+        }
+
+        .hero-top-stack .logo-overlay .hero-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 130px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            z-index: 3;
+        }
+
+        /* Яндекс карта */
+        .yandex-map-container {
+            width: 100%;
+            max-height: 280px;
+            height: 280px;
+            margin: 0;
+            padding: 0;
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        .yandex-map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Кнопки соцсетей */
+        .social-btn.whatsapp:hover {
+            border-color: #25D366;
+            background: rgba(37, 211, 102, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .social-btn.telegram:hover {
+            border-color: #0088cc;
+            background: rgba(0, 136, 204, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .footer {
+            background: rgba(6,6,8,0.9);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 36px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px 32px;
         display: flex;
-        justify-content: space-between; /* Размещаем элементы по краям */
+            flex-wrap: wrap;
+            gap: 14px;
         align-items: center;
-        padding: 20px;
-        background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный фон для футера */
-        color: #fff;
-        margin-top: 50px; /* Отступ сверху */
-        flex-wrap: wrap; /* Позволяет элементам переноситься на новую строку на маленьких экранах */
-        text-align: center; /* Центрируем текст на маленьких экранах */
-    }
-
-    footer .logo-footer {
-        flex-shrink: 0; /* Запрещаем сжимать логотип */
-        margin-right: 20px; /* Отступ справа от логотипа */
-    }
-
-    footer .logo-footer img {
-        height: 50px; /* Размер логотипа в футере */
-    }
-
-    footer .info-footer {
-        flex-grow: 1; /* Позволяем информационному блоку занимать доступное пространство */
-        text-align: center;
-    }
-
-    footer .info-footer p {
-        margin: 0 0 10px 0; /* Отступ для параграфа */
-    }
-
-    footer .info-footer a {
-        color: #ff6600; /* Цвет ссылки */
-        text-decoration: none; /* Убираем подчеркивание */
-        font-weight: bold;
-    }
-
-    footer .info-footer a:hover {
-        text-decoration: underline; /* Подчеркивание при наведении */
-    }
-
-    /* Верхнее меню */
-    .top-menu {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        background-color: rgba(0, 0, 0, 0.8);
-        padding: 15px 20px;
-        z-index: 1000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .top-menu .phone-link {
-        color: #ff6600;
-        text-decoration: none;
-        font-size: 1.2em;
-        font-weight: bold;
-        transition: color 0.3s ease;
-    }
-
-    .top-menu .phone-link:hover {
-        color: #e65c00;
-    }
-
-    /* Видео баннер контейнер */
-    .video-banner-container {
-        position: relative;
-        width: 90%;
-        max-width: 1200px;
-        margin: 100px auto 50px auto;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-    }
-
-    .video-banner-container video {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-
-    .video-banner-container .logo-overlay {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        z-index: 10;
-    }
-
-    .video-banner-container .logo-overlay img {
-        height: 25px;
-        width: auto;
-    }
-
-    /* Баннер Яндекс Еды */
-    .yandex-eda-banner {
-        width: 100%;
-        max-height: 96px;
-        height: 96px;
-        background: url('https://taxi-uptime.ru/wp-content/uploads/2023/11/peshiy-courier-yandex-eda.jpg') no-repeat center center;
-        background-size: cover;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 30px 0;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .yandex-eda-banner::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.3);
-        z-index: 1;
-    }
-
-    .yandex-eda-banner a {
-        position: relative;
-        z-index: 2;
-        padding: 15px 30px;
-        background-color: #ff6600;
-        color: #fff;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 1.1em;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    .yandex-eda-banner a:hover {
-        background-color: #e65c00;
-    }
-
-    /* Кнопки соцсетей */
-    .social-buttons {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-top: 20px;
-        flex-wrap: wrap;
-    }
-
-    .social-button {
-        display: inline-block;
-        padding: 12px 25px;
-        color: #fff;
-        text-decoration: none;
-        font-weight: bold;
-        border-radius: 5px;
-        transition: all 0.3s ease;
-        font-size: 1.05em;
-    }
-
-    .social-button.instagram {
-        background-color: #E4405F;
-    }
-
-    .social-button.instagram:hover {
-        background-color: #C13584;
-    }
-
-    .social-button.whatsapp {
-        background-color: #25D366;
-    }
-
-    .social-button.whatsapp:hover {
-        background-color: #128C7E;
-    }
-
-    .social-button.telegram {
-        background-color: #0088cc;
-    }
-
-    .social-button.telegram:hover {
-        background-color: #006699;
-    }
-
-    /* Медиа-запросы для адаптивности */
-    @media (max-width: 768px) {
-        h1 {
-            font-size: 1.6em;
+            justify-content: space-between;
         }
 
-        .container {
-            width: 90%;
-            padding: 15px;
+        .footer small { color: var(--muted); }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
         }
 
-        .image-wrapper {
-            height: 300px;
+        @media (max-width: 720px) {
+            body {
+                background-attachment: scroll;
+            }
+            
+            nav {
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 8px 12px 10px;
+            }
+
+            .brand {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .brand img {
+                height: 34px;
+            }
+
+            nav > div {
+                width: 100%;
+                flex: 1 1 100%;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .header-actions {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: center;
+                gap: 8px 10px;
+                width: 100%;
+            }
+
+            .top-links {
+                flex: 1 1 100%;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .phone-link {
+                font-size: 0.78rem;
+                padding: 6px 8px;
+            }
+
+            .lang-switch {
+                flex-shrink: 0;
+            }
+
+            .theme-toggle {
+                width: 36px;
+                height: 32px;
+            }
+
+            .lang-toggle {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+            
+            .hero-visual { min-height: 260px; order: -1; }
+            .ring { width: 220px; }
+            .section { padding: 48px 16px; }
+            .hero { padding-top: 20px; }
+            .about { grid-template-columns: 1fr; }
+            .about-content { max-width: 100%; }
+            .about-media { justify-content: center; }
+            
+            .hero-top-stack {
+                padding: 8px 12px 0;
+                overflow: hidden;
+            }
+
+            .hero-top-stack .welcome-marquee-section .marquee-rail {
+                font-size: 0.42rem;
+            }
+
+            .hero-top-stack .welcome-marquee-section .marquee-track {
+                gap: 10px;
+                padding-right: 10px;
+            }
+
+            .hero-top-stack .welcome-marquee-section .marquee-head {
+                padding: 3px 0;
+                border-radius: 6px;
+            }
+
+            .hero-top-stack .logo-overlay {
+                display: none !important;
+            }
+
+            .slider-container {
+                transform: none;
+            }
+            
+            .yandex-map-container {
+                height: 240px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+
+            .footer-links {
+                align-items: center;
+                width: 100%;
+            }
         }
 
-        .static-image,
-        .rotating-image {
-            max-width: 90%;
-            max-height: 90%;
+        @media (max-width: 1100px) {
+            .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         }
+        
+        @media (max-width: 820px) {
+            .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        
+        @media (max-width: 480px) {
+            .cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
 
-        footer {
-            flex-direction: column; /* Элементы футера выстраиваются в столбец */
-            text-align: center;
-        }
+            .card {
+                padding: 10px;
+            }
 
-        footer .logo-footer {
-            margin-right: 0;
-            margin-bottom: 15px; /* Отступ снизу от логотипа */
-        }
+            .card img {
+                height: 120px;
+            }
 
-        .video-banner-container {
-            width: 95%;
-            margin-top: 80px;
-        }
+            .card h3 {
+                font-size: 0.82rem;
+            }
 
-        .video-banner-container .logo-overlay img {
-            height: 20px;
-        }
+            .card p {
+                font-size: 0.72rem;
+                line-height: 1.35;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
 
-        .yandex-eda-banner {
-            height: 80px;
-        }
+            .card-price {
+                font-size: 0.95rem;
+            }
 
-        .yandex-eda-banner a {
-            font-size: 0.9em;
-            padding: 12px 20px;
-        }
+            .card-footer {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
 
-        .top-menu .phone-link {
-            font-size: 1em;
+            .add-to-cart-btn {
+                width: 100%;
+                padding: 8px 10px;
+                font-size: 0.72rem;
+            }
         }
-    }
-</style>
+        
+        @media (max-width: 480px) {
+            .brand img {
+                height: 28px;
+            }
+
+            nav {
+                padding: 6px 10px 8px;
+            }
+
+            .phone-link {
+                font-size: 0.72rem;
+                padding: 5px 6px;
+            }
+
+            .hero-top-stack {
+                padding: 6px 10px 0;
+            }
+        }
+    </style>
 </head>
-<body bgcolor="#000000" background="images/background.jpg" no-repeat>
+<body>
+    <header>
+        <nav>
+            <div class="brand">
+                <img src="images/logo.png" alt="Emika's Hot Chicken логотип">
+            </div>
+            <div style="display:flex;align-items:center;gap:20px;">
+                <div class="header-actions">
+                    <div class="top-links" aria-label="Навигация">
+                        <div class="menu-hover">
+                            <a class="top-link" href="#menuTabs"><span class="lang-ru">Меню</span><span class="lang-en">Menu</span></a>
+                            <div class="menu-hover-panel">
+                                <a class="menu-tab" href="#combos"><span class="lang-ru">Комбо</span><span class="lang-en">Combos</span></a>
+                                <a class="menu-tab" href="#bowls"><span class="lang-ru">Боулы</span><span class="lang-en">Bowls</span></a>
+                                <a class="menu-tab" href="#chicken"><span class="lang-ru">Курица</span><span class="lang-en">Chicken</span></a>
+                                <a class="menu-tab" href="#burgers"><span class="lang-ru">Бургеры</span><span class="lang-en">Burgers</span></a>
+                                <a class="menu-tab" href="#sides"><span class="lang-ru">Соусы</span><span class="lang-en">Sauces</span></a>
+                                <a class="menu-tab" href="#drinks"><span class="lang-ru">Напитки</span><span class="lang-en">Drinks</span></a>
+                            </div>
+                        </div>
+                        <a class="top-link" href="contacts.html"><span class="lang-ru">Контакты</span><span class="lang-en">Contacts</span></a>
+                    </div>
+                    <a href="tel:+79778389898" class="phone-link">+7 977 838 98 98</a>
+                    <div class="cart-indicator" id="cartIndicator">
+                        <span class="cart-icon">🛒</span>
+                        <span class="cart-total" id="cartTotal">0 ₽</span>
+                    </div>
+                    <div class="cart-preview" id="cartPreview">
+                        <div class="cart-preview-items" id="cartPreviewItems">
+                            <p class="muted"><span class="lang-ru">Корзина пуста</span><span class="lang-en">Cart is empty</span></p>
+                        </div>
+                        <div class="cart-preview-total"><span>Итого</span><strong id="cartPreviewTotal">0 ₽</strong></div>
+                        <button class="modal-add-btn" id="cartGoCheckoutBtn" type="button">
+                            <span class="lang-ru">Оформить заказ</span><span class="lang-en">Checkout</span>
+                        </button>
+                    </div>
+                    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">
+                        <span id="themeIcon">🌙</span>
+                    </button>
+                    <div class="lang-switch">
+                        <button type="button" class="lang-toggle" id="langToggle" aria-label="Переключить язык">
+                            <span class="lang-opt is-active" data-lang="ru">RU</span>
+                            <span class="lang-sep" aria-hidden="true">/</span>
+                            <span class="lang-opt" data-lang="en">EN</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-<!-- Верхнее меню с телефоном -->
-<div class="top-menu">
-    <a href="tel:+79778389898" class="phone-link">+7 977 838 98 98</a>
-</div>
+    <main>
+        <div class="hero-top-stack">
+            <section class="section welcome-marquee-section">
+                <div class="section-title">
+                    <div class="marquee-head">
+                        <div class="marquee-rail lang-ru" aria-label="Добро пожаловать в мир Нэшвиллской курицы">
+                            <div class="marquee-track">
+                                <span>Добро пожаловать в мир Нэшвилловской курицы</span><span>//</span><span>Добро пожаловать в мир Нэшвилловской курицы</span><span>//</span><span>Добро пожаловать в мир Нэшвилловской курицы</span><span>//</span><span>Добро пожаловать в мир Нэшвилловской курицы</span>
+                            </div>
+                            <div class="marquee-track" aria-hidden="true">
+                                <span>Добро пожаловать в мир Нэшвилловской курицы</span><span>//</span><span>Добро пожаловать в мир Нэшвилловской курицы</span><span>//</span><span>Добро пожаловать в мир Нэшвилловской курицы</span><span>//</span><span>Добро пожаловать в мир Нэшвилловской курицы</span>
+                            </div>
+                        </div>
+                        <div class="marquee-rail lang-en" aria-label="Welcome to the world of Nashville hot chicken">
+                            <div class="marquee-track">
+                                <span>Welcome to the world of Nashville hot chicken</span><span>//</span><span>Welcome to the world of Nashville hot chicken</span><span>//</span><span>Welcome to the world of Nashville hot chicken</span><span>//</span><span>Welcome to the world of Nashville hot chicken</span>
+                            </div>
+                            <div class="marquee-track" aria-hidden="true">
+                                <span>Welcome to the world of Nashville hot chicken</span><span>//</span><span>Welcome to the world of Nashville hot chicken</span><span>//</span><span>Welcome to the world of Nashville hot chicken</span><span>//</span><span>Welcome to the world of Nashville hot chicken</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-<center>
+            <div class="logo-overlay" aria-hidden="true">
+                <div class="logo-overlay-bg"></div>
+                <img class="ring r1 fade-in-image" src="images/circle1.png" alt="">
+                <img class="hero-logo fade-in-image" src="images/circle2.png" alt="Emika's Hot Chicken">
+            </div>
 
-<!-- Шапка с вращающимися логотипами -->
-<div class="image-wrapper">
-    <img src="images/circle2.png" alt="Emika's Hot Chicken" class="static-image">
-    <img src="images/circle1.png" class="rotating-image">
-</div>
+            <section class="video-banner-section" id="banner">
+                <div class="slider-container">
+                    <div class="slider-slide active" data-slide="0" data-action="scroll">
+                        <img src="images/banner1.jpg" alt="Banner 1">
+                    </div>
+                    <div class="slider-slide" data-slide="1" data-action="next">
+                        <video muted loop playsinline>
+                            <source src="images/banner_1_720.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="slider-slide" data-slide="2" data-action="next">
+                        <video muted loop playsinline>
+                            <source src="images/banner_2_720.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="slider-slide" data-slide="3" data-action="franchise">
+                        <img src="images/banner2.jpg" alt="Banner 2">
+                    </div>
+                </div>
+            </section>
+        </div>
 
-<!-- Видео баннер с логотипом -->
-<div class="video-banner-container">
-    <video autoplay muted loop playsinline>
-        <source src="images/banner_1_720.mp4" type="video/mp4">
-    </video>
-    <div class="logo-overlay">
-        <img src="images/logo.png" alt="Emika's Hot Chicken Logo">
+        <section class="pinned-section" aria-label="Закрепления">
+            <div class="pinned-grid">
+                <button type="button" class="pin-tile pin-tile--1" id="pinTile1" aria-label="Eat Arena">
+                    <div class="pin-tile__media">
+                        <img src="images/place1.png" alt="">
+                    </div>
+                    <div class="pin-tile__text-wrap">
+                        <div class="pin-tile__text lang-ru">
+                            <strong>Eat Arena</strong>
+                            <span>место с лучшей курочкой</span>
+                        </div>
+                        <div class="pin-tile__text lang-en">
+                            <strong>Eat Arena</strong>
+                            <span>the best chicken spot</span>
+                        </div>
+                    </div>
+                </button>
+                <button type="button" class="pin-tile pin-tile--2" id="pinTile2" aria-label="Новая точка">
+                    <div class="pin-tile__media">
+                        <img src="images/place2.png" alt="">
+                    </div>
+                    <div class="pin-tile__text-wrap">
+                        <div class="pin-tile__text lang-ru">
+                            <strong>Мы растём!</strong>
+                            <span>Скоро откроем новую точку</span>
+                        </div>
+                        <div class="pin-tile__text lang-en">
+                            <strong>We're growing!</strong>
+                            <span>New location opening soon</span>
+                        </div>
+                    </div>
+                </button>
+                <button type="button" class="pin-tile pin-tile--3" id="pinTile3" aria-label="Рилсы">
+                    <div class="pin-tile__media">
+                        <video src="images/reels.mp4" muted loop playsinline autoplay preload="metadata" aria-hidden="true"></video>
+                    </div>
+                    <div class="pin-tile__text-wrap">
+                        <div class="pin-tile__text lang-ru">
+                            <strong>Рилсы</strong>
+                            <span>Вместо тысячи слов</span>
+                        </div>
+                        <div class="pin-tile__text lang-en">
+                            <strong>Reels</strong>
+                            <span>See it for yourself</span>
+                        </div>
+                    </div>
+                </button>
+                <a class="pin-tile pin-tile--4" href="https://eda.yandex.ru/moscow/r/emika_s_hot_chicken" target="_blank" rel="noopener" aria-label="Доставка Яндекс Еда">
+                    <div class="pin-tile__media">
+                        <span class="pin-kurica-bob" aria-hidden="true">
+                            <img src="images/kurica.png" alt="">
+                        </span>
+                    </div>
+                    <div class="pin-tile__text-wrap">
+                        <div class="pin-tile__text lang-ru">
+                            <strong>Доставка</strong>
+                            <span class="pin-delivery-line">закажи в <img class="pin-yeda" src="images/yeda.png" alt="Яндекс Еда"></span>
+                        </div>
+                        <div class="pin-tile__text lang-en">
+                            <strong>Delivery</strong>
+                            <span class="pin-delivery-line">order on <img class="pin-yeda" src="images/yeda.png" alt="Yandex Eda"></span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="section hero" id="top">
+            <div>
+                <h1 class="lang-ru">Острая курочка из <span class="highlight">Нэшвилла</span> — в <span class="highlight">Москве</span>!</h1>
+                <h1 class="lang-en">Nashville hot chicken — now in <span class="highlight">Moscow</span>!</h1>
+                <p class="lang-ru">
+                    Культовая курочка в Нэшвиллском стиле. Вы узнаете, почему наша курочка доминирует
+                    над вкусом из Кентукки!
+                </p>
+                <p class="lang-en">
+                    Iconic Nashville-style chicken. Taste why our chicken leaves Kentucky in the dust.
+                </p>
+            </div>
+        </section>
+
+        <!-- About videos popup (Instagram stories style) -->
+        <div id="storiesPopup" class="stories-popup" aria-hidden="true">
+            <div class="stories-popup-inner" role="dialog" aria-modal="true" aria-label="About videos">
+                <div class="stories-progress" aria-hidden="true">
+                    <div class="stories-progress-bar"><div class="fill"></div></div>
+                    <div class="stories-progress-bar"><div class="fill"></div></div>
+                </div>
+                <button id="storiesCloseBtn" class="stories-close" type="button" aria-label="Close">×</button>
+           
+                <video id="storiesVideo" class="stories-video" playsinline preload="metadata"></video>
+                <div class="stories-scrub-wrap">
+                    <input id="storiesScrub" class="stories-scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek video">
+                </div>
+            </div>
+        </div>
+
+        <div id="menuTabs" style="position:relative; top:-90px;"></div>
+
+        <section class="section menu-start-section" id="menu">
+            <div class="section-title">
+                <div class="marquee-head menu">
+                    <div class="marquee-rail lang-ru" aria-label="Меню">
+                        <div class="marquee-track">
+                            <span>МЕНЮ</span><span>//</span><span>МЕНЮ</span><span>//</span><span>МЕНЮ</span><span>//</span><span>МЕНЮ</span><span>//</span><span>МЕНЮ</span>
+                        </div>
+                        <div class="marquee-track" aria-hidden="true">
+                            <span>МЕНЮ</span><span>//</span><span>МЕНЮ</span><span>//</span><span>МЕНЮ</span><span>//</span><span>МЕНЮ</span><span>//</span><span>МЕНЮ</span>
+                        </div>
+                    </div>
+                    <div class="marquee-rail lang-en" aria-label="Menu">
+                        <div class="marquee-track">
+                            <span>MENU</span><span>//</span><span>MENU</span><span>//</span><span>MENU</span><span>//</span><span>MENU</span><span>//</span><span>MENU</span>
+                        </div>
+                        <div class="marquee-track" aria-hidden="true">
+                            <span>MENU</span><span>//</span><span>MENU</span><span>//</span><span>MENU</span><span>//</span><span>MENU</span><span>//</span><span>MENU</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-spice-block" id="menuSpice">
+                <p class="spice-global-title lang-ru">Выберите свою остроту!</p>
+                <p class="spice-global-title lang-en">Choose your heat level!</p>
+                <div class="spice-global-btns" id="spiceGlobalBtns" role="group" aria-label="Уровень остроты">
+                    <button type="button" class="spice-global-btn is-active" data-spice="0">
+                        <span class="lang-ru">без остроты</span><span class="lang-en">no spice</span>
+                    </button>
+                    <button type="button" class="spice-global-btn" data-spice="25">
+                        <span class="lang-ru">легкий</span><span class="lang-en">mild</span>
+                    </button>
+                    <button type="button" class="spice-global-btn" data-spice="50">
+                        <span class="lang-ru">средний</span><span class="lang-en">medium</span>
+                    </button>
+                    <button type="button" class="spice-global-btn" data-spice="75">
+                        <span class="lang-ru">острый</span><span class="lang-en">hot</span>
+                    </button>
+                    <button type="button" class="spice-global-btn" data-spice="100">
+                        <span class="lang-ru">жгучий</span><span class="lang-en">supreme</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="combos">
+            <div class="section-title">
+                <h2 class="lang-ru">Комбо</h2>
+                <h2 class="lang-en">Combos</h2>
+                <span class="pill lang-ru">Все сразу</span>
+                <span class="pill lang-en">All-in one</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image" data-product="combo1">
+                    <img src="images/combo1.png" alt="Комбо 1" class="product-image" data-modal="combo1">
+                    <h3><span class="lang-ru">Комбо 1</span><span class="lang-en">Combo 1</span></h3>
+                    <p class="lang-ru">1 MC Сэндвич, 1 тендер, картофель фри, огурчики, MC соус.</p>
+                    <p class="lang-en">1 MC sandwich, 1 tender, seasoned fries, pickles, MC sauce.</p>
+                    <div class="card-footer">
+                        <div class="card-price">619 ₽</div>
+                        <button class="add-to-cart-btn" data-product="combo1" data-price="619">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="combo2">
+                    <img src="images/combo2.png" alt="Комбо 2" class="product-image" data-modal="combo2">
+                    <h3><span class="lang-ru">Комбо 2</span><span class="lang-en">Combo 2</span></h3>
+                    <p class="lang-ru">3 тендера, картофель фри, огурчики, MC соус.</p>
+                    <p class="lang-en">3 tenders, seasoned fries, pickles, MC sauce.</p>
+                    <div class="card-footer">
+                        <div class="card-price">820 ₽</div>
+                        <button class="add-to-cart-btn" data-product="combo2" data-price="820">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="combo3">
+                    <img src="images/combo3.png" alt="Комбо 3" class="product-image" data-modal="combo3">
+                    <h3><span class="lang-ru">Комбо 3</span><span class="lang-en">Combo 3</span></h3>
+                    <p class="lang-ru">2 MC Сэндвича, картофель фри, MC соус.</p>
+                    <p class="lang-en">2 MC sandwiches, seasoned fries, MC sauce.</p>
+                    <div class="card-footer">
+                        <div class="card-price">889 ₽</div>
+                        <button class="add-to-cart-btn" data-product="combo3" data-price="889">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="combo4">
+                    <img src="images/combo4.png" alt="Комбо 4" class="product-image" data-modal="combo4">
+                    <h3><span class="lang-ru">Комбо 4</span><span class="lang-en">Combo 4</span></h3>
+                    <p class="lang-ru">6 тендеров, картофель фри, огурчики, 3 MC соуса.</p>
+                    <p class="lang-en">6 tenders, seasoned fries, pickles, 3 MC sauces.</p>
+                    <div class="card-footer">
+                        <div class="card-price">949 ₽</div>
+                        <button class="add-to-cart-btn" data-product="combo4" data-price="949">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="combo5">
+                    <img src="images/combo5.png" alt="Байтсы и картошка Фри" class="product-image" data-modal="combo5">
+                    <h3><span class="lang-ru">Байтсы и картошка Фри</span><span class="lang-en">Bites & Fries</span></h3>
+                    <p class="lang-ru">Байтсы из курочки и картофель фри — самый быстрый перекус.</p>
+                    <p class="lang-en">Chicken bites and fries — the fastest snack.</p>
+                    <div class="card-footer">
+                        <div class="card-price">123 ₽</div>
+                        <button class="add-to-cart-btn" data-product="combo5" data-price="123">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="bowls">
+            <div class="section-title">
+                <h2 class="lang-ru">Боулы</h2>
+                <h2 class="lang-en">Bowls</h2>
+                <span class="pill lang-ru">Плотно и сочно</span>
+                <span class="pill lang-en">Hearty & saucy</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image" data-product="bowl1">
+                    <img src="images/bowl1.png" alt="Emika's Боул" class="product-image" data-modal="bowl1">
+                    <h3><span class="lang-ru">Emika's Боул</span><span class="lang-en">Emika's Bowl</span></h3>
+                    <p class="lang-ru">Нэшвилл курица, фирменные специи, добавьте свой уровень огня.</p>
+                    <p class="lang-en">Nashville chicken with our signature spice blend and your heat level.</p>
+                    <div class="card-footer">
+                        <div class="card-price">799 ₽</div>
+                        <button class="add-to-cart-btn" data-product="bowl1" data-price="799">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="bowl2">
+                    <img src="images/bowl2.png" alt="Мак'н'Чиз Боул" class="product-image" data-modal="bowl2">
+                    <h3><span class="lang-ru">Мак'н'Чиз Боул</span><span class="lang-en">Mac & Cheese Bowl</span></h3>
+                    <p class="lang-ru">Кремовый сырный мак-н-чиз и горячая курица — утешение в миске.</p>
+                    <p class="lang-en">Creamy mac & cheese topped with hot chicken — comfort in a bowl.</p>
+                    <div class="card-footer">
+                        <div class="card-price">799 ₽</div>
+                        <button class="add-to-cart-btn" data-product="bowl2" data-price="799">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="chicken">
+            <div class="section-title">
+                <h2 class="lang-ru">Курица</h2>
+                <h2 class="lang-en">Chicken</h2>
+                <span class="pill lang-ru">Горячее и хрустящее</span>
+                <span class="pill lang-en">Hot & crispy</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image" data-product="tenders">
+                    <img src="images/burg3.png" alt="Стрипс" class="product-image" data-modal="tenders">
+                    <h3><span class="lang-ru">Стрипс</span><span class="lang-en">Tenders</span></h3>
+                    <p class="lang-ru">Тендеры из сочной курицы с вашим уровнем остроты.</p>
+                    <p class="lang-en">Juicy tenders with your heat level of choice.</p>
+                    <div class="card-footer">
+                        <div class="card-price">329 ₽</div>
+                        <button class="add-to-cart-btn" data-product="tenders" data-price="329">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="bites">
+                    <img src="images/bites.png" alt="Байтсы" class="product-image" data-modal="bites">
+                    <h3><span class="lang-ru">Байтсы</span><span class="lang-en">Bites</span></h3>
+                    <p class="lang-ru">Кусочки горячей курицы — идеально, чтобы “перехватить”.</p>
+                    <p class="lang-en">Bite-sized hot chicken — perfect for a quick snack.</p>
+                    <div class="card-footer">
+                        <div class="card-price">350 ₽</div>
+                        <button class="add-to-cart-btn" data-product="bites" data-price="350">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="burgers">
+            <div class="section-title">
+                <h2 class="lang-ru">Бургеры и фри</h2>
+                <h2 class="lang-en">Burgers & fries</h2>
+                <span class="pill lang-ru">Классика</span>
+                <span class="pill lang-en">Classics</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image" data-product="burger">
+                    <img src="images/burg1.png" alt="Бургер" class="product-image" data-modal="burger">
+                    <h3><span class="lang-ru">Бургер</span><span class="lang-en">Sandwich</span></h3>
+                    <p class="lang-ru">Сочный хот-чикен в мягкой булочке, идеальный баланс огня и вкуса.</p>
+                    <p class="lang-en">Juicy hot chicken in a soft bun — the perfect fire/flavor balance.</p>
+                    <div class="card-footer">
+                        <div class="card-price">429 ₽</div>
+                        <button class="add-to-cart-btn" data-product="burger" data-price="429">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="fries">
+                    <img src="images/burg2.png" alt="Картошка фри" class="product-image" data-modal="fries">
+                    <h3><span class="lang-ru">Картошка фри</span><span class="lang-en">Fries</span></h3>
+                    <p class="lang-ru">Хрустящие, приправленные — лучшие друзья любого сэндвича.</p>
+                    <p class="lang-en">Crispy seasoned fries — the only right sidekick.</p>
+                    <div class="card-footer">
+                        <div class="card-price">229 ₽</div>
+                        <button class="add-to-cart-btn" data-product="fries" data-price="229">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="cheese-medallions">
+                    <img src="images/cheese.png" alt="Сырные медальоны" class="product-image" data-modal="cheese-medallions">
+                    <h3><span class="lang-ru">Сырные медальоны</span><span class="lang-en">Cheese medallions</span></h3>
+                    <p class="lang-ru">Нежные сырные медальоны с хрустящей корочкой.</p>
+                    <p class="lang-en">Tender cheese medallions with a crispy crust.</p>
+                    <div class="card-footer">
+                        <div class="card-price">от 179 ₽</div>
+                        <button class="add-to-cart-btn" data-product="cheese-medallions" data-price="179">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="sides">
+            <div class="section-title">
+                <h2 class="lang-ru">Соусы и гарниры</h2>
+                <h2 class="lang-en">Sauces & sides</h2>
+                <span class="pill lang-ru">Идеальны к основным блюдам</span>
+                <span class="pill lang-en">Perfect with your mains</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image" data-product="sauce">
+                    <img src="images/sal1.png" alt="Соус Emika's" class="product-image" data-modal="sauce">
+                    <h3><span class="lang-ru">Соус Emika's</span><span class="lang-en">Emika's sauce</span></h3>
+                    <p class="lang-ru">Фирменный соус, который собирает все вкусы воедино.</p>
+                    <p class="lang-en">Our signature sauce tying every bite together.</p>
+                    <div class="card-footer">
+                        <div class="card-price">199 ₽</div>
+                        <button class="add-to-cart-btn" data-product="sauce" data-price="199">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="coleslaw">
+                    <img src="images/sal2.png" alt="Салат Коул Слоу" class="product-image" data-modal="coleslaw">
+                    <h3><span class="lang-ru">Салат Коул Слоу</span><span class="lang-en">Coleslaw</span></h3>
+                    <p class="lang-ru">Свежий хруст, чтобы сбалансировать остроту.</p>
+                    <p class="lang-en">Fresh crunch to balance the spice.</p>
+                    <div class="card-footer">
+                        <div class="card-price">229 ₽</div>
+                        <button class="add-to-cart-btn" data-product="coleslaw" data-price="229">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="pickles">
+                    <img src="images/sal3.png" alt="Огурчики" class="product-image" data-modal="pickles">
+                    <h3><span class="lang-ru">Огурчики</span><span class="lang-en">Pickles</span></h3>
+                    <p class="lang-ru">Классический акцент к горячей курице.</p>
+                    <p class="lang-en">Classic pickles to cut through the heat.</p>
+                    <div class="card-footer">
+                        <div class="card-price">229 ₽</div>
+                        <button class="add-to-cart-btn" data-product="pickles" data-price="229">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="mac">
+                    <img src="images/sal4.png" alt="Мак'н'Чиз" class="product-image" data-modal="mac">
+                    <h3><span class="lang-ru">Мак'н'Чиз</span><span class="lang-en">Mac & cheese</span></h3>
+                    <p class="lang-ru">Плотный сырный гарнир для настоящих фанатов комфорта.</p>
+                    <p class="lang-en">Rich cheesy side for true comfort fans.</p>
+                    <div class="card-footer">
+                        <div class="card-price">249 ₽</div>
+                        <button class="add-to-cart-btn" data-product="mac" data-price="249">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="drinks">
+            <div class="section-title">
+                <h2 class="lang-ru">Напитки</h2>
+                <h2 class="lang-en">Drinks</h2>
+                <span class="pill lang-ru">Чтобы остудить жар во рту</span>
+                <span class="pill lang-en">Cool the fire</span>
+            </div>
+            <div class="cards">
+                <div class="card fade-in-image" data-product="drink-choco">
+                    <img src="images/drink3.png" alt="Милкшейк Шоколад" class="product-image" data-modal="drink-choco">
+                    <h3><span class="lang-ru">Милкшейк — Шоколад</span><span class="lang-en">Chocolate milkshake</span></h3>
+                    <p class="lang-ru">Плотный шоколадный шейк для десерта.</p>
+                    <p class="lang-en">Thick chocolate shake to finish strong.</p>
+                    <div class="card-footer">
+                        <div class="card-price">290 ₽</div>
+                        <button class="add-to-cart-btn" data-product="drink-choco" data-price="290">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="drink-straw">
+                    <img src="images/drink4.png" alt="Милкшейк Клубника" class="product-image" data-modal="drink-straw">
+                    <h3><span class="lang-ru">Милкшейк — Клубника</span><span class="lang-en">Strawberry milkshake</span></h3>
+                    <p class="lang-ru">Классика с ноткой свежих ягод.</p>
+                    <p class="lang-en">Classic strawberry with a fresh berry vibe.</p>
+                    <div class="card-footer">
+                        <div class="card-price">290 ₽</div>
+                        <button class="add-to-cart-btn" data-product="drink-straw" data-price="290">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card fade-in-image" data-product="drink-van">
+                    <img src="images/drink5.png" alt="Милкшейк Ваниль" class="product-image" data-modal="drink-van">
+                    <h3><span class="lang-ru">Милкшейк — Ваниль</span><span class="lang-en">Vanilla milkshake</span></h3>
+                    <p class="lang-ru">Нежный ванильный вкус, чтобы сбалансировать огонь.</p>
+                    <p class="lang-en">Smooth vanilla to cool things down.</p>
+                    <div class="card-footer">
+                        <div class="card-price">290 ₽</div>
+                        <button class="add-to-cart-btn" data-product="drink-van" data-price="290">
+                            <span class="lang-ru">В корзину</span>
+                            <span class="lang-en">Add</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="yandex-map-container">
+            <iframe src="https://yandex.ru/map-widget/v1/-/CLDpiAJ1" width="100%" height="280" frameborder="0" allowfullscreen="true" style="pointer-events: auto;"></iframe>
+        </div>
+    </main>
+
+    <!-- Pin info modal -->
+    <div class="modal-overlay pin-info-modal" id="pinInfoModal">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-label="Информация">
+            <button class="modal-close" id="pinInfoClose" type="button">&times;</button>
+            <h2 class="modal-title" id="pinInfoTitle"></h2>
+            <p class="modal-description" id="pinInfoText"></p>
+            <a class="pin-map-link" id="pinInfoLink" href="#" target="_blank" rel="noopener" style="display:none;"></a>
+        </div>
     </div>
-</div>
 
-    <br><br><br><br><br>
-        <div class="text-content"><br><br><br><br><br>
-         <center>  <table width="70%"><tr><td> <img src="images/photo.png" alt="Горячая курица" class="fade-in-image" width="80%">
-            <h2>Добро пожаловать в мир Нэшвиллской курицы!</h2>
-<p>
-Мы доставляем настоящий вкус Нэшвилла прямо к вашей тарелке,
-специализируясь на культовых бургерах и стрипсах горячей курицей
-в нэшвиллском стиле. Наш уникальный взгляд
-на эту любимую классику заставит вас захотеть добавки.
-Наше меню составлено с учётом разнообразных вкусов на любой вкус.
-</p>
-<p class="spice-levels">
-Выбирайте из пяти уровней остроты: «без остроты» начальный уровень, «легкий»
-для тех, кто предпочитает лёгкую остроту, «средний» для более смелых,
-«острый» для любителей острых ощущений и «жгучий» для бесстрашных.
-Мы удовлетворим все ваши потребности в блюдах.
-</p>
-<p>
-EMIKA’S Hot Chicken — это не просто еда,
-это создание незабываемых кулинарных впечатлений.
-Нас отличает сочетание традиционных вкусов
-и инновационных решений, подкрепленное
-стремлением к качеству.
-</p>
-<p>
-Приглашаем вас присоединиться к нам и узнать почему!
-Мы больше, чем просто ресторан —
-мы являемся воплощением огненного духа Нэшвилла!
-</p>
-<p>
-Выберите нас и почувствуйте разницу!
-</p>    </div>
-</td></tr></table>
+    <!-- Product modal (frontend) -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-label="Product">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="product-modal-grid">
+                <img class="modal-image" id="modalImage" src="" alt="">
+                <div class="product-modal-right">
+                    <h2 class="modal-title" id="modalTitle"></h2>
+                    <p class="modal-description" id="modalDescription"></p>
+                    <div class="modal-meta" id="modalMeta">
+                        <span class="meta-chip" id="modalKcal">— ккал</span>
+                        <span class="meta-chip" id="modalPrice">— ₽</span>
+                    </div>
+                    <div class="modal-pack-control" id="modalPackControl" aria-hidden="true">
+                        <div class="modal-pack-label">
+                            <span class="lang-ru">Количество</span>
+                            <span class="lang-en">Quantity</span>
+                        </div>
+                        <div class="modal-pack-buttons" id="modalPackButtons"></div>
+                    </div>
+                    <div class="spice-control" id="spiceControl">
+                        <span class="spice-label lang-ru">Острота</span>
+                        <span class="spice-label lang-en">Spice</span>
+                        <div class="spice-control-main">
+                            <input type="range" min="0" max="100" step="25" value="0" class="spice-slider" id="spiceSlider">
+                            <span class="spice-level-display" id="spiceLevelText">Без остроты</span>
+                            <div class="spice-video-wrap" aria-hidden="true">
+                                <video class="spice-video" id="spiceVideo" muted playsinline preload="metadata"></video>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="modal-add-btn" id="modalAddBtn">
+                        <span class="lang-ru">Добавить в корзину</span>
+                        <span class="lang-en">Add to cart</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <aside class="cart-drawer" id="cartDrawer" aria-label="Cart">
+        <div class="cart-head">
+            <h3><span class="lang-ru">Корзина</span><span class="lang-en">Cart</span></h3>
+            <button class="cart-close" id="cartCloseBtn" type="button">×</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <p id="cartEmptyState"><span class="lang-ru">Пока пусто</span><span class="lang-en">Empty for now</span></p>
+        </div>
+        <div class="cart-footer">
+            <input id="preName" class="promo-input" type="text" placeholder="Имя / Name">
+            <input id="prePhone" class="promo-input" type="tel" placeholder="Телефон / Phone">
+            <input id="promoCode" class="promo-input" type="text" placeholder="Промокод / Promo code">
+            <div class="payment-options">
+                <label><input type="radio" name="paymentMethod" value="sbp" checked> <span class="lang-ru">Оплата онлайн СБП</span><span class="lang-en">Online payment via SBP</span></label>
+                <label><input type="radio" name="paymentMethod" value="pickup"> <span class="lang-ru">Оплатить при самовывозе</span><span class="lang-en">Pay on pickup</span></label>
+            </div>
+            <p class="cart-inline-error" id="preCheckoutError"><span class="lang-ru">Введите имя и телефон, чтобы оформить заказ.</span><span class="lang-en">Enter name and phone to continue.</span></p>
+            <div class="card-price" id="cartDrawerTotal">0 ₽</div>
+            <button class="modal-add-btn" id="checkoutBtn" type="button">
+                <span class="lang-ru">Оформить заказ</span><span class="lang-en">Checkout</span>
+            </button>
+        </div>
+    </aside>
 
-<!-- Баннер Яндекс Еды -->
-<div class="yandex-eda-banner">
-    <a href="https://eda.yandex.ru/moscow/r/emika_s_hot_chicken" target="_blank">Закажи доставку на Яндекс Еде</a>
-</div>
-
-<img src="images/title1.png" >
-<table width="80%">
-<tr>
-<td><center>
- <img src="images/combo1.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Комбо 1</font></center></td>
-<td><center>
- <img src="images/combo2.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Комбо 2</font></center></td>
-</tr>
-<tr>
-<td><center>
- <img src="images/combo3.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Комбо 3</font></center></td>
-<td><center>
- <img src="images/combo4.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Комбо 4</font></center></td>
-</tr>
-</table>
-
-
-
-<br>
-
-<img src="images/title2.png" >
-<br> 
-
-
-
-
-<table width="80%">
-<tr>
-<td><center>
- <img src="images/bowl1.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Emika's Боул</font></center></td>
-<td><center>
- <img src="images/bowl2.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Мак'н'Чиз Боул</font></center></td>
-</tr>
-
-</table>
-<br>
-
-<img src="images/title3.png" >
-<br>  
-
-
-<table width="80%">
-<tr>
-<td><center>
- <img src="images/burg1.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Бургер</font></center></td>
-<td><center>
- <img src="images/burg2.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Картошка Фри</font></center></td>
-</tr>
-<tr>
-<td><center>
- <img src="images/burg3.png" class="fade-in-image" width="400"><br>
-<font face="impact" size="4" color="#ffffff">Стрипс</font></center></td>
-<td><center>
-</tr>
-</table>
-<br>
-
-<img src="images/title4.png" >
-<br>  
-<table width="80%">
-<td><center> <img src="images/sal1.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">Соус Emika's</font></center></td>
-<td><center>
- <img src="images/sal2.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">Салат Коул Слоу</font></center></td>
-</tr>
-<tr><td><center>
- <img src="images/sal3.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">Огурчики</font></center></td>
-<td><center>
- <img src="images/sal4.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">Мак'н'Чиз</font></center></td>
-
-</tr>
-</table>
-
-
-<img src="images/title5.png" >
-<br>  
-<table width="80%">
-<td><center> <img src="images/drink1.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">слаш<br>
-<font face="impact" size="4" color="#ffffff">Лесные ягоды</font></center></td>
-<td><center>
- <img src="images/drink2.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">слаш<br>
-<font face="impact" size="4" color="#ffffff">Клубника<br></td>
-<td><center>
- <img src="images/drink3.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">милкшейк<br>
-<font face="impact" size="4" color="#ffffff">Шоколад<br></td></tr><tr>
-<td><center>
- <img src="images/drink4.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">милкшейк<br>
-<font face="impact" size="4" color="#ffffff">Клубника<br></td>
-<td><center>
- <img src="images/drink5.png" class="fade-in-image" width="240"><br>
-<font face="impact" size="4" color="#ffffff">милкшейк<br>
-<font face="impact" size="4" color="#ffffff">Ваниль<br></td>
-</tr>
-</table>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="brand">
+                <img src="images/logo.png" alt="Emika's Hot Chicken логотип">
+            </div>
+            <div style="flex: 1; text-align: center;">
+                <small class="lang-ru">© 2025 Emika's Hot Chicken. Вкус Нэшвилла в Москве.</small>
+                <small class="lang-en">© 2025 Emika's Hot Chicken. Nashville heat in Moscow.</small>
+                <br>
+                <small class="lang-ru" style="display: block; margin-top: 8px;">Москва, Мичуринский проспект, 13А, стр. 1, метро «Ломоносовский проспект», Eat Arena, 2 этаж</small>
+                <small class="lang-en" style="display: block; margin-top: 8px;">Moscow, Michurinsky Avenue, 13A, bld. 1, Lomonosovsky Prospekt metro, Eat Arena, 2nd floor</small>
+                <br>
+                <a href="tel:+79778389898" style="color: var(--orange); font-weight: 700; text-decoration: none;">+7 977 838 98 98</a>
+            </div>
+            <div class="footer-links">
+                <a class="social-btn whatsapp" href="https://wa.me/79778389898" target="_blank" rel="noopener">WhatsApp</a>
+                <a class="social-btn telegram" href="https://t.me/+79778389898" target="_blank" rel="noopener">Telegram</a>
+                <a class="ghost-btn" href="https://www.instagram.com/emikashotchicken/" target="_blank" rel="noopener">Instagram</a>
+                <a class="ghost-btn" href="https://emikashotchicken.ru/franchise" target="_blank" rel="noopener">
+                    <span class="lang-ru">Франшиза Emika's</span>
+                    <span class="lang-en">Emika's Franchise</span>
+                </a>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener('DOMContentLoaded', () => {
             const images = document.querySelectorAll('.fade-in-image');
-
-            const observer = new IntersectionObserver(function(entries, observer) {
-                entries.forEach(function(entry) {
-                    // entry.isIntersecting === true, если элемент виден в области просмотра
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
-                        // Отключаем наблюдение за этим элементом после того, как он стал видимым
                         observer.unobserve(entry.target);
                     }
                 });
-            }, {
-                // rootMargin: '0px 0px -100px 0px' // Опционально: можно настроить, когда элемент считается видимым
+            }, { rootMargin: '0px 0px -80px 0px' });
+
+            images.forEach((image) => observer.observe(image));
+
+            const getActiveLang = () => document.querySelector('.lang-opt.is-active')?.dataset.lang || 'ru';
+
+            const switchLanguage = (lang) => {
+                document.querySelectorAll('.lang-opt').forEach((opt) => {
+                    opt.classList.toggle('is-active', opt.dataset.lang === lang);
+                });
+                document.querySelectorAll('.lang-ru').forEach(el => {
+                    el.style.display = lang === 'ru' ? '' : 'none';
+                });
+                document.querySelectorAll('.lang-en').forEach(el => {
+                    el.style.display = lang === 'en' ? '' : 'none';
+                });
+                localStorage.setItem('emika-lang', lang);
+            };
+
+            const langToggle = document.getElementById('langToggle');
+            if (langToggle) {
+                langToggle.addEventListener('click', (e) => {
+                    const opt = e.target.closest('.lang-opt');
+                    if (opt?.dataset.lang) {
+                        switchLanguage(opt.dataset.lang);
+                        return;
+                    }
+                    switchLanguage(getActiveLang() === 'ru' ? 'en' : 'ru');
+                });
+            }
+
+            const savedLang = localStorage.getItem('emika-lang');
+            switchLanguage(savedLang === 'en' ? 'en' : 'ru');
+
+            // Theme (default = dark)
+            const root = document.documentElement;
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const headerLogo = document.querySelector('header .brand img');
+            const savedTheme = localStorage.getItem('emika-theme');
+            const initialTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
+
+            const applyThemeUi = (theme) => {
+                if (themeIcon) themeIcon.textContent = theme === 'light' ? '☀️' : '🌙';
+                if (headerLogo) {
+                    headerLogo.src = theme === 'light' ? 'images/logo_white.png' : 'images/logo.png';
+                }
+            };
+
+            root.setAttribute('data-theme', initialTheme);
+            applyThemeUi(initialTheme);
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                    const next = current === 'light' ? 'dark' : 'light';
+                    root.setAttribute('data-theme', next);
+                    localStorage.setItem('emika-theme', next);
+                    applyThemeUi(next);
+                });
+            }
+
+            // Popup "stories" for about videos
+            const aboutPreview = document.getElementById('aboutReelsPreview');
+            const aboutStoriesLink = document.getElementById('aboutStoriesLink');
+            const storiesPopup = document.getElementById('storiesPopup');
+            const storiesVideo = document.getElementById('storiesVideo');
+            const storiesScrub = document.getElementById('storiesScrub');
+            const storiesCloseBtn = document.getElementById('storiesCloseBtn');
+            const storiesFirstLink = document.getElementById('storiesFirstLink');
+            const storiesInner = document.querySelector('.stories-popup-inner');
+            const storyProgressFills = storiesPopup
+                ? Array.from(storiesPopup.querySelectorAll('.stories-progress-bar .fill'))
+                : [];
+
+            const storySources = ['images/about_us.mp4', 'images/fran.mp4'];
+            let storyIndex = 0;
+            let isScrubbing = false;
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let isPreviewHeld = false;
+
+            function buildAboutStoryLink(index) {
+                try {
+                    const url = new URL(window.location.href);
+                    url.hash = `aboutStory=${index}`;
+                    return url.toString();
+                } catch (e) {
+                    // Fallback for environments without URL constructor
+                    return `${window.location.pathname || 'index.html'}#aboutStory=${index}`;
+                }
+            }
+
+            function syncStoriesFirstLink() {
+                if (!storiesFirstLink) return;
+                const linkHref = buildAboutStoryLink(0);
+                storiesFirstLink.href = linkHref;
+                storiesFirstLink.style.display = storyIndex === 0 ? 'flex' : 'none';
+            }
+
+            function updateFromTime() {
+                if (!storiesVideo || !storiesScrub) return;
+                const dur = storiesVideo.duration;
+                if (!dur || !isFinite(dur)) return;
+
+                const pct = Math.max(0, Math.min(100, (storiesVideo.currentTime / dur) * 100));
+                if (storyProgressFills[storyIndex]) {
+                    storyProgressFills[storyIndex].style.width = pct + '%';
+                }
+
+                if (!isScrubbing) {
+                    storiesScrub.value = String(Math.round((storiesVideo.currentTime / dur) * 1000));
+                }
+            }
+
+            function resetProgress(targetIndex) {
+                storyProgressFills.forEach((fill, i) => {
+                    fill.style.width = i < targetIndex ? '100%' : '0%';
+                });
+                if (storiesScrub) storiesScrub.value = '0';
+            }
+
+            function loadStory(index) {
+                if (!storiesVideo) return;
+                storyIndex = index;
+
+                resetProgress(storyIndex);
+                storiesVideo.pause();
+                storiesVideo.src = storySources[storyIndex];
+                storiesVideo.currentTime = 0;
+
+                syncStoriesFirstLink();
+
+                const playPromise = storiesVideo.play();
+                if (playPromise && typeof playPromise.catch === 'function') {
+                    playPromise.catch(() => {});
+                }
+            }
+
+            function openStories(startIndex = 0) {
+                if (!storiesPopup || !storiesVideo) return;
+                storyIndex = startIndex;
+
+                storiesPopup.classList.add('open');
+                storiesPopup.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+
+                loadStory(storyIndex);
+            }
+
+            function closeStories() {
+                if (!storiesPopup || !storiesVideo) return;
+                storiesPopup.classList.remove('open');
+                storiesPopup.setAttribute('aria-hidden', 'true');
+                storiesVideo.pause();
+                storiesVideo.currentTime = 0;
+                document.body.style.overflow = '';
+
+                // Clean deep-link hash so refreshing doesn't re-open the popup
+                try {
+                    const h = window.location.hash || '';
+                    if (h.startsWith('#aboutStory=')) window.location.hash = '';
+                } catch (e) {}
+
+                // Resume preview if user closed the popup
+                try {
+                    if (aboutPreview && !isPreviewHeld) aboutPreview.play();
+                } catch (e) {}
+            }
+
+            // Deep link: open first about story automatically
+            try {
+                const match = (window.location.hash || '').match(/aboutStory=(\d+)/);
+                if (match) {
+                    const idx = Math.max(0, Math.min(Number(match[1]) || 0, storySources.length - 1));
+                    openStories(idx);
+                }
+            } catch (e) {}
+
+            // Click on the overlay (outside the video area) closes the popup
+            if (storiesPopup) {
+                storiesPopup.addEventListener('click', (e) => {
+                    if (e.target === storiesPopup) closeStories();
+                });
+            }
+
+            function goNext() {
+                if (storyIndex < storySources.length - 1) loadStory(storyIndex + 1);
+                else closeStories();
+            }
+
+            function goPrev() {
+                if (storyIndex > 0) loadStory(storyIndex - 1);
+                else if (storiesVideo) storiesVideo.currentTime = 0;
+            }
+
+            if (aboutPreview) {
+                aboutPreview.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openStories(0);
+                });
+
+                const safePlay = () => {
+                    try {
+                        const p = aboutPreview.play();
+                        if (p && typeof p.catch === 'function') p.catch(() => {});
+                    } catch (err) {
+                        // Ignore autoplay/play restrictions
+                    }
+                };
+
+                // Hold to pause preview
+                aboutPreview.addEventListener('pointerdown', (e) => {
+                    isPreviewHeld = true;
+                    try { aboutPreview.pause(); } catch (err) {}
+                });
+
+                const resumePreview = () => {
+                    isPreviewHeld = false;
+                    // Don't fight with popup playback
+                    const popupOpen = storiesPopup && storiesPopup.classList.contains('open');
+                    if (!popupOpen) safePlay();
+                };
+
+                aboutPreview.addEventListener('pointerup', resumePreview);
+                aboutPreview.addEventListener('pointercancel', resumePreview);
+
+                // Ensure it starts at least once (some browsers need explicit play)
+                aboutPreview.addEventListener('loadedmetadata', () => {
+                    safePlay();
+                });
+                aboutPreview.addEventListener('canplay', () => {
+                    safePlay();
+                });
+            }
+
+            if (aboutStoriesLink) {
+                aboutStoriesLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openStories(0);
+                });
+            }
+
+            if (storiesCloseBtn) storiesCloseBtn.addEventListener('click', closeStories);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeStories();
             });
 
-            images.forEach(function(image) {
-                observer.observe(image);
+            if (storiesVideo) {
+                storiesVideo.addEventListener('timeupdate', () => {
+                    if (isScrubbing) return;
+                    updateFromTime();
+                });
+
+                storiesVideo.addEventListener('loadedmetadata', () => {
+                    updateFromTime();
+                });
+
+                storiesVideo.addEventListener('ended', () => {
+                    if (storyIndex < storySources.length - 1) loadStory(storyIndex + 1);
+                    else closeStories();
+                });
+            }
+
+            if (storiesScrub) {
+                storiesScrub.addEventListener('pointerdown', () => { isScrubbing = true; });
+                storiesScrub.addEventListener('pointerup', () => { isScrubbing = false; });
+
+                storiesScrub.addEventListener('input', () => {
+                    if (!storiesVideo) return;
+                    const dur = storiesVideo.duration;
+                    if (!dur || !isFinite(dur)) return;
+
+                    const value = Number(storiesScrub.value);
+                    const nextTime = (value / 1000) * dur;
+                    storiesVideo.currentTime = nextTime;
+
+                    // Update progress immediately (timeupdate can lag a bit)
+                    const pct = Math.max(0, Math.min(100, (nextTime / dur) * 100));
+                    if (storyProgressFills[storyIndex]) {
+                        storyProgressFills[storyIndex].style.width = pct + '%';
+                    }
+                });
+            }
+
+            if (storiesInner) {
+                storiesInner.addEventListener('pointerdown', (e) => {
+                    const target = e.target;
+                    if (target && target.closest) {
+                        if (target.closest('#storiesScrub')) return;
+                        if (target.closest('#storiesCloseBtn')) return;
+                        if (target.closest('#storiesFirstLink')) return;
+                        if (target.closest('.stories-progress')) return;
+                    }
+                    touchStartX = e.clientX;
+                    touchStartY = e.clientY;
+                });
+
+                storiesInner.addEventListener('pointerup', (e) => {
+                    const target = e.target;
+                    if (target && target.closest) {
+                        if (target.closest('#storiesScrub')) return;
+                        if (target.closest('#storiesCloseBtn')) return;
+                        if (target.closest('#storiesFirstLink')) return;
+                        if (target.closest('.stories-progress')) return;
+                    }
+
+                    const dx = e.clientX - touchStartX;
+                    const dy = e.clientY - touchStartY;
+
+                    const absDx = Math.abs(dx);
+                    const absDy = Math.abs(dy);
+
+                    // Vertical swipe: close popup
+                    if (absDy > 90 && absDy > absDx) {
+                        closeStories();
+                        return;
+                    }
+
+                    // Tap (no big movement): left/right triggers prev/next
+                    const isTap = absDx < 40 && absDy < 40;
+                    if (!isTap) return;
+
+                    const rect = storiesInner.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+
+                    if (x > rect.width / 2) goNext();
+                    else goPrev();
+                });
+            }
+
+            // ===== Глобальная острота для всего меню =====
+            let globalSpiceLevel = 0;
+            const savedSpiceLevel = localStorage.getItem('emika-spice-level');
+            if (savedSpiceLevel !== null && savedSpiceLevel !== '') {
+                globalSpiceLevel = Number(savedSpiceLevel) || 0;
+            }
+
+            // ===== Menu (frontend) =====
+            const productData = {
+                combo1: { image: 'images/combo1.png', titleRu: 'Комбо 1', titleEn: 'Combo 1', price: 619, hasSpice: true, kcalRange: [980, 1280], baseRu: '1 MC Сэндвич, 1 тендер, картофель фри, огурчики, MC соус.', baseEn: '1 MC sandwich, 1 tender, seasoned fries, pickles, MC sauce.' },
+                combo2: { image: 'images/combo2.png', titleRu: 'Комбо 2', titleEn: 'Combo 2', price: 820, hasSpice: true, kcalRange: [1120, 1480], baseRu: '3 тендера, картофель фри, огурчики, MC соус.', baseEn: '3 tenders, seasoned fries, pickles, MC sauce.' },
+                combo3: { image: 'images/combo3.png', titleRu: 'Комбо 3', titleEn: 'Combo 3', price: 889, hasSpice: true, kcalRange: [1180, 1560], baseRu: '2 MC Сэндвича, картофель фри, MC соус.', baseEn: '2 MC sandwiches, seasoned fries, MC sauce.' },
+                combo4: { image: 'images/combo4.png', titleRu: 'Комбо 4', titleEn: 'Combo 4', price: 949, hasSpice: true, kcalRange: [1350, 1760], baseRu: '6 тендеров, картофель фри, огурчики, 3 MC соуса.', baseEn: '6 tenders, seasoned fries, pickles, 3 MC sauces.' },
+                combo5: { image: 'images/combo5.png', titleRu: 'Байтсы и картошка Фри', titleEn: 'Bites & Fries', price: 123, hasSpice: true, kcalRange: [620, 980], baseRu: 'Байтсы из курочки и картофель фри — самый быстрый перекус.', baseEn: 'Chicken bites and fries — the fastest snack.' },
+                bowl1: { image: 'images/bowl1.png', titleRu: "Emika's Боул", titleEn: "Emika's Bowl", price: 799, hasSpice: true, kcalRange: [740, 980], baseRu: 'Нэшвилл курица, фирменные специи, добавьте свой уровень огня.', baseEn: 'Nashville chicken with our signature spice blend and your heat level.' },
+                bowl2: { image: 'images/bowl2.png', titleRu: "Мак'н'Чиз Боул", titleEn: 'Mac & Cheese Bowl', price: 799, hasSpice: true, kcalRange: [820, 1090], baseRu: 'Кремовый сырный мак-н-чиз и горячая курица — утешение в миске.', baseEn: 'Creamy mac & cheese topped with hot chicken — comfort in a bowl.' },
+                burger: { image: 'images/burg1.png', titleRu: 'Бургер', titleEn: 'Sandwich', price: 429, hasSpice: true, kcalRange: [520, 760], baseRu: 'Сочный хот-чикен в мягкой булочке, идеальный баланс огня и вкуса.', baseEn: 'Juicy hot chicken in a soft bun — the perfect fire/flavor balance.' },
+                fries: { image: 'images/burg2.png', titleRu: 'Картошка фри', titleEn: 'Fries', price: 229, kcalRange: [280, 520], baseRu: 'Хрустящие, приправленные — лучшие друзья любого сэндвича.', baseEn: 'Crispy seasoned fries — the only right sidekick.' },
+                tenders: { image: 'images/burg3.png', titleRu: 'Стрипс', titleEn: 'Tenders', price: 329, hasSpice: true, kcalRange: [420, 720], baseRu: 'Тендеры из сочной курицы с вашим уровнем остроты.', baseEn: 'Juicy tenders with your heat level of choice.' },
+                bites: { image: 'images/bites.png', titleRu: 'Байтсы', titleEn: 'Bites', price: 350, hasSpice: true, kcalRange: [460, 780], baseRu: 'Кусочки горячей курицы — идеально, чтобы “перехватить”.', baseEn: 'Bite-sized hot chicken — perfect for a quick snack.' },
+                sauce: { image: 'images/sal1.png', titleRu: "Соус Emika's", titleEn: "Emika's sauce", price: 199, kcalRange: [90, 220], baseRu: 'Фирменный соус, который собирает все вкусы воедино.', baseEn: 'Our signature sauce tying every bite together.' },
+                coleslaw: { image: 'images/sal2.png', titleRu: 'Коулслоу', titleEn: 'Coleslaw', price: 229, kcalRange: [160, 340], baseRu: 'Свежий хруст, чтобы сбалансировать остроту.', baseEn: 'Fresh crunch to balance the spice.' },
+                pickles: { image: 'images/sal3.png', titleRu: 'Огурчики', titleEn: 'Pickles', price: 229, kcalRange: [25, 60], baseRu: 'Классический акцент к горячей курице.', baseEn: 'Classic pickles to cut through the heat.' },
+                mac: { image: 'images/sal4.png', titleRu: "Мак'н'Чиз", titleEn: 'Mac & cheese', price: 249, kcalRange: [320, 620], baseRu: 'Плотный сырный гарнир для настоящих фанатов комфорта.', baseEn: 'Rich cheesy side for true comfort fans.' },
+                "cheese-medallions": { image: 'images/cheese.png', titleRu: 'Сырные медальоны', titleEn: 'Cheese medallions', price: 179, quantityPrices: { 3: 179, 6: 309, 9: 409 }, defaultPackQty: 3, kcalRange: [290, 520], baseRu: 'Нежные сырные медальоны с хрустящей корочкой.', baseEn: 'Tender cheese medallions with a crispy crust.' },
+                "drink-choco": { image: 'images/drink3.png', titleRu: 'Милкшейк — Шоколад', titleEn: 'Chocolate milkshake', price: 290, kcalRange: [360, 620], baseRu: 'Плотный шоколадный шейк для десерта.', baseEn: 'Thick chocolate shake to finish strong.' },
+                "drink-straw": { image: 'images/drink4.png', titleRu: 'Милкшейк — Клубника', titleEn: 'Strawberry milkshake', price: 290, kcalRange: [340, 600], baseRu: 'Классика с ноткой свежих ягод.', baseEn: 'Classic strawberry with a fresh berry vibe.' },
+                "drink-van": { image: 'images/drink5.png', titleRu: 'Милкшейк — Ваниль', titleEn: 'Vanilla milkshake', price: 290, kcalRange: [330, 590], baseRu: 'Нежный ванильный вкус, чтобы сбалансировать огонь.', baseEn: 'Smooth vanilla to cool things down.' }
+            };
+
+            function getSpiceLevelInfo(value) {
+                if (value <= 0) return { ru: 'Без остроты', en: 'No spice', jar: 1 };
+                if (value <= 25) return { ru: 'Лёгкий', en: 'Mild', jar: 1 };
+                if (value <= 50) return { ru: 'Средний', en: 'Medium', jar: 2 };
+                if (value <= 75) return { ru: 'Острый', en: 'Hot', jar: 3 };
+                return { ru: 'Жгучий', en: 'Burning', jar: 4 };
+            }
+
+            function resolveProductIdFromLineKey(lineKey) {
+                if (typeof lineKey === 'string' && lineKey.includes('::')) return lineKey.split('::')[0];
+                return lineKey;
+            }
+
+            function getQtyPackLineKey(productId, packQty, spiceLevel) {
+                const p = productData[productId];
+                if (!p?.quantityPrices) return productId;
+                const spicePart = p.hasSpice ? String(Number(spiceLevel ?? 0)) : 'ns';
+                return `${productId}::${Number(packQty)}::${spicePart}`;
+            }
+
+            function buildQtyLineTitles(productId, packQty, spiceLevel) {
+                const p = productData[productId];
+                if (!p) return { titleRu: '', titleEn: '' };
+                const n = Number(packQty) || 3;
+                let titleRu = `${p.titleRu} — ${n} шт.`;
+                let titleEn = `${p.titleEn} — ${n} pcs`;
+                if (p.hasSpice) {
+                    const info = getSpiceLevelInfo(Number(spiceLevel ?? 0));
+                    titleRu += ` (${info.ru})`;
+                    titleEn += ` (${info.en})`;
+                }
+                return { titleRu, titleEn };
+            }
+
+            function buildSpiceLineTitles(productId, spiceLevel) {
+                const p = productData[productId];
+                if (!p) return { titleRu: '', titleEn: '' };
+                const info = getSpiceLevelInfo(Number(spiceLevel ?? 0));
+                return {
+                    titleRu: `${p.titleRu} (${info.ru})`,
+                    titleEn: `${p.titleEn} (${info.en})`
+                };
+            }
+
+            function getLineKey(productId, opts = {}) {
+                const p = productData[productId];
+                if (!p) return productId;
+                if (p.quantityPrices) {
+                    return getQtyPackLineKey(
+                        productId,
+                        opts.packQty ?? p.defaultPackQty ?? 3,
+                        p.hasSpice ? (opts.spiceLevel ?? 0) : null
+                    );
+                }
+                if (p.hasSpice) {
+                    return `${productId}::spice::${Number(opts.spiceLevel ?? 0)}`;
+                }
+                return productId;
+            }
+
+            function unitPriceForQtyProduct(productId, packQty) {
+                const p = productData[productId];
+                if (!p?.quantityPrices) return p?.price ?? 0;
+                const n = Number(packQty ?? p.defaultPackQty ?? 3);
+                return p.quantityPrices[n] ?? p.price;
+            }
+
+            // Cart
+            const cartItems = new Map();
+            const cartTotalElement = document.getElementById('cartTotal');
+            const cartDrawerTotal = document.getElementById('cartDrawerTotal');
+            const cartItemsEl = document.getElementById('cartItems');
+            const cartOverlay = document.getElementById('cartOverlay');
+            const cartDrawer = document.getElementById('cartDrawer');
+            const cartCloseBtn = document.getElementById('cartCloseBtn');
+            const cartIndicator = document.getElementById('cartIndicator');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            const cartEmptyState = document.getElementById('cartEmptyState');
+            const cartPreview = document.getElementById('cartPreview');
+            const cartPreviewItems = document.getElementById('cartPreviewItems');
+            const cartPreviewTotal = document.getElementById('cartPreviewTotal');
+            const cartGoCheckoutBtn = document.getElementById('cartGoCheckoutBtn');
+
+            function getCartTotal() {
+                let total = 0;
+                cartItems.forEach(item => {
+                    total += item.price * item.qty;
+                });
+                return total;
+            }
+
+            function updateCart() {
+                const total = getCartTotal();
+                if (cartTotalElement) cartTotalElement.textContent = `${total} ₽`;
+                if (cartDrawerTotal) cartDrawerTotal.textContent = `${total} ₽`;
+                if (cartPreviewTotal) cartPreviewTotal.textContent = `${total} ₽`;
+            }
+
+            function buildCheckoutPayload() {
+                return Array.from(cartItems.entries()).map(([id, item]) => {
+                    const pid = item.productId ?? resolveProductIdFromLineKey(id);
+                    return {
+                        id,
+                        titleRu: item.titleRu,
+                        titleEn: item.titleEn,
+                        price: item.price,
+                        qty: item.qty,
+                        image: productData[pid]?.image || ''
+                    };
+                });
+            }
+
+            function goCheckout() {
+                if (!cartItems.size) return;
+                const payload = buildCheckoutPayload();
+                const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'sbp';
+                const preName = document.getElementById('preName')?.value.trim() || '';
+                const prePhone = document.getElementById('prePhone')?.value.trim() || '';
+                const promoCode = document.getElementById('promoCode')?.value.trim() || '';
+
+                localStorage.setItem('emika-checkout-cart', JSON.stringify(payload));
+                localStorage.setItem('emika-checkout-meta', JSON.stringify({ paymentMethod, promoCode }));
+                localStorage.setItem('emika-checkout-contact', JSON.stringify({ name: preName, phone: prePhone }));
+                window.location.href = 'checkout.html';
+            }
+
+            function addToCart(productId, qty = 1, opts = {}) {
+                const p = productData[productId];
+                if (!p) return;
+                const lineKey = getLineKey(productId, opts);
+                const unitPrice = p.quantityPrices
+                    ? unitPriceForQtyProduct(productId, opts.packQty ?? p.defaultPackQty ?? 3)
+                    : p.price;
+                const titles = p.quantityPrices
+                    ? buildQtyLineTitles(productId, opts.packQty ?? p.defaultPackQty ?? 3, p.hasSpice ? (opts.spiceLevel ?? 0) : 0)
+                    : (p.hasSpice
+                        ? buildSpiceLineTitles(productId, opts.spiceLevel ?? 0)
+                        : { titleRu: p.titleRu, titleEn: p.titleEn });
+
+                const existing = cartItems.get(lineKey);
+                if (existing) {
+                    existing.qty += qty;
+                } else {
+                    cartItems.set(lineKey, {
+                        id: lineKey,
+                        productId,
+                        titleRu: titles.titleRu,
+                        titleEn: titles.titleEn,
+                        price: unitPrice,
+                        qty
+                    });
+                }
+                updateCart();
+                renderCart();
+            }
+
+            function openCart() {
+                if (cartOverlay) cartOverlay.classList.add('open');
+                if (cartDrawer) cartDrawer.classList.add('open');
+            }
+
+            function closeCart() {
+                if (cartOverlay) cartOverlay.classList.remove('open');
+                if (cartDrawer) cartDrawer.classList.remove('open');
+            }
+
+            function renderCart() {
+                if (!cartItemsEl) return;
+                const lang = getActiveLang();
+                cartItemsEl.innerHTML = '';
+
+                if (!cartItems.size) {
+                    const empty = document.createElement('p');
+                    empty.id = 'cartEmptyState';
+                    empty.innerHTML = `<span class="lang-ru">Пока пусто</span><span class="lang-en">Empty for now</span>`;
+                    cartItemsEl.appendChild(empty);
+                    switchLanguage(lang);
+                    return;
+                }
+
+                cartItems.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = 'cart-item';
+                    row.dataset.id = item.id;
+                    row.innerHTML = `
+                        <div>
+                            <div><span class="lang-ru">${item.titleRu}</span><span class="lang-en">${item.titleEn}</span></div>
+                            <small>${item.price} ₽</small>
+                        </div>
+                        <div class="qty">
+                            <button type="button" data-action="minus">−</button>
+                            <strong>${item.qty}</strong>
+                            <button type="button" data-action="plus">+</button>
+                        </div>
+                    `;
+                    cartItemsEl.appendChild(row);
+                });
+                switchLanguage(lang);
+
+                // Preview popover content
+                if (cartPreviewItems) {
+                    cartPreviewItems.innerHTML = '';
+                    if (!cartItems.size) {
+                        cartPreviewItems.innerHTML = '<p class="muted"><span class="lang-ru">Корзина пуста</span><span class="lang-en">Cart is empty</span></p>';
+                    } else {
+                        const previewList = Array.from(cartItems.values()).slice(0, 5);
+                        previewList.forEach(item => {
+                            const lineKey = Array.from(cartItems.keys()).find(k => cartItems.get(k) === item);
+                            const pid = item.productId ?? resolveProductIdFromLineKey(lineKey);
+                            const row = document.createElement('div');
+                            row.className = 'cart-preview-item';
+                            row.innerHTML = `
+                                <img src="${productData[pid]?.image || ''}" alt="">
+                                <div><span class="lang-ru">${item.titleRu}</span><span class="lang-en">${item.titleEn}</span></div>
+                                <strong>x${item.qty}</strong>
+                            `;
+                            cartPreviewItems.appendChild(row);
+                        });
+                    }
+                    switchLanguage(lang);
+                }
+            }
+
+            if (cartItemsEl) {
+                cartItemsEl.addEventListener('click', (e) => {
+                    const btn = e.target.closest('button[data-action]');
+                    if (!btn) return;
+                    const row = e.target.closest('.cart-item');
+                    if (!row) return;
+                    const id = row.dataset.id;
+                    const item = cartItems.get(id);
+                    if (!item) return;
+                    const action = btn.dataset.action;
+
+                    if (action === 'plus') {
+                        item.qty += 1;
+                        updateCart();
+                        renderCart();
+                        return;
+                    }
+
+                    if (action === 'minus') {
+                        if (item.qty > 1) {
+                            item.qty -= 1;
+                            updateCart();
+                            renderCart();
+                        } else {
+                            row.classList.add('removing');
+                            setTimeout(() => {
+                                cartItems.delete(id);
+                                updateCart();
+                                renderCart();
+                            }, 240);
+                        }
+                    }
+                });
+            }
+
+            if (cartCloseBtn) cartCloseBtn.addEventListener('click', closeCart);
+            if (cartOverlay) cartOverlay.addEventListener('click', closeCart);
+
+            // Hover preview for desktop
+            let cartPreviewHideTimer = null;
+            const showPreview = () => {
+                if (!cartPreview || !cartItems.size) return;
+                if (cartPreviewHideTimer) clearTimeout(cartPreviewHideTimer);
+                cartPreview.classList.add('open');
+            };
+            const hidePreview = () => {
+                if (!cartPreview) return;
+                cartPreviewHideTimer = setTimeout(() => {
+                    cartPreview.classList.remove('open');
+                }, 120);
+            };
+            if (cartIndicator) {
+                cartIndicator.addEventListener('mouseenter', showPreview);
+                cartIndicator.addEventListener('mouseleave', hidePreview);
+                cartIndicator.addEventListener('click', () => {
+                    if (!cartPreview) return;
+                    cartPreview.classList.toggle('open');
+                });
+            }
+            if (cartPreview) {
+                cartPreview.addEventListener('mouseenter', showPreview);
+                cartPreview.addEventListener('mouseleave', hidePreview);
+            }
+            if (cartGoCheckoutBtn) {
+                cartGoCheckoutBtn.addEventListener('click', goCheckout);
+            }
+
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener('click', () => {
+                    goCheckout();
+                });
+            }
+
+            updateCart();
+            renderCart();
+
+            // Modal
+            const modal = document.getElementById('productModal');
+            const modalClose = document.getElementById('modalClose');
+            const modalImage = document.getElementById('modalImage');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDescription = document.getElementById('modalDescription');
+            const modalKcal = document.getElementById('modalKcal');
+            const modalPrice = document.getElementById('modalPrice');
+            const spiceControl = document.getElementById('spiceControl');
+            const spiceSlider = document.getElementById('spiceSlider');
+            const spiceLevelText = document.getElementById('spiceLevelText');
+            const spiceVideo = document.getElementById('spiceVideo');
+            const modalAddBtn = document.getElementById('modalAddBtn');
+            const modalPackControl = document.getElementById('modalPackControl');
+            const modalPackButtons = document.getElementById('modalPackButtons');
+            let currentProduct = null;
+            let modalPackQty = 3;
+
+            function randInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            function buildRandomDescription(product, lang) {
+                const addRu = [
+                    'Подаём горячим — лучше есть сразу.',
+                    'Можно усилить остроту — выбирай уровень огня.',
+                    'Сочный вкус, который “цепляет” с первого укуса.',
+                    'Идеально заходит с соусом и огурчиками.',
+                    'Хруст + специи + соус = идеальный баланс.'
+                ];
+                const addEn = [
+                    'Best enjoyed hot and fresh.',
+                    'Pick your heat level to turn it up.',
+                    'Bold flavor that hits from the first bite.',
+                    'Perfect with sauce and pickles.',
+                    'Crunch, spice, and sauce — balanced.'
+                ];
+                const extra = lang === 'ru'
+                    ? addRu[randInt(0, addRu.length - 1)]
+                    : addEn[randInt(0, addEn.length - 1)];
+                const base = lang === 'ru' ? product.baseRu : product.baseEn;
+                return `${base} ${extra}`;
+            }
+
+            const spicePingPongCancels = new WeakMap();
+
+            function stopSpicePingPong() {
+                if (!spiceVideo) return;
+                const cancel = spicePingPongCancels.get(spiceVideo);
+                if (typeof cancel === 'function') cancel();
+                spicePingPongCancels.delete(spiceVideo);
+            }
+
+            function startPingPongVideo(video) {
+                if (!video) return;
+                const prevCancel = spicePingPongCancels.get(video);
+                if (typeof prevCancel === 'function') prevCancel();
+
+                let rafId = 0;
+                let lastTs = 0;
+                let dir = 1;
+                const speed = 1;
+
+                function step(ts) {
+                    if (!lastTs) lastTs = ts;
+                    const dt = (ts - lastTs) / 1000;
+                    lastTs = ts;
+
+                    if (video.readyState < 2) {
+                        rafId = requestAnimationFrame(step);
+                        return;
+                    }
+
+                    const duration = video.duration || 0;
+                    if (!duration || !isFinite(duration)) {
+                        rafId = requestAnimationFrame(step);
+                        return;
+                    }
+
+                    const nextTime = video.currentTime + dir * speed * dt;
+                    if (dir === 1 && nextTime >= duration) {
+                        dir = -1;
+                        video.currentTime = duration;
+                    } else if (dir === -1 && nextTime <= 0) {
+                        dir = 1;
+                        video.currentTime = 0;
+                    } else {
+                        video.currentTime = Math.min(duration, Math.max(0, nextTime));
+                    }
+
+                    rafId = requestAnimationFrame(step);
+                }
+
+                try { video.pause(); } catch {}
+                video.muted = true;
+                video.loop = false;
+                video.playsInline = true;
+
+                rafId = requestAnimationFrame(step);
+                spicePingPongCancels.set(video, () => {
+                    cancelAnimationFrame(rafId);
+                    lastTs = 0;
+                });
+            }
+
+            const spiceJarPreloadVideos = [];
+            function preloadSpiceJarVideos() {
+                if (spiceJarPreloadVideos.length) return;
+                [1, 2, 3, 4].forEach((n) => {
+                    const v = document.createElement('video');
+                    v.preload = 'auto';
+                    v.muted = true;
+                    v.playsInline = true;
+                    v.src = `images/jar${n}.mp4`;
+                    v.load();
+                    spiceJarPreloadVideos.push(v);
+                });
+            }
+
+            function setSpiceVideoByLevel(jar) {
+                if (!spiceVideo) return;
+                const src = `images/jar${jar}.mp4`;
+
+                const startPlayback = () => {
+                    if (spiceVideo.getAttribute('data-src') !== src) return;
+                    startPingPongVideo(spiceVideo);
+                };
+
+                if (spiceVideo.getAttribute('data-src') === src && spiceVideo.readyState >= 2) {
+                    startPlayback();
+                    return;
+                }
+
+                stopSpicePingPong();
+                spiceVideo.setAttribute('data-src', src);
+                spiceVideo.src = src;
+
+                const onReady = () => startPlayback();
+                spiceVideo.addEventListener('loadeddata', onReady, { once: true });
+                spiceVideo.load();
+                if (spiceVideo.readyState >= 2) onReady();
+            }
+
+            function updateSpiceDisplay(value) {
+                const info = getSpiceLevelInfo(value);
+                const lang = getActiveLang();
+                if (spiceLevelText) spiceLevelText.textContent = lang === 'ru' ? info.ru : info.en;
+                setSpiceVideoByLevel(info.jar);
+            }
+
+            function setGlobalSpiceLevel(value) {
+                globalSpiceLevel = Number(value) || 0;
+                localStorage.setItem('emika-spice-level', String(globalSpiceLevel));
+                document.querySelectorAll('.spice-global-btn').forEach((btn) => {
+                    btn.classList.toggle('is-active', Number(btn.dataset.spice) === globalSpiceLevel);
+                });
+                if (spiceSlider && modal && modal.classList.contains('active') && currentProduct) {
+                    const p = productData[currentProduct];
+                    if (p?.hasSpice) {
+                        spiceSlider.value = String(globalSpiceLevel);
+                        updateSpiceDisplay(globalSpiceLevel);
+                    }
+                }
+            }
+
+            document.querySelectorAll('.spice-global-btn').forEach((btn) => {
+                btn.addEventListener('click', () => setGlobalSpiceLevel(btn.dataset.spice));
             });
+            setGlobalSpiceLevel(globalSpiceLevel);
+
+            function renderModalPackUI(product) {
+                if (!modalPackControl || !modalPackButtons) return;
+                if (!product.quantityPrices) {
+                    modalPackControl.classList.remove('is-visible');
+                    modalPackControl.setAttribute('aria-hidden', 'true');
+                    modalPackButtons.innerHTML = '';
+                    return;
+                }
+                modalPackControl.classList.add('is-visible');
+                modalPackControl.setAttribute('aria-hidden', 'false');
+                const packs = Object.keys(product.quantityPrices).map(Number).sort((a, b) => a - b);
+                const def = product.defaultPackQty;
+                modalPackQty = def != null && packs.includes(def) ? def : packs[0];
+                modalPackButtons.innerHTML = packs.map((n) => {
+                    const active = n === modalPackQty ? ' is-active' : '';
+                    return `<button type="button" class="modal-pack-btn${active}" data-pack="${n}">${n} шт.</button>`;
+                }).join('');
+            }
+
+            function openModal(productId) {
+                const product = productData[productId];
+                if (!product || !modal) return;
+
+                currentProduct = productId;
+                const lang = getActiveLang();
+
+                if (modalImage) modalImage.src = product.image;
+                if (modalTitle) modalTitle.textContent = lang === 'ru' ? product.titleRu : product.titleEn;
+                if (modalDescription) modalDescription.textContent = buildRandomDescription(product, lang);
+
+                const kcal = randInt(product.kcalRange[0], product.kcalRange[1]);
+                if (modalKcal) modalKcal.textContent = `${kcal} ккал`;
+
+                renderModalPackUI(product);
+                if (modalPrice) {
+                    if (product.quantityPrices) {
+                        modalPrice.textContent = `${product.quantityPrices[modalPackQty] ?? product.price} ₽`;
+                    } else {
+                        modalPrice.textContent = `${product.price} ₽`;
+                    }
+                }
+
+                const hasSpice = !!product.hasSpice;
+                if (spiceControl) spiceControl.style.display = hasSpice ? '' : 'none';
+                if (hasSpice && spiceSlider) {
+                    preloadSpiceJarVideos();
+                    spiceSlider.value = String(globalSpiceLevel);
+                    updateSpiceDisplay(globalSpiceLevel);
+                } else {
+                    stopSpicePingPong();
+                }
+
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('active'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                if (!modal) return;
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+                stopSpicePingPong();
+                if (spiceVideo) {
+                    spiceVideo.removeAttribute('data-src');
+                    spiceVideo.removeAttribute('src');
+                }
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+
+            if (modalPackButtons) {
+                modalPackButtons.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.modal-pack-btn');
+                    if (!btn || !currentProduct) return;
+                    modalPackQty = Number(btn.dataset.pack) || 3;
+                    modalPackButtons.querySelectorAll('.modal-pack-btn').forEach((b) => {
+                        b.classList.toggle('is-active', Number(b.dataset.pack) === modalPackQty);
+                    });
+                    const p = productData[currentProduct];
+                    if (modalPrice && p?.quantityPrices) {
+                        modalPrice.textContent = `${p.quantityPrices[modalPackQty] ?? p.price} ₽`;
+                    }
+                });
+            }
+
+            document.querySelectorAll('.product-image').forEach(img => {
+                img.addEventListener('click', () => {
+                    const productId = img.dataset.modal;
+                    if (productId) openModal(productId);
+                });
+            });
+
+            document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+                const id = btn.dataset.product;
+                const p = id ? productData[id] : null;
+                const needsModal = !!(p?.hasSpice || p?.quantityPrices);
+
+                if (needsModal) {
+                    btn.innerHTML = `<span class="lang-ru">Выбрать</span><span class="lang-en">Choose</span>`;
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (id) openModal(id);
+                    });
+                } else {
+                    btn.innerHTML = `<span class="lang-ru">В корзину</span><span class="lang-en">Add</span>`;
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (id) addToCart(id, 1);
+                    });
+                }
+            });
+
+            // Re-apply current language after dynamic button text updates
+            const activeLang = getActiveLang();
+            switchLanguage(activeLang);
+
+            if (modalAddBtn) {
+                modalAddBtn.addEventListener('click', () => {
+                    if (!currentProduct) return;
+                    const p = productData[currentProduct];
+                    const ok = p?.quantityPrices || p?.price;
+                    if (!ok) return;
+                    const spiceLevel = p.hasSpice ? (parseInt(spiceSlider?.value, 10) || globalSpiceLevel) : 0;
+                    if (p.quantityPrices) {
+                        addToCart(currentProduct, 1, {
+                            packQty: modalPackQty,
+                            spiceLevel: p.hasSpice ? spiceLevel : 0
+                        });
+                    } else {
+                        addToCart(currentProduct, 1, p.hasSpice ? { spiceLevel } : {});
+                    }
+                    closeModal();
+                });
+            }
+
+            if (spiceSlider) {
+                spiceSlider.addEventListener('input', (e) => {
+                    const raw = parseInt(e.target.value, 10);
+                    const snapped = Math.round(raw / 25) * 25;
+                    if (String(snapped) !== e.target.value) e.target.value = String(snapped);
+                    updateSpiceDisplay(snapped);
+                });
+                spiceSlider.addEventListener('change', (e) => {
+                    const snapped = Math.round(parseInt(e.target.value, 10) / 25) * 25;
+                    updateSpiceDisplay(snapped);
+                });
+            }
+
+            if (modalClose) modalClose.addEventListener('click', closeModal);
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal && modal.classList.contains('active')) closeModal();
+            });
+
+            // (Account removed from header)
+
+            // Слайдер баннеров
+            const slides = document.querySelectorAll('.slider-slide');
+            let currentSlide = 0; // Начинаем с Баннера 1 (индекс 0)
+            let slideInterval;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.remove('active');
+                    const video = slide.querySelector('video');
+                    if (video) {
+                        if (i === index) {
+                            video.play();
+                        } else {
+                            video.pause();
+                            video.currentTime = 0;
+                        }
+                    }
+                    if (i === index) {
+                        slide.classList.add('active');
+                    }
+                });
+                currentSlide = index;
+            }
+
+            function nextSlide() {
+                const next = (currentSlide + 1) % slides.length;
+                showSlide(next);
+            }
+
+            function startSlider() {
+                if (slideInterval) clearInterval(slideInterval);
+                if (!slides.length || slides.length < 2) return;
+                slideInterval = setInterval(nextSlide, 7000); // 7 секунд
+            }
+
+            function stopSlider() {
+                clearInterval(slideInterval);
+            }
+
+            // Обработчики кликов на слайды
+            slides.forEach((slide, index) => {
+                slide.addEventListener('click', (e) => {
+                    const action = slide.dataset.action;
+                    const index = Number(slide.dataset.slide || 0);
+                    
+                    if (action === 'scroll') {
+                        // Banner1 - прокрутка к меню
+                        e.preventDefault();
+                        const menuSection = document.querySelector('#combos');
+                        if (menuSection) {
+                            menuSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } else if (action === 'next') {
+                        // Видео-баннеры: открываем нужные блюда
+                        e.preventDefault();
+                        if (index === 1) {
+                            openModal('bites');
+                        } else if (index === 2) {
+                            openModal('cheese-medallions');
+                        } else {
+                            stopSlider();
+                            nextSlide();
+                            startSlider();
+                        }
+                    } else if (action === 'franchise') {
+                        // Banner2 - открыть франшизу
+                        e.preventDefault();
+                        window.open('https://emikashotchicken.ru/franchise', '_blank');
+                    }
+                });
+            });
+
+            // Инициализируем показ первого слайда
+            showSlide(currentSlide);
+            
+            // Запускаем слайдер
+            startSlider();
+
+            // Закреплённые плитки
+            const pinInfoModal = document.getElementById('pinInfoModal');
+            const pinInfoClose = document.getElementById('pinInfoClose');
+            const pinInfoTitle = document.getElementById('pinInfoTitle');
+            const pinInfoText = document.getElementById('pinInfoText');
+            const pinInfoLink = document.getElementById('pinInfoLink');
+            const pinTile1 = document.getElementById('pinTile1');
+            const pinTile2 = document.getElementById('pinTile2');
+            const pinTile3 = document.getElementById('pinTile3');
+
+            const pinTexts = {
+                about: {
+                    titleRu: 'Eat Arena',
+                    titleEn: 'Eat Arena',
+                    textRu: 'Мы доставляем настоящий вкус Нэшвилла, специализируясь на культовой горячей курице. Наше меню составлено с учётом разнообразных вкусов.\n\nВыбирайте из пяти уровней остроты: без остроты начальный уровень, легкий для тех, кто предпочитает лёгкую остроту, средний для более смелых, острый для любителей острых ощущений и жгучий для бесстрашных. Мы удовлетворим все ваши потребности в блюдах.\n\nEmika\'s Hot Chicken — это не просто еда, это создание незабываемых кулинарных впечатлений. Нас отличает сочетание традиционных вкусов и инновационных решений, подкреплённое стремлением к качеству.\n\nМосква, Мичуринский проспект, 13А, стр. 1, метро «Ломоносовский проспект», Eat Arena, 2 этаж',
+                    textEn: 'We bring authentic Nashville flavor with iconic hot chicken. Choose from five heat levels.\n\nMoscow, Michurinsky Avenue, 13A, bld. 1, Lomonosovsky Prospekt metro, Eat Arena, 2nd floor'
+                },
+                soon: {
+                    titleRu: 'Скоро откроемся!',
+                    titleEn: 'Opening soon!',
+                    textRu: 'Проектируемый пр. № 5539, 10В, посёлок Развилка\n\nБудем ждать вас',
+                    textEn: 'Planned address: 10V, Razvilka village\n\nWe look forward to seeing you',
+                    link: 'https://yandex.ru/navi/org/ageva/230515854150?si=3qht15cpg13frarn1n412z92zr',
+                    linkTextRu: 'Открыть на карте',
+                    linkTextEn: 'Open on map'
+                }
+            };
+
+            function openPinInfo(key) {
+                const data = pinTexts[key];
+                if (!data || !pinInfoModal) return;
+                const lang = getActiveLang();
+                if (pinInfoTitle) pinInfoTitle.textContent = lang === 'ru' ? data.titleRu : data.titleEn;
+                if (pinInfoText) pinInfoText.textContent = lang === 'ru' ? data.textRu : data.textEn;
+                if (pinInfoLink) {
+                    if (data.link) {
+                        pinInfoLink.href = data.link;
+                        pinInfoLink.textContent = lang === 'ru' ? data.linkTextRu : data.linkTextEn;
+                        pinInfoLink.style.display = 'inline-block';
+                    } else {
+                        pinInfoLink.style.display = 'none';
+                    }
+                }
+                pinInfoModal.style.display = 'flex';
+                setTimeout(() => pinInfoModal.classList.add('active'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closePinInfo() {
+                if (!pinInfoModal) return;
+                pinInfoModal.classList.remove('active');
+                document.body.style.overflow = '';
+                setTimeout(() => { pinInfoModal.style.display = 'none'; }, 300);
+            }
+
+            if (pinTile1) pinTile1.addEventListener('click', () => openPinInfo('about'));
+            if (pinTile2) pinTile2.addEventListener('click', () => openPinInfo('soon'));
+            if (pinTile3) pinTile3.addEventListener('click', () => openStories(0));
+
+            const pinReelsVideo = document.querySelector('.pin-tile--3 .pin-tile__media video');
+            if (pinReelsVideo) {
+                pinReelsVideo.play().catch(() => {});
+            }
+
+            if (pinInfoClose) pinInfoClose.addEventListener('click', closePinInfo);
+            if (pinInfoModal) {
+                pinInfoModal.addEventListener('click', (e) => {
+                    if (e.target === pinInfoModal) closePinInfo();
+                });
+            }
+        });
+
+        window.addEventListener('scroll', () => {
+            const offset = window.pageYOffset * 0.15;
+            document.body.style.backgroundPositionY = `-${offset}px`;
         });
     </script>
 
-<footer>
-    <div class="logo-footer">
-        <img src="images/logo.png" alt="Emika's Hot Chicken Logo">
-    </div>
-    <div class="info-footer">
-        <p>&copy; 2025 Emika's Hot Chicken. Все права защищены.</p>
-        <p>Вкус Нешвилла в Москве</p>
-        <p>Москва, Мичуринский проспект, 13А, стр. 1, метро «Ломоносовский проспект», ТЦ Арфа, 2 этаж</p>
-        <p><a href="tel:+79778389898">+7 977 838 98 98</a></p>
-        <p>Следите за нами в <a href="https://www.instagram.com/emikashotchicken/" target="_blank">Instagram</a></p>
-        <div class="social-buttons">
-            <a href="https://wa.me/79778389898" target="_blank" class="social-button whatsapp">WhatsApp</a>
-            <a href="https://t.me/+79778389898" target="_blank" class="social-button telegram">Telegram</a>
-        </div>
-    </div>
-</footer>
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109092149', 'ym');
+
+        ym(109092149, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/109092149" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
 </body>
 </html>

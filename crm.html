@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM — заказы доставки | Emika's</title>
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #ff6a1a;
+            --orange-dark: #e2550f;
+            --bg: #0f1014;
+            --card: #1a1b22;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f4f4f6;
+            --muted: #9a9cab;
+            --ok: #3ecf8e;
+            --warn: #ffd700;
+            --danger: #ff6b6b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .login-wrap {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+        }
+
+        .login-card, .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        .login-card {
+            width: min(400px, 100%);
+            padding: 24px;
+        }
+
+        .login-card h1 {
+            margin: 0 0 8px;
+            font-size: 1.35rem;
+        }
+
+        .login-card p {
+            margin: 0 0 18px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            padding: 10px 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        textarea { min-height: 88px; resize: vertical; }
+
+        button {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.88rem;
+        }
+
+        .btn-primary {
+            background: var(--orange);
+            color: #fff;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .btn-primary:hover { background: var(--orange-dark); }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .app { display: none; }
+        .app.is-ready { display: block; }
+
+        .topbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.25);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .topbar small { color: var(--muted); }
+
+        .topbar-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(280px, 360px) 1fr;
+            gap: 14px;
+            padding: 14px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .panel { padding: 12px; }
+
+        .filters {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .orders-list {
+            display: grid;
+            gap: 8px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .order-card {
+            text-align: left;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            color: inherit;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .order-card:hover,
+        .order-card.is-active {
+            border-color: rgba(255, 106, 26, 0.55);
+            background: rgba(255, 106, 26, 0.08);
+        }
+
+        .order-card__head {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .order-card__num {
+            font-weight: 700;
+            font-size: 0.92rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+
+        .badge-new { background: rgba(255, 106, 26, 0.2); color: #ffb07a; }
+        .badge-confirmed { background: rgba(62, 207, 142, 0.15); color: var(--ok); }
+        .badge-cooking { background: rgba(255, 215, 0, 0.15); color: var(--warn); }
+        .badge-delivery { background: rgba(100, 149, 237, 0.2); color: #9ec5ff; }
+        .badge-done { background: rgba(255, 255, 255, 0.1); color: #ccc; }
+        .badge-cancelled { background: rgba(255, 107, 107, 0.15); color: var(--danger); }
+
+        .order-card__meta {
+            font-size: 0.78rem;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        .detail-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .detail-head {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .info-block {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .info-block h3 {
+            margin: 0 0 8px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .info-block p {
+            margin: 0;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.86rem;
+        }
+
+        .items-table th,
+        .items-table td {
+            padding: 8px 6px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .items-table th { color: var(--muted); font-weight: 600; font-size: 0.75rem; }
+
+        .detail-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-end;
+            margin-top: 14px;
+        }
+
+        .detail-actions > div { flex: 1; min-width: 180px; }
+
+        .total-line {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--orange);
+            margin-top: 10px;
+        }
+
+        .toast {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 12px 14px;
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            display: none;
+            z-index: 20;
+        }
+
+        .toast.show { display: block; }
+
+        .login-error {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .orders-list {
+                max-height: 320px;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrap" id="loginScreen">
+        <form class="login-card" id="loginForm">
+            <h1>CRM доставки</h1>
+            <p>Вход для обработки заявок Emika's Hot Chicken</p>
+            <label for="crmPassword">Пароль</label>
+            <input id="crmPassword" type="password" autocomplete="current-password" required>
+            <p class="login-error" id="loginError">Неверный пароль</p>
+            <button type="submit" class="btn-primary">Войти</button>
+        </form>
+    </div>
+
+    <div class="app" id="app">
+        <header class="topbar">
+            <div>
+                <h1>Заказы доставки</h1>
+                <small id="ordersCount">—</small>
+            </div>
+            <div class="topbar-actions">
+                <button type="button" class="btn-ghost" id="refreshBtn">Обновить</button>
+                <button type="button" class="btn-ghost" id="logoutBtn">Выйти</button>
+            </div>
+        </header>
+
+        <div class="layout">
+            <aside class="panel">
+                <div class="filters">
+                    <input type="search" id="searchInput" placeholder="Поиск: номер, имя, телефон…">
+                    <select id="statusFilter">
+                        <option value="all">Все статусы</option>
+                        <option value="new">Новые</option>
+                        <option value="confirmed">Подтверждены</option>
+                        <option value="cooking">Готовятся</option>
+                        <option value="delivery">В доставке</option>
+                        <option value="done">Выполнены</option>
+                        <option value="cancelled">Отменены</option>
+                    </select>
+                </div>
+                <div class="orders-list" id="ordersList"></div>
+            </aside>
+
+            <main class="panel" id="detailPanel">
+                <div class="detail-empty" id="detailEmpty">Выберите заказ из списка</div>
+                <div id="detailContent" hidden></div>
+            </main>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const TOKEN_KEY = 'emika-crm-token';
+        const STATUS_LABELS = {
+            new: 'Новый',
+            confirmed: 'Подтверждён',
+            cooking: 'Готовится',
+            delivery: 'В доставке',
+            done: 'Выполнен',
+            cancelled: 'Отменён'
+        };
+
+        const loginScreen = document.getElementById('loginScreen');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const app = document.getElementById('app');
+        const ordersList = document.getElementById('ordersList');
+        const detailEmpty = document.getElementById('detailEmpty');
+        const detailContent = document.getElementById('detailContent');
+        const statusFilter = document.getElementById('statusFilter');
+        const searchInput = document.getElementById('searchInput');
+        const ordersCount = document.getElementById('ordersCount');
+        const toast = document.getElementById('toast');
+
+        let orders = [];
+        let selectedId = null;
+        let pollTimer = null;
+
+        function esc(text) {
+            return String(text ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function getToken() {
+            return localStorage.getItem(TOKEN_KEY) || '';
+        }
+
+        function setToken(token) {
+            if (token) localStorage.setItem(TOKEN_KEY, token);
+            else localStorage.removeItem(TOKEN_KEY);
+        }
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3200);
+        }
+
+        async function api(path, options = {}) {
+            const headers = { ...(options.headers || {}) };
+            if (options.body) headers['Content-Type'] = 'application/json';
+            const token = getToken();
+            if (token) headers.Authorization = `Bearer ${token}`;
+
+            const res = await fetch(path, { ...options, headers });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                const err = new Error(data.error || res.statusText);
+                err.status = res.status;
+                throw err;
+            }
+            return data;
+        }
+
+        function formatDate(iso) {
+            try {
+                return new Date(iso).toLocaleString('ru-RU', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            } catch {
+                return iso || '—';
+            }
+        }
+
+        function paymentLabel(method) {
+            return method === 'pickup' ? 'При получении' : 'СБП онлайн';
+        }
+
+        function deliveryLabel(type) {
+            return type === 'pickup' ? 'Самовывоз' : 'Доставка';
+        }
+
+        function renderOrdersList() {
+            ordersList.innerHTML = '';
+            if (!orders.length) {
+                ordersList.innerHTML = '<p style="color:var(--muted);font-size:0.85rem;margin:0;">Заказов пока нет</p>';
+                ordersCount.textContent = '0 заказов';
+                return;
+            }
+
+            ordersCount.textContent = `${orders.length} заказ(ов)`;
+
+            orders.forEach((order) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'order-card' + (order.id === selectedId ? ' is-active' : '');
+                btn.dataset.id = order.id;
+                btn.innerHTML = `
+                    <div class="order-card__head">
+                        <span class="order-card__num">${order.orderNumber}</span>
+                        <span class="badge badge-${order.status}">${STATUS_LABELS[order.status] || order.status}</span>
+                    </div>
+                    <div class="order-card__meta">
+                        ${order.customer?.name || '—'} · ${order.customer?.phone || '—'}<br>
+                        ${deliveryLabel(order.deliveryType)} · ${order.total} ₽<br>
+                        ${formatDate(order.createdAt)}
+                    </div>
+                `;
+                btn.addEventListener('click', () => selectOrder(order.id));
+                ordersList.appendChild(btn);
+            });
+        }
+
+        function renderDetail(order) {
+            if (!order) {
+                detailEmpty.hidden = false;
+                detailContent.hidden = true;
+                return;
+            }
+
+            detailEmpty.hidden = true;
+            detailContent.hidden = false;
+
+            const itemsHtml = (order.items || []).map((item) => `
+                <tr>
+                    <td>${esc(item.titleRu || item.titleEn || '—')}</td>
+                    <td>${item.qty}</td>
+                    <td>${item.price} ₽</td>
+                    <td><strong>${item.qty * item.price} ₽</strong></td>
+                </tr>
+            `).join('');
+
+            detailContent.innerHTML = `
+                <div class="detail-head">
+                    <div>
+                        <div style="font-size:1.25rem;font-weight:700;">${esc(order.orderNumber)}</div>
+                        <div style="color:var(--muted);font-size:0.85rem;">Создан: ${esc(formatDate(order.createdAt))}</div>
+                    </div>
+                    <span class="badge badge-${order.status}">${STATUS_LABELS[order.status]}</span>
+                </div>
+                <div class="detail-grid">
+                    <div class="info-block">
+                        <h3>Клиент</h3>
+                        <p><strong>${esc(order.customer?.name || '—')}</strong></p>
+                        <p><a href="tel:${esc((order.customer?.phone || '').replace(/\s/g, ''))}" style="color:var(--orange)">${esc(order.customer?.phone || '—')}</a></p>
+                        ${order.customer?.email ? `<p>${esc(order.customer.email)}</p>` : ''}
+                    </div>
+                    <div class="info-block">
+                        <h3>Доставка</h3>
+                        <p>${esc(deliveryLabel(order.deliveryType))}</p>
+                        <p>${esc(order.address || '—')}</p>
+                        ${order.addressExtra ? `<p>${esc(order.addressExtra)}</p>` : ''}
+                        <p>Оплата: ${esc(paymentLabel(order.paymentMethod))}</p>
+                        ${order.promoCode ? `<p>Промокод: ${esc(order.promoCode)}</p>` : ''}
+                    </div>
+                </div>
+                ${order.comment ? `<div class="info-block" style="margin-bottom:12px;"><h3>Комментарий клиента</h3><p>${esc(order.comment)}</p></div>` : ''}
+                <div class="info-block">
+                    <h3>Состав заказа</h3>
+                    <table class="items-table">
+                        <thead><tr><th>Позиция</th><th>Кол-во</th><th>Цена</th><th>Сумма</th></tr></thead>
+                        <tbody>${itemsHtml}</tbody>
+                    </table>
+                    <div class="total-line">Итого: ${order.total} ₽</div>
+                </div>
+                <div class="detail-actions">
+                    <div>
+                        <label for="statusSelect">Статус</label>
+                        <select id="statusSelect">
+                            ${Object.entries(STATUS_LABELS).map(([k, v]) => `<option value="${k}" ${order.status === k ? 'selected' : ''}>${v}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="flex:2;min-width:220px;">
+                        <label for="managerNote">Заметка менеджера</label>
+                        <textarea id="managerNote">${esc(order.managerNote || '')}</textarea>
+                    </div>
+                    <button type="button" class="btn-primary" id="saveOrderBtn" style="width:auto;margin-top:22px;">Сохранить</button>
+                </div>
+            `;
+
+            document.getElementById('saveOrderBtn').addEventListener('click', () => saveOrder(order.id));
+        }
+
+        function selectOrder(id) {
+            selectedId = id;
+            renderOrdersList();
+            const order = orders.find((o) => o.id === id);
+            renderDetail(order);
+        }
+
+        async function loadOrders() {
+            const params = new URLSearchParams();
+            if (statusFilter.value !== 'all') params.set('status', statusFilter.value);
+            if (searchInput.value.trim()) params.set('q', searchInput.value.trim());
+
+            const data = await api(`/api/orders?${params}`);
+            const prevNew = orders.filter((o) => o.status === 'new').length;
+            orders = data.orders || [];
+            const nextNew = orders.filter((o) => o.status === 'new').length;
+
+            if (nextNew > prevNew && document.visibilityState === 'visible') {
+                showToast('Поступил новый заказ');
+            }
+
+            if (selectedId && !orders.find((o) => o.id === selectedId)) {
+                selectedId = orders[0]?.id || null;
+            }
+            if (!selectedId && orders.length) selectedId = orders[0].id;
+
+            renderOrdersList();
+            renderDetail(orders.find((o) => o.id === selectedId));
+        }
+
+        async function saveOrder(id) {
+            const status = document.getElementById('statusSelect').value;
+            const managerNote = document.getElementById('managerNote').value;
+            const data = await api(`/api/orders/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ status, managerNote })
+            });
+            const idx = orders.findIndex((o) => o.id === id);
+            if (idx !== -1) orders[idx] = data.order;
+            renderOrdersList();
+            renderDetail(data.order);
+            showToast('Сохранено');
+        }
+
+        function showApp() {
+            loginScreen.style.display = 'none';
+            app.classList.add('is-ready');
+        }
+
+        function showLogin() {
+            loginScreen.style.display = 'grid';
+            app.classList.remove('is-ready');
+            if (pollTimer) clearInterval(pollTimer);
+        }
+
+        async function tryBoot() {
+            if (!getToken()) return showLogin();
+            try {
+                await loadOrders();
+                showApp();
+                pollTimer = setInterval(() => {
+                    loadOrders().catch((e) => {
+                        if (e.status === 401) {
+                            setToken('');
+                            showLogin();
+                        }
+                    });
+                }, 20000);
+            } catch (e) {
+                setToken('');
+                showLogin();
+            }
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.style.display = 'none';
+            try {
+                const password = document.getElementById('crmPassword').value;
+                const data = await api('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ password })
+                });
+                setToken(data.token);
+                await tryBoot();
+            } catch {
+                loginError.style.display = 'block';
+            }
+        });
+
+        document.getElementById('refreshBtn').addEventListener('click', () => loadOrders().catch(() => showToast('Ошибка загрузки')));
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            setToken('');
+            showLogin();
+        });
+
+        statusFilter.addEventListener('change', () => loadOrders());
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchInput._t);
+            searchInput._t = setTimeout(() => loadOrders(), 350);
+        });
+
+        tryBoot();
+    </script>
+</body>
+</html>

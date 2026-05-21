@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Брендбук Emika's Hot Chicken</title>
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #ff6a1a;
+            --orange-dark: #e2550f;
+            --bg: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e5e5e5;
+            --hover: #f5f5f5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Шапка */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: #000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand img {
+            height: 48px;
+            filter: brightness(0) invert(1);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .phone-link {
+            color: #fff;
+            font-weight: 600;
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+
+        .phone-link:hover {
+            color: var(--orange);
+        }
+
+        .home-btn {
+            padding: 10px 20px;
+            background: var(--orange);
+            color: #fff;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+
+        .home-btn:hover {
+            background: var(--orange-dark);
+        }
+
+        /* Горизонтальное меню */
+        .top-nav {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 73px;
+            z-index: 99;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .top-nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .top-nav-menu {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 16px 0;
+        }
+
+        .top-nav-menu a {
+            padding: 10px 20px;
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 500;
+            white-space: nowrap;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .top-nav-menu a:hover {
+            background: var(--hover);
+            color: var(--text);
+        }
+
+        .top-nav-menu a.active {
+            background: var(--orange);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Основной контейнер */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Основной контент */
+        .content {
+            padding: 64px 80px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Заголовки */
+        h1 {
+            font-size: 72px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-top: 80px;
+            margin-bottom: 32px;
+            color: var(--text);
+            scroll-margin-top: 150px;
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-size: 36px;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-top: 56px;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        h4 {
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-top: 40px;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        /* Параграфы */
+        p {
+            font-size: 20px;
+            line-height: 1.7;
+            margin-bottom: 24px;
+            color: var(--text);
+        }
+
+        /* Списки */
+        ul {
+            margin-bottom: 32px;
+            padding-left: 32px;
+        }
+
+        li {
+            font-size: 20px;
+            line-height: 1.7;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        /* Вступление */
+        .intro {
+            font-size: 28px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 64px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Разделитель */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 48px 0;
+        }
+
+        /* Выделение текста */
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1024px) {
+            .content {
+                padding: 48px 40px;
+            }
+
+            h1 {
+                font-size: 56px;
+            }
+
+            h2 {
+                font-size: 42px;
+                margin-top: 64px;
+            }
+
+            h3 {
+                font-size: 28px;
+            }
+
+            p, li {
+                font-size: 18px;
+            }
+
+            .intro {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            nav {
+                padding: 12px 16px;
+            }
+
+            .header-actions {
+                gap: 12px;
+            }
+
+            .phone-link {
+                font-size: 14px;
+            }
+
+            .home-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+
+            h1 {
+                font-size: 42px;
+            }
+
+            h2 {
+                font-size: 32px;
+                margin-top: 48px;
+            }
+
+            h3 {
+                font-size: 24px;
+            }
+
+            .content {
+                padding: 32px 24px;
+            }
+
+            p, li {
+                font-size: 16px;
+            }
+
+            .intro {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="brand">
+                <img src="images/logo.png" alt="Emika's Hot Chicken логотип">
+            </div>
+            <div class="header-actions">
+                <a href="tel:+79778389898" class="phone-link">+7 977 838 98 98</a>
+                <a href="#" class="home-btn">Главная</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="top-nav">
+        <div class="top-nav-container">
+            <nav class="top-nav-menu">
+                <a href="#intro" class="active">Введение</a>
+                <a href="#who-we-are">Кто мы такие?</a>
+                <a href="#product">Продукт — основа всего</a>
+                <a href="#product-principles">Принципы продукта</a>
+                <a href="#brand-character">Характер бренда</a>
+                <a href="#tone-of-voice">Tone of Voice</a>
+                <a href="#visual-system">Визуальная система</a>
+                <a href="#restaurant-space">Ресторан и пространство</a>
+                <a href="#system-automation">Система и автоматизация</a>
+                <a href="#franchise">Франшиза Emika's</a>
+                <a href="#commercial">Коммерческие условия</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <main class="content">
+            <section id="intro">
+                <h1>Emika's Hot Chicken</h1>
+                <div class="intro">
+                    Emika's Hot Chicken — бренд нэшвилловской курицы с характером.
+                </div>
+            </section>
+
+            <p>
+                Мы показываем:<br>
+                — как мы готовим<br>
+                — как мы выглядим<br>
+                — как мы говорим<br>
+                — и почему это важно для франшизы.
+            </p>
+
+            <p>
+                Этот брендбук — живой документ. Он будет дополняться и уточняться по мере роста сети.
+            </p>
+
+            <div class="divider"></div>
+
+            <section id="who-we-are">
+                <h2>Кто мы такие?</h2>
+                <p>
+                    Emika's — это не ресторан «про всё» и не очередной фастфуд.
+                </p>
+                <p>
+                    Мы — бренд, построенный вокруг одного продукта. Узкая специализация позволяет нам держать вкус, качество и процессы под контролем.
+                </p>
+                <p>
+                    Мы молодой бренд, который:<br>
+                    — работает меньше года<br>
+                    — вышел в плюс<br>
+                    — масштабирует только то, что уже доказало эффективность
+                </p>
+                <p>
+                    Мы не притворяемся корпорацией. Мы строим систему шаг за шагом.
+                </p>
+            </section>
+
+            <div class="divider"></div>
+
+            <section id="product">
+                <h2>Продукт — основа всего</h2>
+                <p>
+                    Всё в Emika's начинается с курицы.
+                </p>
+                <p>
+                    Курица — массовый и понятный продукт. Она легко объясняется гостю и даёт повторные визиты.
+                </p>
+                <p>
+                    Нэшвилловская курица — это не просто рецепт и не только острота. Это культурный код. Та самая курица, которую вы видели в кино, клипах, рилсах и слышали в кантри-музыке, даже если не знали её название.
+                </p>
+                <p>
+                    Хруст, острое масло, специи и несколько уровней остроты создают вкус с характером.
+                </p>
+                <p>
+                    Фокус на одном продукте даёт деньги:<br>
+                    — меньше ошибок<br>
+                    — меньше списаний<br>
+                    — быстрее обучение персонала<br>
+                    — стабильный результат в каждой точке.
+                </p>
+            </section>
+
+            <div class="divider"></div>
+
+            <section id="product-principles">
+                <h2>Принципы продукта</h2>
+                <p>
+                    Мы не экономим на специях — потому что вкус важнее себестоимости.
+                </p>
+                <p>
+                    Мы не смягчаем вкус «для всех» — потому что характер продукта важнее универсальности.
+                </p>
+                <p>
+                    Мы не раздуваем меню — потому что фокус даёт стабильность.
+                </p>
+                <p>
+                    Мы не жертвуем хрустом ради скорости — потому что именно за хрустом возвращаются гости.
+                </p>
+            </section>
+
+            <div class="divider"></div>
+
+            <section id="brand-character">
+                <h2>Характер бренда</h2>
+                <p>
+                    Emika's — дерзкий, но не хамский.<br>
+                    Уверенный, но не пафосный.<br>
+                    Честный и с юмором.
+                </p>
+                <p>
+                    Мы не глянцевые, не корпоративные и не стерильные.
+                </p>
+                <p>
+                    Вайб бренда — рок, гранж, огонь, металл, кухня в работе.
+                </p>
+            </section>
+
+            <div class="divider"></div>
+
+            <section id="tone-of-voice">
+                <h2>Tone of Voice</h2>
+                <p>
+                    Мы говорим просто, коротко и по делу.
+                </p>
+                <p>
+                    Мы не используем канцелярит и пустые слова.
+                </p>
+                <p>
+                    Мы не говорим:<br>
+                    «уникальное гастрономическое путешествие»,<br>
+                    «мы дарим эмоции»,<br>
+                    «высочайшее качество».
+                </p>
+                <p>
+                    Мы объясняем продукт так, как говорим с другом.
+                </p>
+            </section>
+
+            <div class="divider"></div>
+
+            <section id="visual-system">
+                <h2>Визуальная система</h2>
+                <p>
+                    Визуальная система защищает бренд от колхоза.
+                </p>
+                <p>
+                    Здесь фиксируются:<br>
+                    — правила использования логотипа<br>
+                    — цвета и шрифты<br>
+                    — графика и фото еды<br>
+                    — примеры правильного и неправильного применения
+                </p>
+                <p>
+                    Лучше жёсткие ограничения, чем размытая свобода.
+                </p>
+            </section>
+
+            <div class="divider"></div>
+
+            <section id="restaurant-space">
+                <h2>Ресторан и пространство</h2>
+                <p>
+                    Emika's — это открытая кухня, огонь и ощущение процесса.
+                </p>
+                <h3>Для фудкорта:</h3>
+                <ul>
+                    <li>компактность</li>
+                    <li>яркая фронтальная зона</li>
+                    <li>читаемое меню</li>
+                    <li>свет и контраст</li>
+                </ul>
+                <h3>Для отдельного помещения:</h3>
+                <ul>
+                    <li>индустриальные материалы</li>
+                    <li>металл, кафель, бетон</li>
+                    <li>тёплый свет на продукт</li>
+                    <li>кухня как центр внимания</li>
+                </ul>
+                <p>
+                    Пространство должно выглядеть как часть одной сети, а не как локальная интерпретация.
+                </p>
+            </section>
+
+            <div class="divider"></div>
+
+            <section id="system-automation">
+                <h2>Система и автоматизация</h2>
+                <p>
+                    Emika's строит собственную систему, вдохновлённую Dodo IS.
+                </p>
+                <p>
+                    Онлайн-магазин и приложение объединяют заказы, аналитику и лояльность.
+                </p>
+                <p>
+                    Система анализирует продажи и подсказывает:<br>
+                    — когда заканчиваются ингредиенты<br>
+                    — что и в каком объёме закупать<br>
+                    — как подготовиться к росту или спаду спроса
+                </p>
+                <p>
+                    Это снижает потери и упрощает управление.
+                </p>
+            </section>
+
+            <div class="divider"></div>
+
+            <section id="franchise">
+                <h2>Франшиза Emika's</h2>
+                <p>
+                    Мы идём во франшизу, чтобы масштабировать рабочую модель.
+                </p>
+                <p>
+                    Мы даём партнёру:<br>
+                    — продукт<br>
+                    — стандарты<br>
+                    — систему<br>
+                    — поддержку
+                </p>
+                <p>
+                    Партнёр даёт бренду:<br>
+                    — соблюдение стандартов<br>
+                    — репутацию<br>
+                    — рост сети
+                </p>
+                <p>
+                    В Emika's стандарты важнее свободы.
+                </p>
+            </section>
+
+            <div class="divider"></div>
+
+            <section id="commercial">
+                <h2>Коммерческие условия</h2>
+                <ul>
+                    <li><strong>Вступительный взнос:</strong> 350 000 ₽</li>
+                    <li><strong>Роялти:</strong> 5% от выручки</li>
+                    <li><strong>Минимальный бюджет запуска:</strong> от 5 000 000 ₽</li>
+                    <li><strong>Ожидаемая рентабельность:</strong> 20–30%</li>
+                    <li><strong>Срок окупаемости:</strong> около 1 года</li>
+                </ul>
+                <p>
+                    Модель прозрачна и рассчитана на масштабирование.
+                </p>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Активная навигация при прокрутке
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.top-nav-menu a');
+
+            function updateActiveNav() {
+                let current = '';
+                const scrollPos = window.scrollY + 200;
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                // Также проверяем вступление
+                if (!current && scrollPos < 500) {
+                    current = 'intro';
+                }
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    const href = link.getAttribute('href');
+                    if (href === `#${current}` || (href === '#intro' && current === '')) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', updateActiveNav);
+            updateActiveNav();
+
+            // Плавная прокрутка
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    if (targetId.startsWith('#')) {
+                        if (targetId === '#intro') {
+                            window.scrollTo({
+                                top: 0,
+                                behavior: 'smooth'
+                            });
+                        } else {
+                            const targetSection = document.querySelector(targetId);
+                            if (targetSection) {
+                                const offsetTop = targetSection.offsetTop - 150;
+                                window.scrollTo({
+                                    top: offsetTop,
+                                    behavior: 'smooth'
+                                });
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Оформление заказа — Emika's</title>
+  <link rel="shortcut icon" href="images/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --orange:#ff6a1a; --bg:#0d0d0f; --card:rgba(20,20,24,.92); --text:#f5f5f5; --muted:#c9c9ce; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:'Montserrat', sans-serif; }
+    .wrap { max-width:980px; margin:0 auto; padding:22px 14px 40px; }
+    h1 { margin:0 0 14px; font-size:1.5rem; }
+    .grid { display:grid; grid-template-columns:1.2fr .8fr; gap:14px; }
+    .card { background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:14px; }
+    .items { display:grid; gap:10px; }
+    .item { display:grid; grid-template-columns:64px 1fr auto; gap:10px; align-items:center; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:8px; }
+    .item img { width:64px; height:64px; object-fit:contain; border-radius:8px; background:rgba(255,255,255,.04); }
+    .muted { color:var(--muted); font-size:.9rem; }
+    .total { font-size:1.2rem; font-weight:700; color:var(--orange); margin-top:10px; }
+    label { display:block; font-size:.88rem; margin:10px 0 6px; color:var(--muted); font-weight:600; }
+    input, textarea, select { width:100%; border-radius:10px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.05); color:var(--text); padding:10px; font-family:inherit; }
+    textarea { min-height:80px; resize:vertical; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .type-row { display:flex; gap:10px; flex-wrap:wrap; margin:8px 0 4px; }
+    .type-row label { display:inline-flex; align-items:center; gap:8px; margin:0; font-weight:600; color:var(--text); cursor:pointer; }
+    .type-row input { width:auto; }
+    .actions { display:flex; gap:10px; margin-top:12px; }
+    button, a.btn { padding:12px 16px; border-radius:999px; border:none; background:var(--orange); color:#fff; font-weight:700; cursor:pointer; text-decoration:none; font-family:inherit; }
+    button:disabled { opacity:.6; cursor:not-allowed; }
+    .back-to-menu { display:inline-block; margin-bottom:16px; color:var(--orange); font-weight:700; text-decoration:none; font-size:.95rem; }
+    .error { color:#ff8080; font-size:.88rem; display:none; margin-top:8px; }
+    #addressBlock[hidden] { display:none !important; }
+    @media (max-width:860px) { .grid { grid-template-columns:1fr; } }
+    @media (max-width:520px) { .row { grid-template-columns:1fr; } .actions { flex-direction:column; } .actions button { width:100%; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back-to-menu" href="index.html">&lt; назад в меню</a>
+    <h1>Оформление заказа</h1>
+    <div class="grid">
+      <section class="card">
+        <h3>Ваш заказ</h3>
+        <div class="items" id="checkoutItems"></div>
+        <div class="total" id="checkoutTotal">0 ₽</div>
+      </section>
+
+      <section class="card">
+        <h3>Доставка и контакты</h3>
+        <form id="checkoutForm" novalidate>
+          <label>Способ получения</label>
+          <div class="type-row">
+            <label><input type="radio" name="deliveryType" value="delivery" checked> Доставка</label>
+            <label><input type="radio" name="deliveryType" value="pickup"> Самовывоз (Eat Arena)</label>
+          </div>
+
+          <div id="addressBlock">
+            <label for="address">Адрес доставки *</label>
+            <input id="address" type="text" placeholder="Улица, дом, квартира">
+
+            <label for="addressExtra">Подъезд, этаж, домофон</label>
+            <input id="addressExtra" type="text" placeholder="Необязательно">
+          </div>
+
+          <label for="name">Имя *</label>
+          <input id="name" type="text" placeholder="Например: Артур">
+
+          <div class="row">
+            <div>
+              <label for="phone">Телефон *</label>
+              <input id="phone" type="tel" placeholder="+7 999 123 45 67">
+            </div>
+            <div>
+              <label for="email">Почта</label>
+              <input id="email" type="email" placeholder="you@email.com">
+            </div>
+          </div>
+
+          <label for="comment">Комментарий</label>
+          <textarea id="comment" placeholder="Время доставки, пожелания…"></textarea>
+
+          <p class="error" id="formError"></p>
+          <div class="actions">
+            <button type="submit" id="submitBtn">Отправить заказ</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const itemsWrap = document.getElementById('checkoutItems');
+    const totalEl = document.getElementById('checkoutTotal');
+    const form = document.getElementById('checkoutForm');
+    const err = document.getElementById('formError');
+    const submitBtn = document.getElementById('submitBtn');
+    const addressBlock = document.getElementById('addressBlock');
+
+    const prefContactRaw = localStorage.getItem('emika-checkout-contact');
+    const metaRaw = localStorage.getItem('emika-checkout-meta');
+
+    if (prefContactRaw) {
+      try {
+        const pref = JSON.parse(prefContactRaw);
+        if (pref?.name) document.getElementById('name').value = pref.name;
+        if (pref?.phone) document.getElementById('phone').value = pref.phone;
+      } catch (e) {}
+    }
+
+    let meta = {};
+    if (metaRaw) {
+      try { meta = JSON.parse(metaRaw) || {}; } catch (e) {}
+    }
+
+    const cart = JSON.parse(localStorage.getItem('emika-checkout-cart') || '[]');
+    let total = 0;
+
+    if (!cart.length) {
+      itemsWrap.innerHTML = '<p class="muted">Корзина пуста. <a href="index.html" style="color:var(--orange)">Вернитесь в меню</a>.</p>';
+      submitBtn.disabled = true;
+    } else {
+      cart.forEach((item) => {
+        const sum = item.price * item.qty;
+        total += sum;
+        const el = document.createElement('div');
+        el.className = 'item';
+        el.innerHTML = `
+          <img src="${item.image}" alt="">
+          <div>
+            <div>${item.titleRu || item.titleEn}</div>
+            <div class="muted">${item.qty} × ${item.price} ₽</div>
+          </div>
+          <strong>${sum} ₽</strong>
+        `;
+        itemsWrap.appendChild(el);
+      });
+    }
+    totalEl.textContent = `${total} ₽`;
+
+    function syncDeliveryType() {
+      const isPickup = document.querySelector('input[name="deliveryType"]:checked')?.value === 'pickup';
+      addressBlock.hidden = isPickup;
+      document.getElementById('address').required = !isPickup;
+    }
+
+    document.querySelectorAll('input[name="deliveryType"]').forEach((el) => {
+      el.addEventListener('change', syncDeliveryType);
+    });
+    syncDeliveryType();
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      err.style.display = 'none';
+
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const deliveryType = document.querySelector('input[name="deliveryType"]:checked')?.value || 'delivery';
+      const address = document.getElementById('address').value.trim();
+
+      if (!name || !phone) {
+        err.textContent = 'Введите имя и телефон.';
+        err.style.display = 'block';
+        return;
+      }
+      if (deliveryType === 'delivery' && !address) {
+        err.textContent = 'Укажите адрес доставки.';
+        err.style.display = 'block';
+        return;
+      }
+      if (!cart.length) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Отправляем…';
+
+      const payload = {
+        customer: {
+          name,
+          phone,
+          email: document.getElementById('email').value.trim()
+        },
+        deliveryType,
+        address: deliveryType === 'delivery' ? address : 'Eat Arena, самовывоз',
+        addressExtra: document.getElementById('addressExtra').value.trim(),
+        comment: document.getElementById('comment').value.trim(),
+        paymentMethod: meta.paymentMethod || 'sbp',
+        promoCode: meta.promoCode || '',
+        items: cart,
+        total
+      };
+
+      try {
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
+
+        localStorage.setItem('emika-checkout-contact', JSON.stringify({ name, phone }));
+        localStorage.removeItem('emika-checkout-cart');
+        localStorage.removeItem('emika-checkout-meta');
+        localStorage.setItem('emika-last-order', JSON.stringify({
+          orderNumber: data.orderNumber,
+          id: data.id
+        }));
+
+        window.location.href = `order-success.html?order=${encodeURIComponent(data.orderNumber)}`;
+      } catch (error) {
+        err.textContent = error.message || 'Не удалось отправить заказ. Запустите сервер: npm start';
+        err.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Отправить заказ';
+      }
+    });
+  </script>
+</body>
+</html>

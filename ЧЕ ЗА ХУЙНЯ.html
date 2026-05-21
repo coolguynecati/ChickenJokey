@@ -1,0 +1,579 @@
+<html>
+<head>
+<title>Emika's Hot Chicken</title>
+ <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com" >
+  <link rel="shortcut icon" href="images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto Slab', serif; 
+            color: #fff;
+            overflow-x: hidden;
+            background: url('images/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+            z-index: -1;
+        }
+
+.container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+            background-color: rgba(0, 0, 0, 0.6);
+            position: relative;
+            z-index: 1;
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff6600;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-family: 'Merriweather', serif; /* Другой шрифт для заголовка */
+        }
+
+        .image-section {
+            margin-bottom: 50px;
+            text-align: center;
+            padding: 50px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fade-in-image {
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .visible {
+            opacity: 1;
+        }
+
+        .spacer {
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            color: #ccc;
+        }
+
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+
+     .text-content .photo {
+            display: block; /* Изображение как блочный элемент */
+ margin: 0 auto 30px auto; /* Центрирование и отступ снизу */
+        max-width: 80%; /* Максимальная ширина картинки */
+        height: auto; /* Автоматическая высота для сохранения пропорций */
+        border-radius: 10px; /* Скругленные углы */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Небольшая тень */
+    }
+
+    .text-content h2 {
+        font-family: 'Merriweather', serif; /* Заголовок внутри текста */
+        color: #ff6600;
+        margin-bottom: 20px;
+        font-size: 1.2em;
+    }
+
+    .text-content p {
+        margin-bottom: 20px; /* Отступ между параграфами */
+        color: #eee; /* Более светлый цвет текста */
+    }
+
+    .text-content .spice-levels {
+        margin-top: 25px;
+        font-size: 0.95em;
+        color: #ccc;
+    }
+
+    .text-content .spice-levels strong {
+        color: #ff6600; /* Цвет для выделения уровней остроты */
+    }
+
+    .text-content .instagram-link {
+        display: inline-block;
+        margin-top: 30px;
+        padding: 12px 25px;
+        background-color: #ff6600;
+        color: #fff;
+        text-decoration: none;
+        font-weight: bold;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        font-size: 1.05em;
+    }
+
+    .text-content .instagram-link:hover {
+        background-color: #e65c00;
+    }
+
+
+<title>Emika's Hot Chicken</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif; /* Добавим базовый шрифт */
+            color: #fff; /* Цвет текста по умолчанию для темного фона */
+            overflow-x: hidden; /* Скрываем горизонтальную прокрутку */
+            background: url('images/background.jpg') no-repeat center center fixed; /* Фон для всего body */
+            background-size: cover; /* Масштабируем фон, чтобы он покрывал весь экран */
+            position: relative; /* Для позиционирования элементов относительно body */
+            z-index: -1; /* Отправляем фон на задний план */
+        }
+
+        /* Параллакс эффект для фона */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('images/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            z-index: -1;
+            transform: translateZ(-1px) scale(2); /* Движение в 2 раза медленнее */
+        }
+
+        .container {
+            width: 95%; /* Увеличим ширину контейнера для лучшего отображения на мобильных */
+            max-width: 1200px; /* Ограничим максимальную ширину на больших экранах */
+            margin: 20px auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Более заметная тень */
+            background-color: rgba(0, 0, 0, 0.6); /* Полупрозрачный фон для содержимого */
+            position: relative; /* Для корректного позиционирования внутренних элементов */
+            z-index: 1; /* Чтобы содержимое было поверх фона */
+            border-radius: 10px; /* Скруглим углы контейнера */
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff6600; /* Яркий цвет для заголовка */
+            margin-bottom: 30px;
+            font-size: 2em; /* Увеличим размер заголовка */
+        }
+
+        .image-section {
+            margin-bottom: 50px;
+            text-align: center;
+            padding: 100px 0; /* Увеличим отступы сверху и снизу */
+            position: relative; /* Для позиционирования изображений */
+            overflow: hidden; /* Скрываем выходящие за пределы изображения */
+        }
+
+        .fade-in-image {
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out; /* Немного увеличим время перехода */
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .visible {
+            opacity: 1;
+        }
+
+        .spacer {
+            height: 80vh; /* Уменьшим высоту для лучшей адаптивности */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.7em;
+            color: #ccc;
+        }
+
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+
+        .static-image,
+        .rotating-image {
+            position: absolute;
+            top: 160;
+            left: 50%;
+            transform: translate(-50%, -50%); 
+            max-width: 200;
+            max-height: 200; 
+        }
+
+        .rotating-image {
+            animation: spin 15s linear infinite; /* Увеличим длительность анимации */
+            z-index: 2;
+	}
+	
+	 .static-image {
+        z-index: 1;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+        100% {
+            transform: translate(-50%, -50%) rotate(360deg);
+        }
+    }
+
+    /* Футер */
+    footer {
+        display: flex;
+        justify-content: space-between; /* Размещаем элементы по краям */
+        align-items: center;
+        padding: 20px;
+        background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный фон для футера */
+        color: #fff;
+        margin-top: 50px; /* Отступ сверху */
+        flex-wrap: wrap; /* Позволяет элементам переноситься на новую строку на маленьких экранах */
+        text-align: center; /* Центрируем текст на маленьких экранах */
+    }
+
+    footer .logo-footer {
+        flex-shrink: 0; /* Запрещаем сжимать логотип */
+        margin-right: 20px; /* Отступ справа от логотипа */
+    }
+
+    footer .logo-footer img {
+        height: 50px; /* Размер логотипа в футере */
+    }
+
+    footer .info-footer {
+        flex-grow: 1; /* Позволяем информационному блоку занимать доступное пространство */
+        text-align: center;
+    }
+
+    footer .info-footer p {
+        margin: 0 0 10px 0; /* Отступ для параграфа */
+    }
+
+    footer .info-footer a {
+        color: #ff6600; /* Цвет ссылки */
+        text-decoration: none; /* Убираем подчеркивание */
+        font-weight: bold;
+    }
+
+    footer .info-footer a:hover {
+        text-decoration: underline; /* Подчеркивание при наведении */
+    }
+
+    /* Медиа-запросы для адаптивности */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.6em;
+        }
+
+        .container {
+            width: 90%;
+            padding: 15px;
+        }
+
+        .image-wrapper {
+            height: 300px;
+        }
+
+        .static-image,
+        .rotating-image {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        footer {
+            flex-direction: column; /* Элементы футера выстраиваются в столбец */
+                text-align: center;
+        }
+
+        footer .logo-footer {
+            margin-right: 0;
+            margin-bottom: 15px; /* Отступ снизу от логотипа */
+        }
+        }
+
+    /* ===== Меню: единые карточки и сетка ===== */
+    .menu-section {
+        width: 80%;
+        margin: 0 auto 28px auto;
+    }
+
+    .menu-title {
+        text-align: center;
+        margin: 10px 0 16px 0;
+    }
+
+    .menu-title img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+        align-items: stretch;
+    }
+
+    .product-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        min-width: 0;
+    }
+
+    .product-media {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        padding: 10px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .product-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+    }
+
+    /* Перебиваем старый .fade-in-image (там height:auto) внутри карточек */
+    .product-media img.fade-in-image {
+        height: 100%;
+    }
+
+    .product-name {
+        margin-top: 10px;
+        font-family: impact, 'Roboto Slab', serif;
+        font-size: 1.05em;
+        color: #ffffff;
+    }
+
+    @media (max-width: 1100px) {
+        .products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .menu-section { width: 90%; }
+    }
+
+    @media (max-width: 768px) {
+        .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .menu-section { width: 92%; }
+    }
+
+    @media (max-width: 480px) {
+        .products-grid { grid-template-columns: 1fr; }
+    }
+    </style>
+</head>
+<body bgcolor="#000000" background="images/background.jpg" no-repeat>
+<center>
+
+   <center><table><tr><td><br><br><br>
+
+        <img src="images/circle2.png" alt="Emika's Hot Chicken" class="static-image">
+
+
+        <img src="images/circle1.png"  class="rotating-image">
+            </div>
+
+
+    <br><br><br><br><br>
+        <div class="text-content"><br><br><br><br><br>
+         <center>  <table width="70%"><tr><td> <img src="images/photo.png" alt="Горячая курица" class="fade-in-image" width="80%">
+            <h2>Добро пожаловать в мир Нэшвиллской курицы!</h2>
+<p>
+Мы доставляем настоящий вкус Нэшвилла прямо к вашей тарелке,
+специализируясь на культовых бургерах и стрипсах горячей курицей
+в нэшвиллском стиле. Наш уникальный взгляд
+на эту любимую классику заставит вас захотеть добавки.
+Наше меню составлено с учётом разнообразных вкусов на любой вкус.
+</p>
+<p class="spice-levels">
+Выбирайте из пяти уровней остроты: «без остроты» начальный уровень, «легкий»
+для тех, кто предпочитает лёгкую остроту, «средний» для более смелых,
+«острый» для любителей острых ощущений и «жгучий» для бесстрашных.
+Мы удовлетворим все ваши потребности в блюдах.
+</p>
+<p>
+EMIKA’S Hot Chicken — это не просто еда,
+это создание незабываемых кулинарных впечатлений.
+Нас отличает сочетание традиционных вкусов
+и инновационных решений, подкрепленное
+стремлением к качеству.
+</p>
+<p>
+Приглашаем вас присоединиться к нам и узнать почему!
+Мы больше, чем просто ресторан —
+мы являемся воплощением огненного духа Нэшвилла!
+</p>
+<p>
+Выберите нас и почувствуйте разницу!
+</p>    </div>
+</td></tr></table>
+
+
+<div class="menu-section">
+    <div class="menu-title"><img src="images/title1.png" alt="Комбо"></div>
+    <div class="products-grid">
+        <div class="product-card">
+            <div class="product-media"><img src="images/combo1.png" class="fade-in-image" alt="Комбо 1"></div>
+            <div class="product-name">Комбо 1</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/combo2.png" class="fade-in-image" alt="Комбо 2"></div>
+            <div class="product-name">Комбо 2</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/combo3.png" class="fade-in-image" alt="Комбо 3"></div>
+            <div class="product-name">Комбо 3</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/combo4.png" class="fade-in-image" alt="Комбо 4"></div>
+            <div class="product-name">Комбо 4</div>
+        </div>
+    </div>
+</div>
+
+
+
+<br>
+
+<div class="menu-section">
+    <div class="menu-title"><img src="images/title2.png" alt="Курица и боулы"></div>
+    <div class="products-grid">
+        <div class="product-card">
+            <div class="product-media"><img src="images/bowl1.png" class="fade-in-image" alt="Emika's Боул"></div>
+            <div class="product-name">Emika's Боул</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/bowl2.png" class="fade-in-image" alt="Мак'н'Чиз Боул"></div>
+            <div class="product-name">Мак'н'Чиз Боул</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/burg1.png" class="fade-in-image" alt="Бургер"></div>
+            <div class="product-name">Бургер</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/burg2.png" class="fade-in-image" alt="Картошка Фри"></div>
+            <div class="product-name">Картошка Фри</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/burg3.png" class="fade-in-image" alt="Стрипс"></div>
+            <div class="product-name">Стрипс</div>
+        </div>
+    </div>
+</div>
+
+<div class="menu-section">
+    <div class="menu-title"><img src="images/title4.png" alt="Добавки"></div>
+    <div class="products-grid">
+        <div class="product-card">
+            <div class="product-media"><img src="images/sal1.png" class="fade-in-image" alt="Соус Emika's"></div>
+            <div class="product-name">Соус Emika's</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/sal2.png" class="fade-in-image" alt="Салат Коул Слоу"></div>
+            <div class="product-name">Салат Коул Слоу</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/sal3.png" class="fade-in-image" alt="Огурчики"></div>
+            <div class="product-name">Огурчики</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/sal4.png" class="fade-in-image" alt="Мак'н'Чиз"></div>
+            <div class="product-name">Мак'н'Чиз</div>
+        </div>
+    </div>
+</div>
+
+
+<div class="menu-section">
+    <div class="menu-title"><img src="images/title5.png" alt="Напитки"></div>
+    <div class="products-grid">
+        <div class="product-card">
+            <div class="product-media"><img src="images/drink1.png" class="fade-in-image" alt="Слаш — Лесные ягоды"></div>
+            <div class="product-name">Слаш<br>Лесные ягоды</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/drink2.png" class="fade-in-image" alt="Слаш — Клубника"></div>
+            <div class="product-name">Слаш<br>Клубника</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/drink3.png" class="fade-in-image" alt="Милкшейк — Шоколад"></div>
+            <div class="product-name">Милкшейк<br>Шоколад</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/drink4.png" class="fade-in-image" alt="Милкшейк — Клубника"></div>
+            <div class="product-name">Милкшейк<br>Клубника</div>
+        </div>
+        <div class="product-card">
+            <div class="product-media"><img src="images/drink5.png" class="fade-in-image" alt="Милкшейк — Ваниль"></div>
+            <div class="product-name">Милкшейк<br>Ваниль</div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const images = document.querySelectorAll('.fade-in-image');
+
+            const observer = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(function(entry) {
+                    // entry.isIntersecting === true, если элемент виден в области просмотра
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // Отключаем наблюдение за этим элементом после того, как он стал видимым
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                // rootMargin: '0px 0px -100px 0px' // Опционально: можно настроить, когда элемент считается видимым
+            });
+
+            images.forEach(function(image) {
+                observer.observe(image);
+            });
+        });
+    </script>
+
+<footer>
+    <div class="logo-footer">
+        <img src="images/logo.png" alt="Emika's Hot Chicken Logo">
+    </div>
+    <div class="info-footer">
+        <p>&copy; 2025 Emika's Hot Chicken. Все права защищены.</p>
+        <p>Вкус Нешвилла в Москве</p>
+        <p>Следите за нами в <a href="https://www.instagram.com/emikashotchicken/" target="_blank">Instagram</a></p>
+    </div>
+</footer>
+</body>
+<html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eat Arena — Emika's</title>
+    <link rel="shortcut icon" href="../images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --orange:#ff6a1a; --bg:#0d0d0f; --text:#f5f5f5; --muted:#c9c9ce; }
+        * { box-sizing:border-box; }
+        body { margin:0; font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--text); }
+        .wrap { max-width:720px; margin:0 auto; padding:24px 16px 48px; }
+        a { color:var(--orange); font-weight:700; text-decoration:none; }
+        h1 { margin:0 0 12px; }
+        p { line-height:1.6; color:var(--muted); }
+        .card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:16px; margin-top:16px; }
+        .has-new-badge { position:relative; }
+        .has-new-badge::after {
+            content:'новое'; position:absolute; top:-6px; right:-8px;
+            background:var(--orange); color:#fff; font-size:.62rem; font-weight:700;
+            padding:2px 6px; border-radius:999px; text-transform:uppercase;
+        }
+    </style>
+</head>
+<body data-page-id="eat-arena">
+    <div class="wrap">
+        <p><a href="./">← Меню</a></p>
+        <h1>Eat Arena</h1>
+        <div class="card">
+            <p>Москва, Мичуринский проспект, 13А, стр. 1, метро «Ломоносовский проспект», Eat Arena, 2 этаж.</p>
+            <p>Острая курочка в стиле Нэшвилла — пять уровней остроты на выбор.</p>
+            <p><a href="tel:+79778389898">+7 977 838 98 98</a></p>
+        </div>
+    </div>
+    <script src="page-new.js"></script>
+</body>
+</html>

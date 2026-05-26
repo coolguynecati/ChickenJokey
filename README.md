@@ -1,30 +1,53 @@
-# Emika's Hot Chicken — сайт + CRM заказов
+# Emika's Hot Chicken — репозиторий сайта
 
-## Локально
+## Структура
+
+```
+├── images/          # общие картинки и видео
+├── franchise/       # страница франшизы
+├── cloud/           # файловое «облако» (папки + cloud.txt)
+├── shop/            # меню, заказ, CRM, сервер
+│   ├── index.html
+│   ├── cloud.html
+│   ├── checkout.html
+│   ├── crm.html
+│   ├── server/
+│   └── package.json
+└── index.html       # редирект на shop/
+```
+
+## Запуск магазина и CRM
 
 ```bash
+cd shop
 npm install
 npm start
 ```
 
 - Сайт: http://localhost:3000  
-- CRM: http://localhost:3000/crm.html (пароль в `.env` → `CRM_PASSWORD`, по умолчанию `emika2025`)
+- CRM: http://localhost:3000/crm.html (пароль: `CRM_PASSWORD` в `shop/.env`, по умолчанию `emika2025`)
+- Облако: http://localhost:3000/cloud.html
 
-## Онлайн (Render.com)
+## Облако (файлы без правки кода)
 
-1. Залейте проект на GitHub.
-2. [render.com](https://render.com) → **New** → **Blueprint** → подключите репозиторий (файл `render.yaml` подхватится сам).
-3. После деплоя откройте URL сервиса и `/crm.html`.
-4. Пароль CRM — в переменных окружения Render (`CRM_PASSWORD`).
+1. Создайте папку в `cloud/`, например `cloud/маркетинг/`.
+2. Положите туда `cloud.txt`:
 
-Заказы хранятся в `data/orders.json` на диске инстанса (на бесплатном плане при перезапуске данные могут сброситься — для продакшена позже подключите БД).
-
-## Быстрый туннель с вашего ПК
-
-Пока сервер запущен (`npm start`):
-
-```bash
-npx cloudflared tunnel --url http://localhost:3000
+```
+Name: Маркетинг
+Description: Баннеры и креативы для соцсетей
+Type: gallery
 ```
 
-В консоли появится публичная ссылка `https://….trycloudflare.com`.
+3. Добавьте файлы (jpg, pdf, mp4…) — они появятся на `/cloud.html` после перезагрузки страницы.
+
+Поле `Type` необязательно: `gallery`, `documents`, `files` или `auto` (по типам файлов).
+
+## Деплой (Render)
+
+В настройках сервиса укажите **Root Directory**: `shop`  
+Либо используйте `render.yaml` в корне репозитория.
+
+## Git
+
+Не коммитьте `shop/node_modules/`, `shop/data/`, `.env` — они уже в `.gitignore`.

@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Заказ принят — Emika's</title>
+  <link rel="shortcut icon" href="../images/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --orange:#ff6a1a; --bg:#0d0d0f; --card:rgba(20,20,24,.92); --text:#f5f5f5; --muted:#c9c9ce; }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; min-height:100vh; padding:20px 14px 32px;
+      background:var(--bg); color:var(--text);
+      font-family:'Montserrat',Arial,sans-serif;
+    }
+    .wrap { max-width:520px; margin:0 auto; }
+    .card {
+      background:var(--card); border:1px solid rgba(255,255,255,.1);
+      border-radius:16px; padding:22px 18px; margin-bottom:12px;
+    }
+    h1 { margin:0 0 8px; font-size:1.35rem; }
+    .lead { color:var(--muted); margin:0 0 14px; line-height:1.55; font-size:0.92rem; }
+    .num { color:var(--orange); font-weight:700; font-size:1rem; margin:0 0 4px; }
+    .sum {
+      font-size:1.75rem; font-weight:700; color:var(--orange);
+      margin:14px 0 6px;
+    }
+    .sum-label { font-size:0.82rem; color:var(--muted); margin:0 0 16px; }
+    .pay-block {
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:12px; padding:14px; margin-bottom:12px;
+      background:rgba(255,255,255,.03);
+    }
+    .pay-block h2 {
+      margin:0 0 8px; font-size:0.95rem;
+      display:flex; align-items:center; gap:8px;
+    }
+    .pay-block p { margin:0 0 10px; color:var(--muted); font-size:0.88rem; line-height:1.5; }
+    .pay-block--online { border-color:rgba(255,106,26,.35); }
+    .pay-block--online h2 { color:var(--orange); }
+    .btn {
+      display:inline-block; width:100%; text-align:center;
+      padding:12px 16px; border-radius:999px; border:none;
+      font-family:inherit; font-weight:700; font-size:0.9rem;
+      cursor:pointer; text-decoration:none; margin-top:6px;
+    }
+    .btn-primary { background:var(--orange); color:#fff; }
+    .btn-ghost {
+      background:transparent; color:var(--text);
+      border:1px solid rgba(255,255,255,.2);
+    }
+    .btn-copy { background:rgba(255,255,255,.08); color:var(--text); }
+    .phone { font-size:1.05rem; font-weight:700; color:var(--text); }
+    .hint { font-size:0.78rem; color:var(--muted); margin-top:8px; }
+    .back { display:inline-block; margin-top:8px; color:var(--orange); font-weight:700; text-decoration:none; font-size:0.92rem; }
+    .toast-copy {
+      position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
+      background:#1a1b22; border:1px solid rgba(255,106,26,.4);
+      padding:10px 16px; border-radius:10px; font-size:0.85rem;
+      display:none; z-index:10;
+    }
+    .toast-copy.show { display:block; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Заявка принята</h1>
+      <p class="lead">Менеджер получил ваш заказ. Мы свяжемся с вами для подтверждения. Оплатить можно <strong>онлайн</strong> (переводом) или <strong>на кассе</strong> при самовывозе.</p>
+      <p class="num" id="orderNum"></p>
+      <p class="sum-label">К оплате</p>
+      <p class="sum" id="orderSum">—</p>
+    </div>
+
+    <div class="pay-block pay-block--online">
+      <h2>Оплатить онлайн</h2>
+      <p id="onlineHint">Переведите указанную сумму и в комментарии укажите номер заказа — так мы быстрее его найдём.</p>
+      <p class="phone" id="phoneDisplay"></p>
+      <a class="btn btn-primary" id="payLinkBtn" href="#" target="_blank" rel="noopener" hidden>Оплатить по ссылке</a>
+      <button type="button" class="btn btn-copy" id="copyPayBtn">Скопировать реквизиты для перевода</button>
+      <p class="hint" id="linkHint"></p>
+    </div>
+
+    <div class="pay-block">
+      <h2>Оплатить на кассе</h2>
+      <p>Приходите в <strong id="venueName">Eat Arena</strong> — оплата на месте перед выдачей заказа.</p>
+      <p class="hint" id="venueAddress"></p>
+    </div>
+
+    <a class="back" href="./">← Вернуться в меню</a>
+  </div>
+
+  <div class="toast-copy" id="copyToast">Скопировано</div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    let order = { orderNumber: params.get('order') || '', total: 0 };
+
+    try {
+      const last = JSON.parse(localStorage.getItem('emika-last-order') || '{}');
+      if (last.orderNumber) order.orderNumber = last.orderNumber;
+      if (last.total) order.total = Number(last.total) || 0;
+    } catch (_) {}
+
+    const DEFAULT_PAYMENT = {
+      phone: '+79778389898',
+      phoneDisplay: '+7 977 838 98 98',
+      payOnlineUrl: '',
+      venueName: 'Eat Arena',
+      venueAddress: 'Мичуринский проспект, 13А, стр. 1, 2 этаж'
+    };
+
+    function formatSum(n) {
+      return `${Number(n).toLocaleString('ru-RU')} ₽`;
+    }
+
+    function buildPaymentComment(cfg) {
+      const parts = [];
+      if (order.orderNumber) parts.push(`Заказ ${order.orderNumber}`);
+      if (order.total) parts.push(`${order.total} руб`);
+      parts.push('Emika\'s Hot Chicken');
+      return parts.join(', ');
+    }
+
+    function buildCopyText(cfg) {
+      const lines = [
+        `Сумма: ${order.total ? formatSum(order.total) : '—'}`,
+        order.orderNumber ? `Номер заказа: ${order.orderNumber}` : '',
+        `Телефон для перевода: ${cfg.phoneDisplay || cfg.phone}`,
+        `Комментарий к переводу: ${buildPaymentComment(cfg)}`
+      ].filter(Boolean);
+      return lines.join('\n');
+    }
+
+    function showCopyToast() {
+      const el = document.getElementById('copyToast');
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    async function init() {
+      document.getElementById('orderNum').textContent = order.orderNumber
+        ? `Номер заказа: ${order.orderNumber}`
+        : '';
+      document.getElementById('orderSum').textContent = order.total
+        ? formatSum(order.total)
+        : 'уточнит менеджер';
+
+      let cfg = { ...DEFAULT_PAYMENT };
+      try {
+        const res = await fetch('payment.json');
+        if (res.ok) cfg = { ...cfg, ...await res.json() };
+      } catch (_) {}
+
+      document.getElementById('phoneDisplay').textContent = cfg.phoneDisplay || cfg.phone;
+      document.getElementById('venueName').textContent = cfg.venueName || 'Eat Arena';
+      document.getElementById('venueAddress').textContent = cfg.venueAddress || '';
+
+      const payLinkBtn = document.getElementById('payLinkBtn');
+      const linkHint = document.getElementById('linkHint');
+      const url = String(cfg.payOnlineUrl || '').trim();
+
+      if (url) {
+        payLinkBtn.href = url;
+        payLinkBtn.hidden = false;
+        linkHint.textContent = 'Ссылка ведёт в приложение банка или на страницу оплаты. Укажите в комментарии номер заказа.';
+      } else {
+        linkHint.textContent = 'Ссылку банка можно добавить в файл shop/payment.json (поле payOnlineUrl). Пока — перевод по номеру телефона.';
+      }
+
+      document.getElementById('copyPayBtn').addEventListener('click', async () => {
+        const text = buildCopyText(cfg);
+        try {
+          await navigator.clipboard.writeText(text);
+          showCopyToast();
+        } catch {
+          prompt('Скопируйте текст:', text);
+        }
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

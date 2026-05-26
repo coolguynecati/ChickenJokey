@@ -1,6 +1,7 @@
-node_modules
+node_modules/
+shop/node_modules/
 .env
-build
-dist
-.cache
-npm-debug.log
+shop/.env
+shop/data/
+*.log
+.DS_Store

@@ -1,0 +1,1175 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>CRM — заказы | Emika's</title>
+    <link rel="shortcut icon" href="../images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #ff6a1a;
+            --orange-dark: #e2550f;
+            --bg: #0f1014;
+            --card: #1a1b22;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f4f4f6;
+            --muted: #9a9cab;
+            --ok: #3ecf8e;
+            --warn: #ffd700;
+            --danger: #ff6b6b;
+            --list-w: 300px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        button, input, select, textarea {
+            font-family: inherit;
+            font-size: 0.88rem;
+        }
+
+        .login-wrap {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+        }
+
+        .login-card, .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+        }
+
+        .login-card { width: min(400px, 100%); padding: 24px; }
+        .login-card h1 { margin: 0 0 8px; font-size: 1.35rem; }
+        .login-card p { margin: 0 0 18px; color: var(--muted); font-size: 0.9rem; }
+
+        label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 5px; }
+
+        input, select, textarea {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            padding: 10px 12px;
+        }
+
+        textarea { min-height: 72px; resize: vertical; }
+
+        button {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-primary { background: var(--orange); color: #fff; }
+        .btn-primary:hover { background: var(--orange-dark); }
+        .btn-ok { background: rgba(62, 207, 142, 0.2); color: var(--ok); border: 1px solid rgba(62, 207, 142, 0.35); }
+        .btn-cooking {
+            background: var(--orange);
+            color: #fff;
+            border: 1px solid var(--orange-dark);
+            box-shadow: 0 4px 14px rgba(255, 106, 26, 0.35);
+        }
+        .btn-cooking:hover { background: var(--orange-dark); }
+        .btn-cooking:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+
+        .btn-cancel-sm {
+            padding: 7px 12px;
+            font-size: 0.76rem;
+            background: rgba(255, 107, 107, 0.12);
+            color: var(--danger);
+            border: 1px solid rgba(255, 107, 107, 0.35);
+        }
+
+        .detail-actions-top .btn-cancel-sm { margin-left: auto; }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            display: none;
+            place-items: center;
+            padding: 16px;
+            z-index: 40;
+        }
+
+        .modal-overlay.is-open { display: grid; }
+
+        .modal-card {
+            width: min(360px, 100%);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .modal-card h3 { margin: 0 0 12px; font-size: 1rem; }
+
+        .cancel-reasons { display: grid; gap: 8px; margin-bottom: 14px; }
+
+        .cancel-reasons label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--text);
+            font-size: 0.88rem;
+        }
+
+        .cancel-reasons input { width: auto; margin: 0; }
+
+        .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .btn-danger { background: rgba(255, 107, 107, 0.15); color: var(--danger); border: 1px solid rgba(255, 107, 107, 0.35); }
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .app { display: none; }
+        .app.is-ready { display: flex; flex-direction: column; min-height: 100vh; }
+
+        .topbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.35);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .topbar h1 { margin: 0; font-size: 1rem; }
+        .topbar small { color: var(--muted); font-size: 0.75rem; }
+        .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ok);
+            display: inline-block;
+            margin-right: 6px;
+            animation: pulse 1.5s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+        }
+
+        .layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: var(--list-w) 1fr;
+            min-height: 0;
+        }
+
+        .sidebar {
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar-head { padding: 10px; border-bottom: 1px solid var(--border); }
+
+        .view-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .view-tabs button {
+            flex: 1;
+            padding: 8px 6px;
+            font-size: 0.78rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        .view-tabs button.is-active {
+            background: rgba(255, 106, 26, 0.15);
+            border-color: rgba(255, 106, 26, 0.45);
+            color: var(--text);
+        }
+
+        .loc-tabs { margin-top: 8px; }
+
+        .bulk-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .bulk-bar button { flex: 1; min-width: 88px; padding: 8px 10px; font-size: 0.76rem; }
+
+        .filters { display: grid; gap: 6px; }
+
+        .filters input, .filters select { padding: 8px 10px; font-size: 0.82rem; }
+
+        .orders-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 6px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .order-row {
+            display: grid;
+            grid-template-columns: auto 36px 1fr auto;
+            gap: 6px 8px;
+            align-items: center;
+            width: 100%;
+            padding: 7px 8px;
+            margin-bottom: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            color: inherit;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .order-row:hover,
+        .order-row.is-active {
+            border-color: rgba(255, 106, 26, 0.5);
+            background: rgba(255, 106, 26, 0.08);
+        }
+
+        .order-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            accent-color: var(--orange);
+        }
+
+        .order-thumb {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .order-row__main { min-width: 0; }
+
+        .order-row__num {
+            font-weight: 700;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .order-row__sub {
+            font-size: 0.68rem;
+            color: var(--muted);
+            line-height: 1.3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 999px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .badge-new { background: rgba(255, 106, 26, 0.2); color: #ffb07a; }
+        .badge-confirmed { background: rgba(62, 207, 142, 0.15); color: var(--ok); }
+        .badge-cooking { background: rgba(255, 215, 0, 0.15); color: var(--warn); }
+        .badge-delivery { background: rgba(100, 149, 237, 0.2); color: #9ec5ff; }
+        .badge-done { background: rgba(255, 255, 255, 0.1); color: #ccc; }
+        .badge-cancelled { background: rgba(255, 107, 107, 0.15); color: var(--danger); }
+
+        .detail-panel {
+            padding: 12px 14px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .detail-empty {
+            padding: 40px 16px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .detail-head {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-actions-top {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .detail-actions-top button { min-height: 44px; padding: 10px 16px; }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .info-block {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+
+        .info-block h3 {
+            margin: 0 0 6px;
+            font-size: 0.72rem;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .info-block p { margin: 0; line-height: 1.45; font-size: 0.88rem; }
+
+        .items-list { display: grid; gap: 6px; }
+
+        .item-line {
+            display: grid;
+            grid-template-columns: 44px 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .item-line img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .item-line__title { font-size: 0.86rem; font-weight: 600; }
+        .item-line__meta { font-size: 0.78rem; color: var(--muted); }
+        .item-line__sum { font-weight: 700; font-size: 0.88rem; white-space: nowrap; }
+
+        .total-line {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--orange);
+            margin-top: 10px;
+        }
+
+        .detail-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-end;
+            margin-top: 14px;
+        }
+
+        .detail-actions > div { flex: 1; min-width: 140px; }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: max(16px, env(safe-area-inset-bottom));
+            transform: translateX(-50%);
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+            display: none;
+            z-index: 30;
+            max-width: min(92vw, 400px);
+            text-align: center;
+            font-size: 0.88rem;
+        }
+
+        .toast.show { display: block; }
+
+        .login-error { color: var(--danger); font-size: 0.85rem; margin-top: 8px; display: none; }
+
+        .back-mobile {
+            display: none;
+            margin-bottom: 10px;
+            padding: 10px 14px;
+            width: 100%;
+        }
+
+        @media (max-width: 860px) {
+            :root { --list-w: 1fr; }
+
+            .layout { grid-template-columns: 1fr; }
+
+            .sidebar { display: none; max-height: none; }
+            .sidebar.is-visible { display: flex; }
+            .detail-panel { display: none; }
+            .detail-panel.is-visible { display: block; }
+            .back-mobile { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrap" id="loginScreen">
+        <form class="login-card" id="loginForm">
+            <h1>CRM заказов</h1>
+            <p>Emika's Hot Chicken — планшет / телефон</p>
+            <label for="crmPassword">Пароль</label>
+            <input id="crmPassword" type="password" autocomplete="current-password" required>
+            <p class="login-error" id="loginError">Неверный пароль</p>
+            <button type="submit" class="btn-primary" style="width:100%;margin-top:12px;">Войти</button>
+        </form>
+    </div>
+
+    <div class="app" id="app">
+        <header class="topbar">
+            <div>
+                <h1><span class="live-dot" id="liveDot"></span>Заказы</h1>
+                <small id="ordersCount">—</small>
+            </div>
+            <div class="topbar-actions">
+                <button type="button" class="btn-ghost" id="logoutBtn">Выйти</button>
+            </div>
+        </header>
+
+        <div class="layout">
+            <aside class="sidebar is-visible" id="sidebar">
+                <div class="sidebar-head">
+                    <div class="view-tabs">
+                        <button type="button" data-view="active" class="is-active">Активные</button>
+                        <button type="button" data-view="archive">Архив</button>
+                        <button type="button" data-view="deleted">Удалённые</button>
+                    </div>
+                    <div class="bulk-bar" id="bulkBar">
+                        <button type="button" class="btn-ok" id="bulkDoneBtn">Выполнено</button>
+                        <button type="button" class="btn-danger" id="bulkDeleteBtn">Удалить</button>
+                    </div>
+                    <div class="filters" style="margin-top:8px;">
+                        <input type="search" id="searchInput" placeholder="Поиск…">
+                        <select id="statusFilter">
+                            <option value="all">Все статусы</option>
+                            <option value="new">Новые</option>
+                            <option value="confirmed">Подтверждены</option>
+                            <option value="cooking">Готовятся</option>
+                            <option value="delivery">В доставке</option>
+                            <option value="cancelled">Отменены</option>
+                        </select>
+                        <label style="display:flex;align-items:center;gap:8px;margin:4px 0 0;font-size:0.78rem;color:var(--muted);">
+                            <input type="checkbox" id="selectAllCb" style="width:auto;"> Выбрать все
+                        </label>
+                    </div>
+                </div>
+                <div class="orders-list" id="ordersList"></div>
+            </aside>
+
+            <main class="detail-panel" id="detailPanel">
+                <button type="button" class="btn-ghost back-mobile" id="backToListBtn">← К списку</button>
+                <div class="detail-empty" id="detailEmpty">Выберите заказ</div>
+                <div id="detailContent" hidden></div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="cancelModal" aria-hidden="true">
+        <div class="modal-card">
+            <h3>Отмена заказа</h3>
+            <div class="cancel-reasons">
+                <label><input type="radio" name="cancelReason" value="guest_cancelled" checked> Гость отменил</label>
+                <label><input type="radio" name="cancelReason" value="guest_no_pickup"> Гость не забрал заказ</label>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-ghost" id="cancelModalClose">Назад</button>
+                <button type="button" class="btn-danger" id="cancelModalConfirm">Отменить заказ</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const TOKEN_KEY = 'emika-crm-token';
+        const POLL_MS = 4000;
+        const STATUS_LABELS = {
+            new: 'Новый',
+            confirmed: 'Подтверждён',
+            cooking: 'Готовим',
+            delivery: 'В доставке',
+            done: 'Выполнен',
+            cancelled: 'Отменён'
+        };
+
+        const LOCATION_LABELS = { 'eat-arena': 'Eat Arena' };
+
+        const CANCEL_REASON_LABELS = {
+            guest_cancelled: 'Гость отменил',
+            guest_no_pickup: 'Гость не забрал заказ'
+        };
+
+        const loginScreen = document.getElementById('loginScreen');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const app = document.getElementById('app');
+        const ordersList = document.getElementById('ordersList');
+        const detailEmpty = document.getElementById('detailEmpty');
+        const detailContent = document.getElementById('detailContent');
+        const detailPanel = document.getElementById('detailPanel');
+        const sidebar = document.getElementById('sidebar');
+        const statusFilter = document.getElementById('statusFilter');
+        const searchInput = document.getElementById('searchInput');
+        const ordersCount = document.getElementById('ordersCount');
+        const toast = document.getElementById('toast');
+        const selectAllCb = document.getElementById('selectAllCb');
+
+        let orders = [];
+        let selectedId = null;
+        let selectedIds = new Set();
+        let currentView = 'active';
+        let currentLocation = 'all';
+        let pollTimer = null;
+        let knownOrderIds = new Set();
+        let audioCtx = null;
+        let soundEnabled = false;
+        let cancelTargetId = null;
+        const cancelModal = document.getElementById('cancelModal');
+        const bulkBar = document.getElementById('bulkBar');
+
+        function esc(text) {
+            return String(text ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function getToken() {
+            return localStorage.getItem(TOKEN_KEY) || '';
+        }
+
+        function setToken(token) {
+            if (token) localStorage.setItem(TOKEN_KEY, token);
+            else localStorage.removeItem(TOKEN_KEY);
+        }
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        function enableSound() {
+            soundEnabled = true;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+            } catch (_) {}
+        }
+
+        function playNewOrderSound() {
+            if (!soundEnabled || !audioCtx) return;
+            try {
+                const playBeep = (freq, start) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.25, start);
+                    gain.gain.exponentialRampToValueAtTime(0.01, start + 0.22);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(start);
+                    osc.stop(start + 0.25);
+                };
+                const t = audioCtx.currentTime;
+                playBeep(880, t);
+                playBeep(1100, t + 0.28);
+            } catch (_) {}
+        }
+
+        async function api(path, options = {}) {
+            const headers = { ...(options.headers || {}) };
+            if (options.body) headers['Content-Type'] = 'application/json';
+            const token = getToken();
+            if (token) headers.Authorization = `Bearer ${token}`;
+
+            const res = await fetch(path, { ...options, headers });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                const err = new Error(data.error || res.statusText);
+                err.status = res.status;
+                throw err;
+            }
+            return data;
+        }
+
+        function formatDate(iso) {
+            try {
+                return new Date(iso).toLocaleString('ru-RU', {
+                    day: '2-digit', month: '2-digit',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            } catch {
+                return iso || '—';
+            }
+        }
+
+        function deliveryLabel(type) {
+            return type === 'pickup' ? 'Самовывоз' : 'Доставка';
+        }
+
+        function orderLocation(order) {
+            return order.location === 'poselok' ? 'poselok' : 'eat-arena';
+        }
+
+        function cancelReasonText(order) {
+            return CANCEL_REASON_LABELS[order.cancelReason] || '';
+        }
+
+        function syncBulkBar() {
+            if (!bulkBar) return;
+            bulkBar.style.display = currentView === 'deleted' ? 'none' : 'flex';
+        }
+
+        function openCancelModal(orderId) {
+            cancelTargetId = orderId;
+            if (cancelModal) {
+                cancelModal.classList.add('is-open');
+                cancelModal.setAttribute('aria-hidden', 'false');
+            }
+        }
+
+        function closeCancelModal() {
+            cancelTargetId = null;
+            if (cancelModal) {
+                cancelModal.classList.remove('is-open');
+                cancelModal.setAttribute('aria-hidden', 'true');
+            }
+        }
+
+        function firstItemImage(order) {
+            const img = order.items?.[0]?.image;
+            return img ? esc(img) : '../images/logo.png';
+        }
+
+        function isMobileLayout() {
+            return window.matchMedia('(max-width: 860px)').matches;
+        }
+
+        function showListOnMobile() {
+            if (!isMobileLayout()) return;
+            sidebar.classList.add('is-visible');
+            detailPanel.classList.remove('is-visible');
+        }
+
+        function showDetailOnMobile() {
+            if (!isMobileLayout()) return;
+            sidebar.classList.remove('is-visible');
+            detailPanel.classList.add('is-visible');
+        }
+
+        function renderOrdersList() {
+            ordersList.innerHTML = '';
+            if (!orders.length) {
+                ordersList.innerHTML = '<p style="color:var(--muted);font-size:0.8rem;margin:8px;">Нет заказов</p>';
+                ordersCount.textContent = currentView === 'deleted'
+                    ? 'Удалённые пусты'
+                    : (currentView === 'archive' ? 'Архив пуст' : '0 активных');
+                return;
+            }
+
+            const newCount = orders.filter((o) => o.status === 'new').length;
+            ordersCount.textContent = currentView === 'deleted'
+                ? `${orders.length} удалённых (7 дней)`
+                : (currentView === 'archive'
+                    ? `${orders.length} в архиве`
+                    : `${orders.length} заказ(ов)${newCount ? ` · ${newCount} новых` : ''}`);
+
+            orders.forEach((order) => {
+                const row = document.createElement('button');
+                row.type = 'button';
+                row.className = 'order-row' + (order.id === selectedId ? ' is-active' : '');
+                row.dataset.id = order.id;
+
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.checked = selectedIds.has(order.id);
+                cb.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (cb.checked) selectedIds.add(order.id);
+                    else selectedIds.delete(order.id);
+                    syncSelectAllCheckbox();
+                });
+
+                const thumb = document.createElement('img');
+                thumb.className = 'order-thumb';
+                thumb.src = order.items?.[0]?.image || '../images/logo.png';
+                thumb.alt = '';
+
+                const main = document.createElement('div');
+                main.className = 'order-row__main';
+                main.innerHTML = `
+                    <div class="order-row__num">${esc(order.orderNumber)}</div>
+                    <div class="order-row__sub">${esc(order.customer?.name || '—')} · ${order.total} ₽</div>
+                    <div class="order-row__sub">Eat Arena · ${deliveryLabel(order.deliveryType)}${order.status === 'cancelled' && cancelReasonText(order) ? ` · ${esc(cancelReasonText(order))}` : ''}</div>
+                    <div class="order-row__sub">${order.deletedAt ? `Удалён: ${formatDate(order.deletedAt)}` : (order.status === 'done' && order.archivedAt ? `Архив: ${formatDate(order.archivedAt)}` : formatDate(order.createdAt))}</div>
+                `;
+
+                const badge = document.createElement('span');
+                badge.className = `badge badge-${order.status}`;
+                badge.textContent = STATUS_LABELS[order.status] || order.status;
+
+                row.append(cb, thumb, main, badge);
+
+                row.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'INPUT') return;
+                    selectOrder(order.id);
+                });
+                ordersList.appendChild(row);
+            });
+            syncSelectAllCheckbox();
+        }
+
+        function syncSelectAllCheckbox() {
+            if (!selectAllCb) return;
+            const visible = orders.map((o) => o.id);
+            selectAllCb.checked = visible.length > 0 && visible.every((id) => selectedIds.has(id));
+        }
+
+        function renderDetail(order) {
+            if (!order) {
+                detailEmpty.hidden = false;
+                detailContent.hidden = true;
+                return;
+            }
+
+            detailEmpty.hidden = true;
+            detailContent.hidden = false;
+
+            const itemsHtml = (order.items || []).map((item) => `
+                <div class="item-line">
+                    <img src="${esc(item.image || '../images/logo.png')}" alt="">
+                    <div>
+                        <div class="item-line__title">${esc(item.titleRu || item.titleEn || '—')}</div>
+                        <div class="item-line__meta">${item.qty} × ${item.price} ₽</div>
+                    </div>
+                    <div class="item-line__sum">${item.qty * item.price} ₽</div>
+                </div>
+            `).join('');
+
+            const isDeletedView = Boolean(order.deletedAt);
+            const showDone = !isDeletedView && order.status !== 'done' && order.status !== 'cancelled';
+            const showCooking = !isDeletedView && !['cooking', 'done', 'cancelled'].includes(order.status);
+            const showCancel = !isDeletedView && !['done', 'cancelled'].includes(order.status);
+            const showDeleteBtn = !isDeletedView;
+            const timeMeta = order.deletedAt
+                ? `<div style="color:var(--danger);font-size:0.82rem;margin-top:4px;">Удалён: ${esc(formatDate(order.deletedAt))} (хранится 7 дней)</div>`
+                : (order.status === 'done' && order.archivedAt
+                    ? `<div style="color:var(--ok);font-size:0.82rem;margin-top:4px;">В архиве: ${esc(formatDate(order.archivedAt))}</div>`
+                    : (order.status === 'cancelled' && order.cancelledAt
+                        ? `<div style="color:var(--danger);font-size:0.82rem;margin-top:4px;">Отменён: ${esc(formatDate(order.cancelledAt))}${cancelReasonText(order) ? ` · ${esc(cancelReasonText(order))}` : ''}</div>`
+                        : (order.status === 'cooking' && order.cookingAt
+                            ? `<div style="color:var(--orange);font-size:0.82rem;margin-top:4px;">На кухне с: ${esc(formatDate(order.cookingAt))}</div>`
+                            : '')));
+
+            detailContent.innerHTML = `
+                <div class="detail-head">
+                    <div>
+                        <div style="font-size:1.15rem;font-weight:700;">${esc(order.orderNumber)}</div>
+                        <div style="color:var(--muted);font-size:0.82rem;">Создан: ${esc(formatDate(order.createdAt))}</div>
+                        ${timeMeta}
+                    </div>
+                    <span class="badge badge-${order.status}">${STATUS_LABELS[order.status]}</span>
+                </div>
+                <div class="detail-actions-top">
+                    ${showCooking ? '<button type="button" class="btn-cooking" id="cookingBtn">Готовим</button>' : ''}
+                    ${showDone ? '<button type="button" class="btn-ok" id="doneOneBtn">Выполнено → в архив</button>' : ''}
+                    ${showCancel ? '<button type="button" class="btn-cancel-sm" id="cancelOneBtn">Отмена</button>' : ''}
+                    ${showDeleteBtn ? '<button type="button" class="btn-danger" id="deleteOneBtn">Удалить</button>' : ''}
+                </div>
+                <div class="detail-grid">
+                    <div class="info-block">
+                        <h3>Клиент</h3>
+                        <p><strong>${esc(order.customer?.name || '—')}</strong></p>
+                        <p><a href="tel:${esc((order.customer?.phone || '').replace(/\s/g, ''))}" style="color:var(--orange)">${esc(order.customer?.phone || '—')}</a></p>
+                        ${order.customer?.email ? `<p>${esc(order.customer.email)}</p>` : ''}
+                    </div>
+                    <div class="info-block">
+                        <h3>Точка</h3>
+                        <p><strong>Eat Arena</strong></p>
+                        <p>${esc(deliveryLabel(order.deliveryType))}</p>
+                        <p>${esc(order.address || '—')}</p>
+                        ${order.addressExtra ? `<p>${esc(order.addressExtra)}</p>` : ''}
+                        <p style="color:var(--muted);font-size:0.82rem;">Оплата на кассе или переводом</p>
+                        ${order.promoCode ? `<p>Промокод: ${esc(order.promoCode)}</p>` : ''}
+                    </div>
+                </div>
+                ${order.status === 'cancelled' && cancelReasonText(order) ? `<div class="info-block" style="margin-bottom:10px;"><h3>Причина отмены</h3><p>${esc(cancelReasonText(order))}</p></div>` : ''}
+                ${order.comment ? `<div class="info-block" style="margin-bottom:10px;"><h3>Комментарий</h3><p>${esc(order.comment)}</p></div>` : ''}
+                <div class="info-block">
+                    <h3>Состав</h3>
+                    <div class="items-list">${itemsHtml}</div>
+                    <div class="total-line">Итого: ${order.total} ₽</div>
+                </div>
+                ${isDeletedView ? '' : `
+                <div class="detail-actions">
+                    <div>
+                        <label for="statusSelect">Статус</label>
+                        <select id="statusSelect">
+                            ${Object.entries(STATUS_LABELS).map(([k, v]) => `<option value="${k}" ${order.status === k ? 'selected' : ''}>${v}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="flex:2;">
+                        <label for="managerNote">Заметка</label>
+                        <textarea id="managerNote">${esc(order.managerNote || '')}</textarea>
+                    </div>
+                    <button type="button" class="btn-primary" id="saveOrderBtn" style="margin-top:20px;">Сохранить</button>
+                </div>`}
+            `;
+
+            if (!isDeletedView) {
+                document.getElementById('saveOrderBtn').addEventListener('click', () => saveOrder(order.id));
+            }
+            if (showCooking) {
+                document.getElementById('cookingBtn').addEventListener('click', () => setOrderStatus(order.id, 'cooking'));
+            }
+            if (showDone) {
+                document.getElementById('doneOneBtn').addEventListener('click', () => bulkAction('done', [order.id]));
+            }
+            if (showCancel) {
+                document.getElementById('cancelOneBtn').addEventListener('click', () => openCancelModal(order.id));
+            }
+            if (showDeleteBtn) {
+                document.getElementById('deleteOneBtn').addEventListener('click', () => {
+                    if (confirm('Переместить в архив удалённых на 7 дней?')) bulkAction('delete', [order.id]);
+                });
+            }
+        }
+
+        async function markOrderSeen(id) {
+            const order = orders.find((o) => o.id === id);
+            if (!order || order.status !== 'new') return;
+            try {
+                const data = await api(`/api/orders/${id}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ status: 'confirmed' })
+                });
+                const idx = orders.findIndex((o) => o.id === id);
+                if (idx !== -1) orders[idx] = data.order;
+            } catch (_) {}
+        }
+
+        async function selectOrder(id) {
+            selectedId = id;
+            await markOrderSeen(id);
+            renderOrdersList();
+            renderDetail(orders.find((o) => o.id === id));
+            showDetailOnMobile();
+        }
+
+        async function loadOrders() {
+            const params = new URLSearchParams();
+            params.set('view', currentView);
+            if (currentLocation !== 'all') params.set('location', currentLocation);
+            if (statusFilter.value !== 'all') params.set('status', statusFilter.value);
+            if (searchInput.value.trim()) params.set('q', searchInput.value.trim());
+
+            const data = await api(`/api/orders?${params}`);
+            const nextOrders = data.orders || [];
+
+            const nextIds = new Set(nextOrders.map((o) => o.id));
+            const newOnes = nextOrders.filter((o) => o.status === 'new' && !knownOrderIds.has(o.id));
+
+            if (knownOrderIds.size && newOnes.length && currentView === 'active') {
+                playNewOrderSound();
+                const label = newOnes.length === 1
+                    ? `Новый заказ ${newOnes[0].orderNumber}`
+                    : `Новых заказов: ${newOnes.length}`;
+                showToast(label);
+                if (Notification.permission === 'granted') {
+                    new Notification('Emika\'s — новый заказ', { body: label });
+                }
+            }
+
+            knownOrderIds = nextIds;
+            orders = nextOrders;
+
+            if (selectedId && !orders.find((o) => o.id === selectedId)) {
+                const gone = selectedId;
+                selectedId = orders[0]?.id || null;
+                selectedIds.delete(gone);
+            }
+            if (!selectedId && orders.length) selectedId = orders[0].id;
+
+            syncBulkBar();
+            renderOrdersList();
+            renderDetail(orders.find((o) => o.id === selectedId));
+        }
+
+        async function cancelOrder(id, reason) {
+            try {
+                const data = await api(`/api/orders/${id}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ status: 'cancelled', cancelReason: reason })
+                });
+                closeCancelModal();
+                const idx = orders.findIndex((o) => o.id === id);
+                if (idx !== -1) orders[idx] = data.order;
+                renderOrdersList();
+                renderDetail(data.order);
+                showToast(`Отменён · ${cancelReasonText(data.order)}`);
+            } catch (e) {
+                showToast(e.message || 'Ошибка отмены');
+            }
+        }
+
+        async function setOrderStatus(id, status) {
+            try {
+                const data = await api(`/api/orders/${id}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ status })
+                });
+                const idx = orders.findIndex((o) => o.id === id);
+                if (idx !== -1) orders[idx] = data.order;
+                renderOrdersList();
+                renderDetail(data.order);
+                if (status === 'cooking') {
+                    showToast(`На кухне · ${formatDate(data.order.cookingAt)}`);
+                } else if (status === 'done') {
+                    showToast(`В архиве · ${formatDate(data.order.archivedAt)}`);
+                } else {
+                    showToast('Статус обновлён');
+                }
+            } catch (e) {
+                showToast(e.message || 'Ошибка');
+            }
+        }
+
+        async function saveOrder(id) {
+            const status = document.getElementById('statusSelect').value;
+            const managerNote = document.getElementById('managerNote').value;
+            const data = await api(`/api/orders/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ status, managerNote })
+            });
+            if (status === 'done' && currentView === 'active') {
+                selectedId = null;
+                await loadOrders();
+                showToast(`В архиве · ${formatDate(data.order.archivedAt)}`);
+                showListOnMobile();
+                return;
+            }
+            const idx = orders.findIndex((o) => o.id === id);
+            if (idx !== -1) orders[idx] = data.order;
+            renderOrdersList();
+            renderDetail(data.order);
+            showToast('Сохранено');
+        }
+
+        async function bulkAction(action, ids) {
+            if (!ids?.length) {
+                showToast('Выберите заказы');
+                return;
+            }
+            if (action === 'delete' && !confirm(`Переместить ${ids.length} заказ(ов) в архив удалённых на 7 дней?`)) return;
+
+            try {
+                await api('/api/orders/bulk', {
+                    method: 'POST',
+                    body: JSON.stringify({ ids, action })
+                });
+            } catch (err) {
+                if (err.status === 404) {
+                    for (const id of ids) {
+                        if (action === 'delete') {
+                            await api(`/api/orders/${id}`, { method: 'DELETE' });
+                        } else if (action === 'cooking') {
+                            await api(`/api/orders/${id}`, {
+                                method: 'PATCH',
+                                body: JSON.stringify({ status: 'cooking' })
+                            });
+                        } else {
+                            await api(`/api/orders/${id}`, {
+                                method: 'PATCH',
+                                body: JSON.stringify({ status: 'done' })
+                            });
+                        }
+                    }
+                } else {
+                    showToast(err.message || 'Ошибка операции');
+                    return;
+                }
+            }
+
+            ids.forEach((id) => selectedIds.delete(id));
+            if (selectedId && ids.includes(selectedId)) selectedId = null;
+            await loadOrders();
+            showToast(action === 'done' ? 'Перенесено в архив' : action === 'cooking' ? 'Отдано на кухню' : 'В архиве удалённых');
+            showListOnMobile();
+        }
+
+        function getSelectedIds() {
+            return Array.from(selectedIds).filter((id) => orders.some((o) => o.id === id));
+        }
+
+        function showApp() {
+            loginScreen.style.display = 'none';
+            app.classList.add('is-ready');
+            if (isMobileLayout()) showListOnMobile();
+        }
+
+        function showLogin() {
+            loginScreen.style.display = 'grid';
+            app.classList.remove('is-ready');
+            if (pollTimer) clearInterval(pollTimer);
+        }
+
+        async function tryBoot() {
+            if (!getToken()) return showLogin();
+            try {
+                orders = [];
+                knownOrderIds = new Set();
+                await loadOrders();
+                knownOrderIds = new Set(orders.map((o) => o.id));
+                showApp();
+                syncBulkBar();
+                if (Notification.permission === 'default') {
+                    Notification.requestPermission().catch(() => {});
+                }
+                pollTimer = setInterval(() => {
+                    loadOrders().catch((e) => {
+                        if (e.status === 401) {
+                            setToken('');
+                            showLogin();
+                        }
+                    });
+                }, POLL_MS);
+            } catch (e) {
+                setToken('');
+                showLogin();
+            }
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.style.display = 'none';
+            enableSound();
+            try {
+                const password = document.getElementById('crmPassword').value;
+                const data = await api('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ password })
+                });
+                setToken(data.token);
+                await tryBoot();
+            } catch {
+                loginError.style.display = 'block';
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            setToken('');
+            showLogin();
+        });
+
+        document.getElementById('backToListBtn').addEventListener('click', showListOnMobile);
+
+        document.querySelectorAll('.view-tabs button[data-view]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.view-tabs button[data-view]').forEach((b) => b.classList.remove('is-active'));
+                btn.classList.add('is-active');
+                currentView = btn.dataset.view;
+                selectedIds.clear();
+                selectedId = null;
+                statusFilter.value = 'all';
+                syncBulkBar();
+                loadOrders();
+            });
+        });
+
+        document.getElementById('cancelModalClose')?.addEventListener('click', closeCancelModal);
+        document.getElementById('cancelModalConfirm')?.addEventListener('click', () => {
+            if (!cancelTargetId) return;
+            const reason = document.querySelector('input[name="cancelReason"]:checked')?.value;
+            if (!reason) {
+                showToast('Выберите причину');
+                return;
+            }
+            cancelOrder(cancelTargetId, reason);
+        });
+        cancelModal?.addEventListener('click', (e) => {
+            if (e.target === cancelModal) closeCancelModal();
+        });
+
+        document.getElementById('bulkDoneBtn').addEventListener('click', () => bulkAction('done', getSelectedIds()));
+        document.getElementById('bulkDeleteBtn').addEventListener('click', () => bulkAction('delete', getSelectedIds()));
+
+        selectAllCb.addEventListener('change', () => {
+            if (selectAllCb.checked) {
+                orders.forEach((o) => selectedIds.add(o.id));
+            } else {
+                orders.forEach((o) => selectedIds.delete(o.id));
+            }
+            renderOrdersList();
+        });
+
+        statusFilter.addEventListener('change', () => loadOrders());
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchInput._t);
+            searchInput._t = setTimeout(() => loadOrders(), 300);
+        });
+
+        document.addEventListener('click', enableSound, { once: true });
+        window.addEventListener('resize', () => {
+            if (!isMobileLayout()) {
+                sidebar.classList.add('is-visible');
+                detailPanel.classList.add('is-visible');
+            }
+        });
+
+        tryBoot();
+    </script>
+</body>
+</html>

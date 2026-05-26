@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Контакты — Emika's Hot Chicken</title>
-    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="shortcut icon" href="../images/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -30,7 +30,7 @@
             margin: 0;
             font-family: 'Montserrat', sans-serif;
             color: var(--text);
-            background: #000 url('images/background.jpg') center top / cover no-repeat fixed;
+            background: #000 url('../images/background.jpg') center top / cover no-repeat fixed;
             min-height: 100vh;
         }
 
@@ -300,16 +300,17 @@
         }
     </style>
 </head>
-<body>
+<body data-page-id="contacts">
     <header>
         <nav>
-            <a class="brand" href="index.html">
-                <img src="images/logo.png" alt="Emika's Hot Chicken">
+            <a class="brand" href="./">
+                <img src="../images/logo.png" alt="Emika's Hot Chicken">
             </a>
             <div class="header-actions">
                 <div class="top-links">
-                    <a class="top-link" href="index.html#menuTabs"><span class="lang-ru">Меню</span><span class="lang-en">Menu</span></a>
+                    <a class="top-link" href="./#menuTabs"><span class="lang-ru">Меню</span><span class="lang-en">Menu</span></a>
                     <a class="top-link is-current" href="contacts.html"><span class="lang-ru">Контакты</span><span class="lang-en">Contacts</span></a>
+                    <a class="top-link" href="cloud.html"><span class="lang-ru">Облако</span><span class="lang-en">Cloud</span></a>
                 </div>
                 <a href="tel:+79778389898" class="phone-link">+7 977 838 98 98</a>
                 <button type="button" class="lang-toggle" id="langToggle" aria-label="Переключить язык">
@@ -325,7 +326,7 @@
     </header>
 
     <main>
-        <a class="back-home" href="index.html"><span class="lang-ru">← На главную</span><span class="lang-en">← Back to home</span></a>
+        <a class="back-home" href="./"><span class="lang-ru">← На главную</span><span class="lang-en">← Back to home</span></a>
 
         <h1><span class="lang-ru">Контакты</span><span class="lang-en">Contacts</span></h1>
 
@@ -377,7 +378,7 @@
             root.setAttribute('data-theme', theme);
             if (themeIcon) themeIcon.textContent = theme === 'light' ? '☀️' : '🌙';
             if (headerLogo) {
-                headerLogo.src = theme === 'light' ? 'images/logo_white.png' : 'images/logo.png';
+                headerLogo.src = theme === 'light' ? '../images/logo_white.png' : '../images/logo.png';
             }
         }
 
@@ -422,5 +423,6 @@
         const savedLang = localStorage.getItem('emika-lang');
         switchLanguage(savedLang === 'en' ? 'en' : 'ru');
     </script>
+    <script src="page-new.js"></script>
 </body>
 </html>

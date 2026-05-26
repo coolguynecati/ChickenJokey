@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Оформление заказа — Emika's</title>
-  <link rel="shortcut icon" href="images/favicon.ico">
+  <link rel="shortcut icon" href="../images/favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root { --orange:#ff6a1a; --bg:#0d0d0f; --card:rgba(20,20,24,.92); --text:#f5f5f5; --muted:#c9c9ce; }
@@ -31,15 +31,18 @@
     button:disabled { opacity:.6; cursor:not-allowed; }
     .back-to-menu { display:inline-block; margin-bottom:16px; color:var(--orange); font-weight:700; text-decoration:none; font-size:.95rem; }
     .error { color:#ff8080; font-size:.88rem; display:none; margin-top:8px; }
-    #addressBlock[hidden] { display:none !important; }
+    #addressBlock[hidden], #deliveryTypeRow[hidden] { display:none !important; }
+    .pickup-point { margin:0 0 12px; padding:10px 12px; border-radius:10px; background:rgba(255,106,26,.08); border:1px solid rgba(255,106,26,.25); }
+    .pickup-point strong { color:var(--orange); }
     @media (max-width:860px) { .grid { grid-template-columns:1fr; } }
     @media (max-width:520px) { .row { grid-template-columns:1fr; } .actions { flex-direction:column; } .actions button { width:100%; } }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <a class="back-to-menu" href="index.html">&lt; назад в меню</a>
+    <a class="back-to-menu" href="./">&lt; назад в меню</a>
     <h1>Оформление заказа</h1>
+    <p id="apiStatus" class="muted" style="margin:0 0 12px;font-size:0.88rem;"></p>
     <div class="grid">
       <section class="card">
         <h3>Ваш заказ</h3>
@@ -48,15 +51,22 @@
       </section>
 
       <section class="card">
-        <h3>Доставка и контакты</h3>
+        <h3>Самовывоз и контакты</h3>
         <form id="checkoutForm" novalidate>
-          <label>Способ получения</label>
-          <div class="type-row">
-            <label><input type="radio" name="deliveryType" value="delivery" checked> Доставка</label>
-            <label><input type="radio" name="deliveryType" value="pickup"> Самовывоз (Eat Arena)</label>
+          <input type="hidden" name="deliveryType" value="pickup">
+          <input type="hidden" name="pickupLocation" value="eat-arena">
+
+          <p class="pickup-point muted">Самовывоз: <strong>Eat Arena</strong><br><span style="font-size:0.85rem;">Мичуринский пр., 13А, стр. 1, Eat Arena, 2 этаж</span></p>
+
+          <div id="deliveryTypeRow" hidden>
+            <label>Способ получения</label>
+            <div class="type-row">
+              <label><input type="radio" name="deliveryTypeVisible" value="delivery"> Доставка</label>
+              <label><input type="radio" name="deliveryTypeVisible" value="pickup" checked> Самовывоз</label>
+            </div>
           </div>
 
-          <div id="addressBlock">
+          <div id="addressBlock" hidden>
             <label for="address">Адрес доставки *</label>
             <input id="address" type="text" placeholder="Улица, дом, квартира">
 
@@ -79,7 +89,7 @@
           </div>
 
           <label for="comment">Комментарий</label>
-          <textarea id="comment" placeholder="Время доставки, пожелания…"></textarea>
+          <textarea id="comment" placeholder="Время самовывоза, пожелания…"></textarea>
 
           <p class="error" id="formError"></p>
           <div class="actions">
@@ -118,7 +128,7 @@
     let total = 0;
 
     if (!cart.length) {
-      itemsWrap.innerHTML = '<p class="muted">Корзина пуста. <a href="index.html" style="color:var(--orange)">Вернитесь в меню</a>.</p>';
+      itemsWrap.innerHTML = '<p class="muted">Корзина пуста. <a href="./" style="color:var(--orange)">Вернитесь в меню</a>.</p>';
       submitBtn.disabled = true;
     } else {
       cart.forEach((item) => {
@@ -139,16 +149,107 @@
     }
     totalEl.textContent = `${total} ₽`;
 
-    function syncDeliveryType() {
-      const isPickup = document.querySelector('input[name="deliveryType"]:checked')?.value === 'pickup';
-      addressBlock.hidden = isPickup;
-      document.getElementById('address').required = !isPickup;
+    const PICKUP_ADDRESS = 'Eat Arena, Мичуринский пр., 13А, стр. 1 — самовывоз';
+
+    const SHOP_ORIGIN = 'http://localhost:3000';
+    const DEV_PORTS = new Set(['5500', '5501', '8080', '5173', '4173', '8888']);
+
+    function isShopServerPage() {
+      if (!location.protocol.startsWith('http')) return false;
+      if (location.port === '3000') return true;
+      return !location.port && ['localhost', '127.0.0.1'].includes(location.hostname);
     }
 
-    document.querySelectorAll('input[name="deliveryType"]').forEach((el) => {
-      el.addEventListener('change', syncDeliveryType);
-    });
-    syncDeliveryType();
+    async function redirectToShopServerIfNeeded() {
+      const wrongUrl =
+        location.protocol === 'file:' ||
+        DEV_PORTS.has(location.port) ||
+        location.pathname.includes('/shop/');
+
+      if (!wrongUrl && isShopServerPage()) return false;
+
+      for (const origin of [SHOP_ORIGIN, 'http://127.0.0.1:3000']) {
+        try {
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 3000);
+          const res = await fetch(`${origin}/api/health`, { signal: ctrl.signal });
+          clearTimeout(timer);
+          if (!res.ok) continue;
+          const data = await res.json();
+          if (!data?.ok) continue;
+          const path = location.protocol === 'file:'
+            ? '/checkout.html'
+            : (location.pathname.match(/checkout\.html$/) ? '/checkout.html' : '/');
+          window.location.replace(`${origin}${path}${location.search}${location.hash}`);
+          return true;
+        } catch (_) {}
+      }
+      return false;
+    }
+
+    async function parseJsonResponse(res) {
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch {
+        throw new Error(
+          'Сервер заказов не отвечает. Запустите start-shop.bat или: cd shop → npm start, затем откройте http://localhost:3000'
+        );
+      }
+    }
+
+    const apiStatusEl = document.getElementById('apiStatus');
+
+    async function resolveApiBase(force) {
+      if (!force) {
+        const cached = sessionStorage.getItem('emika-api-base');
+        if (cached !== null) return cached;
+      }
+
+      const onNodeServer = isShopServerPage();
+      const candidates = onNodeServer
+        ? ['', 'http://127.0.0.1:3000', SHOP_ORIGIN]
+        : ['http://127.0.0.1:3000', SHOP_ORIGIN, ''];
+
+      for (const base of candidates) {
+        try {
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 4000);
+          const res = await fetch(`${base}/api/health`, { signal: ctrl.signal });
+          clearTimeout(timer);
+          if (!res.ok) continue;
+          const ct = (res.headers.get('content-type') || '').toLowerCase();
+          if (!ct.includes('json')) continue;
+          const data = await res.json();
+          if (data && data.ok) {
+            sessionStorage.setItem('emika-api-base', base);
+            return base;
+          }
+        } catch (_) {}
+      }
+      sessionStorage.removeItem('emika-api-base');
+      return null;
+    }
+
+    async function refreshApiStatus() {
+      if (!apiStatusEl) return;
+      apiStatusEl.textContent = 'Проверяем сервер заказов…';
+      const base = await resolveApiBase(true);
+      if (base !== null) {
+        apiStatusEl.innerHTML = 'Сервер заказов: <strong style="color:#3ecf8e">подключён</strong>';
+        return true;
+      }
+      apiStatusEl.innerHTML =
+        'Сервер заказов: <strong style="color:#ff8080">не найден</strong>. ' +
+        'Запустите <code>start-shop.bat</code> или в терминале: <code>cd shop</code> → <code>npm start</code>, ' +
+        'затем откройте <a href="http://localhost:3000" style="color:#ff6a1a">http://localhost:3000</a>';
+      return false;
+    }
+
+    (async () => {
+      if (await redirectToShopServerIfNeeded()) return;
+      refreshApiStatus();
+    })();
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -156,16 +257,11 @@
 
       const name = document.getElementById('name').value.trim();
       const phone = document.getElementById('phone').value.trim();
-      const deliveryType = document.querySelector('input[name="deliveryType"]:checked')?.value || 'delivery';
-      const address = document.getElementById('address').value.trim();
+      const deliveryType = 'pickup';
+      const address = '';
 
       if (!name || !phone) {
         err.textContent = 'Введите имя и телефон.';
-        err.style.display = 'block';
-        return;
-      }
-      if (deliveryType === 'delivery' && !address) {
-        err.textContent = 'Укажите адрес доставки.';
         err.style.display = 'block';
         return;
       }
@@ -181,30 +277,38 @@
           email: document.getElementById('email').value.trim()
         },
         deliveryType,
-        address: deliveryType === 'delivery' ? address : 'Eat Arena, самовывоз',
+        location: 'eat-arena',
+        address: PICKUP_ADDRESS,
         addressExtra: document.getElementById('addressExtra').value.trim(),
         comment: document.getElementById('comment').value.trim(),
-        paymentMethod: meta.paymentMethod || 'sbp',
         promoCode: meta.promoCode || '',
         items: cart,
         total
       };
 
       try {
-        const res = await fetch('/api/orders', {
+        const apiBase = await resolveApiBase(true);
+        if (apiBase === null) {
+          await refreshApiStatus();
+          throw new Error('Сначала запустите сервер (см. подсказку выше).');
+        }
+
+        const res = await fetch(`${apiBase}/api/orders`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        const data = await res.json();
+        const data = await parseJsonResponse(res);
         if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
 
         localStorage.setItem('emika-checkout-contact', JSON.stringify({ name, phone }));
         localStorage.removeItem('emika-checkout-cart');
         localStorage.removeItem('emika-checkout-meta');
+        localStorage.removeItem('emika-cart');
         localStorage.setItem('emika-last-order', JSON.stringify({
           orderNumber: data.orderNumber,
-          id: data.id
+          id: data.id,
+          total
         }));
 
         window.location.href = `order-success.html?order=${encodeURIComponent(data.orderNumber)}`;

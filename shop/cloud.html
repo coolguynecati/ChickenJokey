@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Облако — Emika's Hot Chicken</title>
+    <link rel="shortcut icon" href="../images/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #ff6a1a;
+            --orange-dark: #e2550f;
+            --bg: #0d0d0f;
+            --card: rgba(20, 20, 24, 0.88);
+            --text: #f5f5f5;
+            --muted: #c9c9ce;
+        }
+
+        html[data-theme="light"] {
+            --bg: #f6f6f7;
+            --card: rgba(255, 255, 255, 0.96);
+            --text: #121316;
+            --muted: #545863;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text);
+            background: #000 url('../images/background.jpg') center top / cover no-repeat fixed;
+            min-height: 100vh;
+        }
+
+        html[data-theme="light"] body {
+            background-color: var(--bg);
+            background-image: none;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(12px);
+            background: rgba(10, 10, 12, 0.75);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        html[data-theme="light"] header {
+            background: rgba(255, 255, 255, 0.85);
+            border-bottom-color: rgba(10, 10, 12, 0.1);
+        }
+
+        nav {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand img { height: 42px; width: auto; display: block; }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .top-link {
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .top-link:hover { background: rgba(255, 255, 255, 0.08); }
+        html[data-theme="light"] .top-link:hover { background: rgba(10, 10, 12, 0.06); }
+        .top-link.is-current { color: var(--orange); }
+
+        .theme-toggle {
+            width: 40px;
+            height: 36px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 28px 20px 56px;
+        }
+
+        h1 {
+            font-family: 'Dela Gothic One', sans-serif;
+            font-weight: 400;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin: 0 0 8px;
+            line-height: 1.15;
+        }
+
+        .lead {
+            margin: 0 0 24px;
+            color: var(--muted);
+            line-height: 1.55;
+            max-width: 640px;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .breadcrumbs a:hover { color: var(--orange); }
+        .breadcrumbs span.sep { opacity: 0.5; }
+
+        .folder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .folder-card {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: border-color 0.2s, transform 0.15s;
+        }
+
+        html[data-theme="light"] .folder-card {
+            border-color: rgba(10, 10, 12, 0.1);
+        }
+
+        .folder-card:hover {
+            border-color: rgba(255, 106, 26, 0.45);
+            transform: translateY(-2px);
+        }
+
+        .folder-card h2 {
+            margin: 0 0 8px;
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .folder-card p {
+            margin: 0;
+            font-size: 0.88rem;
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        .folder-meta {
+            margin-top: 12px;
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .gallery-item {
+            background: var(--card);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .gallery-item img,
+        .gallery-item video {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            display: block;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .gallery-item figcaption {
+            padding: 10px 12px;
+            font-size: 0.8rem;
+            word-break: break-word;
+        }
+
+        .file-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .file-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 14px 18px;
+        }
+
+        .file-row .name {
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .file-row .meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .btn-dl {
+            flex-shrink: 0;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--orange);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .btn-dl:hover { background: var(--orange-dark); }
+
+        .empty {
+            padding: 32px;
+            text-align: center;
+            color: var(--muted);
+            background: var(--card);
+            border-radius: 16px;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+        }
+
+        .status {
+            padding: 24px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .status.is-error { color: #ff8a8a; }
+
+        .hint {
+            margin-top: 32px;
+            padding: 16px 18px;
+            border-radius: 12px;
+            background: rgba(255, 106, 26, 0.12);
+            border: 1px solid rgba(255, 106, 26, 0.25);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--muted);
+        }
+
+        .hint code {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.82rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a class="brand" href="index.html"><img src="../images/logo_white.png" alt="Emika's Hot Chicken"></a>
+            <div class="header-actions">
+                <a class="top-link" href="index.html">Меню</a>
+                <a class="top-link" href="contacts.html">Контакты</a>
+                <a class="top-link is-current" href="cloud.html">Облако</a>
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Тема">◐</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <nav class="breadcrumbs" id="breadcrumbs" aria-label="Путь"></nav>
+        <h1 id="pageTitle">Облако</h1>
+        <p class="lead" id="pageDesc"></p>
+        <div id="content" class="status">Загрузка…</div>
+        <div class="hint" id="adminHint">
+            <strong>Как добавить папку:</strong> создайте каталог в <code>cloud/</code> на сервере,
+            положите туда файл <code>cloud.txt</code> с полями <code>Name:</code> и <code>Description:</code>,
+            затем добавьте файлы — страница обновится при перезагрузке.
+        </div>
+    </main>
+
+    <script>
+        const contentEl = document.getElementById('content');
+        const titleEl = document.getElementById('pageTitle');
+        const descEl = document.getElementById('pageDesc');
+        const crumbsEl = document.getElementById('breadcrumbs');
+
+        function getPathFromUrl() {
+            const p = new URLSearchParams(location.search).get('path');
+            return p ? decodeURIComponent(p) : '';
+        }
+
+        function setPathInUrl(folderPath) {
+            const url = new URL(location.href);
+            if (folderPath) url.searchParams.set('path', folderPath);
+            else url.searchParams.delete('path');
+            history.pushState({ path: folderPath }, '', url);
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function renderBreadcrumbs(folderPath, rootName) {
+            const parts = folderPath ? folderPath.split('/') : [];
+            let html = '<a href="cloud.html">Облако</a>';
+            let acc = '';
+            parts.forEach((part, i) => {
+                acc = acc ? acc + '/' + part : part;
+                const isLast = i === parts.length - 1;
+                html += '<span class="sep">/</span>';
+                if (isLast) html += '<span>' + escapeHtml(part) + '</span>';
+                else html += '<a href="cloud.html?path=' + encodeURIComponent(acc) + '">' + escapeHtml(part) + '</a>';
+            });
+            crumbsEl.innerHTML = html;
+        }
+
+        function escapeHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function renderFolders(folders) {
+            if (!folders.length) return '';
+            return '<div class="folder-grid">' + folders.map((f) => `
+                <article class="folder-card" data-path="${escapeHtml(f.id)}" tabindex="0" role="button">
+                    <h2>${escapeHtml(f.name)}</h2>
+                    <p>${escapeHtml(f.description || 'Без описания')}</p>
+                    <div class="folder-meta">${f.fileCount} элементов · ${escapeHtml(f.type || 'auto')}</div>
+                </article>
+            `).join('') + '</div>';
+        }
+
+        function renderFiles(files, viewType) {
+            if (!files.length) return '';
+
+            const images = files.filter((f) => f.kind === 'image' || f.kind === 'video');
+            const showGallery = (viewType === 'gallery' || viewType === 'mixed') && images.length;
+
+            let html = '';
+            if (showGallery) {
+                html += '<div class="gallery">' + images.map((f) => {
+                    const media = f.kind === 'video'
+                        ? `<video src="${f.url}" controls preload="metadata"></video>`
+                        : `<img src="${f.url}" alt="${escapeHtml(f.name)}" loading="lazy">`;
+                    return `<figure class="gallery-item"><a href="${f.url}" target="_blank" rel="noopener">${media}</a><figcaption>${escapeHtml(f.name)}</figcaption></figure>`;
+                }).join('') + '</div>';
+            }
+
+            const rest = showGallery ? files.filter((f) => f.kind !== 'image' && f.kind !== 'video') : files;
+            if (rest.length) {
+                html += '<div class="file-list" style="margin-top:' + (showGallery ? '20px' : '0') + '">' + rest.map((f) => `
+                    <div class="file-row">
+                        <div>
+                            <div class="name">${escapeHtml(f.name)}</div>
+                            <div class="meta">${escapeHtml(f.kind)} · ${formatSize(f.size)}</div>
+                        </div>
+                        <a class="btn-dl" href="${f.url}" download>Скачать</a>
+                    </div>
+                `).join('') + '</div>';
+            }
+            return html;
+        }
+
+        async function loadFolder(folderPath) {
+            contentEl.className = 'status';
+            contentEl.textContent = 'Загрузка…';
+
+            try {
+                const q = folderPath ? '?path=' + encodeURIComponent(folderPath) : '';
+                const res = await fetch('/api/cloud' + q);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Ошибка загрузки');
+
+                titleEl.textContent = data.name;
+                descEl.textContent = data.description || '';
+                renderBreadcrumbs(folderPath, data.name);
+
+                let html = renderFolders(data.folders);
+                html += renderFiles(data.files, data.type);
+
+                if (!data.folders.length && !data.files.length) {
+                    html = '<div class="empty">В этой папке пока нет файлов. Добавьте их на сервер в каталог <code>cloud/</code>.</div>';
+                }
+
+                contentEl.className = '';
+                contentEl.innerHTML = html;
+
+                contentEl.querySelectorAll('.folder-card').forEach((card) => {
+                    const open = () => {
+                        const p = card.getAttribute('data-path');
+                        setPathInUrl(p);
+                        loadFolder(p);
+                    };
+                    card.addEventListener('click', open);
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            open();
+                        }
+                    });
+                });
+            } catch (err) {
+                contentEl.className = 'status is-error';
+                contentEl.textContent = err.message || 'Не удалось загрузить облако';
+            }
+        }
+
+        window.addEventListener('popstate', () => loadFolder(getPathFromUrl()));
+        loadFolder(getPathFromUrl());
+
+        const themeToggle = document.getElementById('themeToggle');
+        const savedTheme = localStorage.getItem('emika-theme');
+        if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+        themeToggle.addEventListener('click', () => {
+            const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            if (next === 'dark') document.documentElement.removeAttribute('data-theme');
+            else document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('emika-theme', next === 'dark' ? '' : 'light');
+        });
+    </script>
+</body>
+</html>

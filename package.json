@@ -1,14 +1,8 @@
 {
-  "name": "emikashotchicken",
-  "version": "1.0.0",
+  "name": "emikashotchicken-repo",
   "private": true,
-  "description": "Emika's Hot Chicken — site + order CRM",
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "node server/index.js",
-    "tunnel": "npx cloudflared tunnel --url http://127.0.0.1:3000"
-  },
-  "dependencies": {
-    "express": "^4.21.2"
+    "start": "npm --prefix shop start",
+    "install:all": "npm --prefix shop install"
   }
 }

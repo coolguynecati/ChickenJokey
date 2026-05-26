@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>CRM — заказы | Emika's</title>
-    <link rel="shortcut icon" href="../images/favicon.ico">
+    <link rel="shortcut icon" href="/images/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="emika-guard.js"></script>
+    <script src="emika-api.js"></script>
     <style>
         :root {
             --orange: #ff6a1a;
@@ -473,6 +474,7 @@
                 <small id="ordersCount">—</small>
             </div>
             <div class="topbar-actions">
+                <button type="button" class="btn-ghost" id="soundToggleBtn" title="Включить звук новых заказов">🔊 Звук</button>
                 <button type="button" class="btn-ghost" id="logoutBtn">Выйти</button>
             </div>
         </header>
@@ -572,8 +574,67 @@
         let currentLocation = 'all';
         let pollTimer = null;
         let knownOrderIds = new Set();
+        let newOrderAudio = null;
         let audioCtx = null;
         let soundEnabled = false;
+        let soundFileOk = false;
+        let resolvedSoundUrl = '';
+        let soundResolvePromise = null;
+
+        function getNewOrderSoundCandidates() {
+            const urls = [new URL('neworder.mp3', location.href).href];
+            const path = location.pathname || '/';
+            if (/\/shop\/?/i.test(path)) {
+                urls.push(`${location.origin}/shop/neworder.mp3`);
+            }
+            urls.push('https://emikashotchicken.ru/shop/neworder.mp3');
+            return [...new Set(urls)];
+        }
+
+        function probeAudioUrl(url) {
+            return new Promise((resolve) => {
+                const test = new Audio();
+                test.preload = 'auto';
+                const finish = (ok) => {
+                    test.removeAttribute('src');
+                    resolve(ok);
+                };
+                const timer = setTimeout(() => finish(false), 12000);
+                test.addEventListener('canplaythrough', () => {
+                    clearTimeout(timer);
+                    finish(true);
+                }, { once: true });
+                test.addEventListener('error', () => {
+                    clearTimeout(timer);
+                    finish(false);
+                }, { once: true });
+                test.src = url;
+                test.load();
+            });
+        }
+
+        async function resolveNewOrderSoundUrl() {
+            for (const url of getNewOrderSoundCandidates()) {
+                if (await probeAudioUrl(url)) return url;
+            }
+            return '';
+        }
+
+        function ensureSoundResolved() {
+            if (!soundResolvePromise) {
+                soundResolvePromise = resolveNewOrderSoundUrl().then((url) => {
+                    resolvedSoundUrl = url;
+                    soundFileOk = Boolean(url);
+                    if (url && !newOrderAudio) {
+                        newOrderAudio = new Audio(url);
+                        newOrderAudio.preload = 'auto';
+                    }
+                    updateSoundButton();
+                    return url;
+                });
+            }
+            return soundResolvePromise;
+        }
         let cancelTargetId = null;
         const cancelModal = document.getElementById('cancelModal');
         const bulkBar = document.getElementById('bulkBar');
@@ -601,33 +662,87 @@
             setTimeout(() => toast.classList.remove('show'), 3500);
         }
 
-        function enableSound() {
-            soundEnabled = true;
+        function getNewOrderAudio() {
+            if (!newOrderAudio && resolvedSoundUrl) {
+                newOrderAudio = new Audio(resolvedSoundUrl);
+                newOrderAudio.preload = 'auto';
+            }
+            return newOrderAudio;
+        }
+
+        function updateSoundButton() {
+            const btn = document.getElementById('soundToggleBtn');
+            if (!btn) return;
+            if (!soundEnabled) {
+                btn.textContent = '🔇 Звук';
+                btn.title = 'Нажмите, чтобы включить звук';
+                return;
+            }
+            btn.textContent = soundFileOk ? '🔊 Звук' : '🔊 …';
+            btn.title = soundFileOk
+                ? 'Звук включён (neworder.mp3)'
+                : 'Файл neworder.mp3 не найден — короткий сигнал';
+        }
+
+        function playBeepFallback() {
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
-            } catch (_) {}
-        }
-
-        function playNewOrderSound() {
-            if (!soundEnabled || !audioCtx) return;
-            try {
-                const playBeep = (freq, start) => {
+                const playTone = (freq, start) => {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'sine';
                     osc.frequency.value = freq;
-                    gain.gain.setValueAtTime(0.25, start);
+                    gain.gain.setValueAtTime(0.3, start);
                     gain.gain.exponentialRampToValueAtTime(0.01, start + 0.22);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
                     osc.start(start);
-                    osc.stop(start + 0.25);
+                    osc.stop(start + 0.24);
                 };
                 const t = audioCtx.currentTime;
-                playBeep(880, t);
-                playBeep(1100, t + 0.28);
+                playTone(880, t);
+                playTone(1100, t + 0.28);
             } catch (_) {}
+        }
+
+        async function enableSound() {
+            soundEnabled = true;
+            updateSoundButton();
+            await ensureSoundResolved();
+            const audio = getNewOrderAudio();
+            if (!audio) {
+                soundFileOk = false;
+                playBeepFallback();
+                updateSoundButton();
+                return;
+            }
+            try {
+                audio.volume = 1;
+                await audio.play();
+                audio.pause();
+                audio.currentTime = 0;
+                soundFileOk = true;
+            } catch {
+                soundFileOk = false;
+                playBeepFallback();
+            }
+            updateSoundButton();
+        }
+
+        function playNewOrderSound() {
+            if (!soundEnabled) return;
+            if (soundFileOk && newOrderAudio) {
+                try {
+                    newOrderAudio.currentTime = 0;
+                    const p = newOrderAudio.play();
+                    if (p && typeof p.catch === 'function') {
+                        p.catch(() => playBeepFallback());
+                    }
+                    return;
+                } catch (_) {}
+            }
+            playBeepFallback();
         }
 
         async function api(path, options = {}) {
@@ -636,7 +751,8 @@
             const token = getToken();
             if (token) headers.Authorization = `Bearer ${token}`;
 
-            const url = path.startsWith('http') ? path : new URL(path, location.origin).href;
+            await window.emikaApiReady;
+            const url = path.startsWith('http') ? path : emikaApiUrl(path);
             const res = await fetch(url, { ...options, headers });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
@@ -706,7 +822,7 @@
 
         function firstItemImage(order) {
             const img = order.items?.[0]?.image;
-            return img ? esc(img) : '../images/logo.png';
+            return img ? esc(img) : '/images/logo.png';
         }
 
         function isMobileLayout() {
@@ -760,7 +876,7 @@
 
                 const thumb = document.createElement('img');
                 thumb.className = 'order-thumb';
-                thumb.src = order.items?.[0]?.image || '../images/logo.png';
+                thumb.src = order.items?.[0]?.image || '/images/logo.png';
                 thumb.alt = '';
 
                 const main = document.createElement('div');
@@ -805,7 +921,7 @@
 
             const itemsHtml = (order.items || []).map((item) => `
                 <div class="item-line">
-                    <img src="${esc(item.image || '../images/logo.png')}" alt="">
+                    <img src="${esc(item.image || '/images/logo.png')}" alt="">
                     <div>
                         <div class="item-line__title">${esc(item.titleRu || item.titleEn || '—')}</div>
                         <div class="item-line__meta">${item.qty} × ${item.price} ₽</div>
@@ -1091,6 +1207,8 @@
                 knownOrderIds = new Set(orders.map((o) => o.id));
                 showApp();
                 syncBulkBar();
+                getNewOrderAudio();
+                updateSoundButton();
                 if (Notification.permission === 'default') {
                     Notification.requestPermission().catch(() => {});
                 }
@@ -1182,7 +1300,21 @@
             searchInput._t = setTimeout(() => loadOrders(), 300);
         });
 
-        document.addEventListener('click', enableSound, { once: true });
+        document.getElementById('soundToggleBtn')?.addEventListener('click', async () => {
+            await enableSound();
+            playNewOrderSound();
+            showToast(
+                soundFileOk
+                    ? 'Звук: neworder.mp3'
+                    : 'Сигнал (бип) — загрузите shop/neworder.mp3 на сервер'
+            );
+        });
+
+        document.addEventListener('click', () => {
+            if (!soundEnabled) enableSound();
+        }, { once: true });
+
+        ensureSoundResolved();
         window.addEventListener('resize', () => {
             if (!isMobileLayout()) {
                 sidebar.classList.add('is-visible');

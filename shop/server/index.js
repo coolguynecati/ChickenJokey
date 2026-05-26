@@ -37,12 +37,14 @@ const CLOUD_ROOT = path.join(REPO_ROOT, 'cloud');
 
 cloud.ensureCloudRoot(CLOUD_ROOT);
 
+const SESSION_TTL_MS = 3 * 24 * 60 * 60 * 1000;
+
 /** @type {Map<string, number>} token -> expiry timestamp */
 const sessions = new Map();
 
 function createToken() {
     const token = crypto.randomBytes(24).toString('hex');
-    sessions.set(token, Date.now() + 12 * 60 * 60 * 1000);
+    sessions.set(token, Date.now() + SESSION_TTL_MS);
     return token;
 }
 
@@ -94,7 +96,7 @@ app.post('/api/auth/login', (req, res) => {
         });
     }
     const token = createToken();
-    res.json({ token, expiresInHours: 12 });
+    res.json({ token, expiresInHours: SESSION_TTL_MS / (60 * 60 * 1000) });
 });
 
 app.post('/api/orders', (req, res) => {
@@ -125,6 +127,8 @@ app.post('/api/orders', (req, res) => {
         addressExtra: body.addressExtra,
         comment: body.comment,
         paymentMethod: body.paymentMethod,
+        pickupTimeMode: body.pickupTimeMode,
+        pickupTimeAt: body.pickupTimeAt,
         promoCode: body.promoCode,
         items: body.items.map((item) => ({
             id: item.id,
@@ -265,7 +269,22 @@ app.get('/shop/*', (req, res) => {
     res.redirect(301, target);
 });
 
-app.use('/images', express.static(path.join(REPO_ROOT, 'images')));
+function resolveImagesDir() {
+    const shopImages = path.join(SHOP_ROOT, 'images');
+    const repoImages = path.join(REPO_ROOT, 'images');
+    if (fs.existsSync(shopImages)) return shopImages;
+    if (fs.existsSync(repoImages)) return repoImages;
+    return repoImages;
+}
+
+app.get('/neworder.mp3', (_req, res) => {
+    const filePath = path.join(SHOP_ROOT, 'neworder.mp3');
+    if (!fs.existsSync(filePath)) return res.sendStatus(404);
+    res.type('audio/mpeg');
+    res.sendFile(filePath);
+});
+
+app.use('/images', express.static(resolveImagesDir()));
 app.use('/cloud', express.static(CLOUD_ROOT, { index: false, dotfiles: 'deny' }));
 app.use(express.static(SHOP_ROOT));
 

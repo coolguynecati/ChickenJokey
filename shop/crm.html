@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>CRM — заказы | Emika's</title>
     <link rel="shortcut icon" href="/images/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -30,7 +33,8 @@
             --ok: #3ecf8e;
             --warn: #ffd700;
             --danger: #ff6b6b;
-            --list-w: 300px;
+            --list-w: 360px;
+            font-size: 17px;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -45,7 +49,7 @@
 
         button, input, select, textarea {
             font-family: inherit;
-            font-size: 0.88rem;
+            font-size: 1rem;
         }
 
         .login-wrap {
@@ -71,9 +75,14 @@
             width: 100%;
             border-radius: 10px;
             border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--card);
             color: var(--text);
-            padding: 10px 12px;
+            padding: 12px 14px;
+        }
+
+        select option {
+            background: #1a1b22;
+            color: #f4f4f6;
         }
 
         textarea { min-height: 72px; resize: vertical; }
@@ -128,7 +137,31 @@
             padding: 16px;
         }
 
-        .modal-card h3 { margin: 0 0 12px; font-size: 1rem; }
+        .modal-card h3 { margin: 0 0 12px; font-size: 1.15rem; }
+
+        .modal-card--delete {
+            width: min(440px, 100%);
+            padding: 22px 20px;
+        }
+
+        .modal-card--delete p {
+            margin: 0 0 18px;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.45;
+        }
+
+        .modal-actions--stack {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-lg {
+            width: 100%;
+            min-height: 52px;
+            padding: 14px 18px;
+            font-size: 1.05rem;
+        }
 
         .cancel-reasons { display: grid; gap: 8px; margin-bottom: 14px; }
 
@@ -155,7 +188,12 @@
         }
 
         .app { display: none; }
-        .app.is-ready { display: flex; flex-direction: column; min-height: 100vh; }
+        .app.is-ready {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            height: 100dvh;
+        }
 
         .topbar {
             display: flex;
@@ -171,9 +209,46 @@
             z-index: 10;
         }
 
-        .topbar h1 { margin: 0; font-size: 1rem; }
-        .topbar small { color: var(--muted); font-size: 0.75rem; }
+        .topbar h1 { margin: 0; font-size: 1.2rem; }
+        .topbar small { color: var(--muted); font-size: 0.88rem; }
         .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+        .bulk-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .bulk-bar[hidden] { display: none !important; }
+
+        .bulk-bar button {
+            min-width: 120px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+        }
+
+        .sound-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 0 12px 12px;
+            padding: 12px 14px;
+            background: rgba(255, 106, 26, 0.14);
+            border: 1px solid rgba(255, 106, 26, 0.45);
+            border-radius: 12px;
+        }
+
+        .sound-banner[hidden] { display: none !important; }
+
+        .sound-banner__text {
+            flex: 1;
+            min-width: 200px;
+            font-size: 0.85rem;
+            line-height: 1.35;
+        }
 
         .live-dot {
             width: 8px;
@@ -195,29 +270,44 @@
             display: grid;
             grid-template-columns: var(--list-w) 1fr;
             min-height: 0;
+            overflow: hidden;
         }
 
         .sidebar {
             border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-rows: auto auto minmax(0, 1fr);
             min-height: 0;
+            height: 100%;
             background: rgba(0, 0, 0, 0.15);
         }
 
-        .sidebar-head { padding: 10px; border-bottom: 1px solid var(--border); }
+        .sidebar-frame {
+            flex-shrink: 0;
+        }
+
+        .sidebar-frame--tabs {
+            padding: 10px 12px 8px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .sidebar-frame--toolbar {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.15);
+        }
 
         .view-tabs {
             display: flex;
-            gap: 6px;
-            margin-bottom: 8px;
+            gap: 8px;
         }
 
         .view-tabs button {
             flex: 1;
-            padding: 8px 6px;
-            font-size: 0.78rem;
-            border-radius: 8px;
+            padding: 12px 6px;
+            font-size: 0.88rem;
+            border-radius: 10px;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border);
             color: var(--muted);
@@ -229,43 +319,132 @@
             color: var(--text);
         }
 
-        .loc-tabs { margin-top: 8px; }
-
-        .bulk-bar {
+        .toolbar-row {
             display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 8px;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
         }
 
-        .bulk-bar button { flex: 1; min-width: 88px; padding: 8px 10px; font-size: 0.76rem; }
+        .search-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            max-width: 44px;
+            overflow: hidden;
+            transition: max-width 0.2s ease, flex 0.2s ease;
+        }
 
-        .filters { display: grid; gap: 6px; }
+        .search-wrap.is-open {
+            flex: 1;
+            max-width: none;
+            min-width: 0;
+        }
 
-        .filters input, .filters select { padding: 8px 10px; font-size: 0.82rem; }
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            padding: 0;
+            display: grid;
+            place-items: center;
+            font-size: 1.15rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .btn-icon.is-active {
+            border-color: rgba(255, 106, 26, 0.55);
+            background: rgba(255, 106, 26, 0.12);
+        }
+
+        .search-input {
+            width: 0;
+            min-width: 0;
+            padding: 0;
+            border: none;
+            opacity: 0;
+            pointer-events: none;
+            font-size: 1rem;
+            background: transparent;
+            color: var(--text);
+            transition: opacity 0.15s ease;
+        }
+
+        .search-wrap.is-open .search-input {
+            flex: 1;
+            width: auto;
+            padding: 10px 8px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--card);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .toolbar-row select {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 10px;
+            font-size: 0.92rem;
+            background: var(--card);
+            color: var(--text);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .search-wrap.is-open ~ #statusFilter,
+        .search-wrap.is-open ~ .select-all-label {
+            display: none;
+        }
+
+        .select-all-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            font-size: 0.85rem;
+            color: var(--muted);
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .select-all-label input {
+            width: 22px;
+            height: 22px;
+            margin: 0;
+            accent-color: var(--orange);
+        }
 
         .orders-list {
-            flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 6px;
+            min-height: 0;
             -webkit-overflow-scrolling: touch;
         }
 
         .order-row {
             display: grid;
-            grid-template-columns: auto 36px 1fr auto;
-            gap: 6px 8px;
+            grid-template-columns: auto 44px 1fr auto;
+            gap: 8px 10px;
             align-items: center;
             width: 100%;
-            padding: 7px 8px;
-            margin-bottom: 4px;
-            border-radius: 10px;
+            padding: 11px 12px;
+            margin-bottom: 6px;
+            border-radius: 12px;
             border: 1px solid var(--border);
             background: rgba(255, 255, 255, 0.02);
             color: inherit;
             cursor: pointer;
             text-align: left;
-            transition: border-color 0.15s, background 0.15s;
+            transition: border-color 0.12s, background 0.12s, box-shadow 0.12s;
+            touch-action: manipulation;
         }
 
         .order-row:hover,
@@ -274,16 +453,35 @@
             background: rgba(255, 106, 26, 0.08);
         }
 
+        .order-row--picked {
+            box-shadow: inset 0 0 0 2px var(--orange);
+        }
+
+        @keyframes order-unread-blink {
+            0%, 49.9% {
+                background: rgba(255, 106, 26, 0.38);
+                border-color: var(--orange);
+            }
+            50%, 100% {
+                background: rgba(255, 255, 255, 0.04);
+                border-color: var(--border);
+            }
+        }
+
+        .order-row--unread {
+            animation: order-unread-blink 10s ease-in-out infinite;
+        }
+
         .order-row input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
+            width: 22px;
+            height: 22px;
             margin: 0;
             accent-color: var(--orange);
         }
 
         .order-thumb {
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             border-radius: 8px;
             object-fit: contain;
             background: rgba(255, 255, 255, 0.05);
@@ -293,14 +491,14 @@
 
         .order-row__num {
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 0.95rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .order-row__sub {
-            font-size: 0.68rem;
+            font-size: 0.82rem;
             color: var(--muted);
             line-height: 1.3;
             white-space: nowrap;
@@ -326,7 +524,7 @@
         .badge-cancelled { background: rgba(255, 107, 107, 0.15); color: var(--danger); }
 
         .detail-panel {
-            padding: 12px 14px;
+            padding: 16px 18px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -354,7 +552,7 @@
             margin-bottom: 12px;
         }
 
-        .detail-actions-top button { min-height: 44px; padding: 10px 16px; }
+        .detail-actions-top button { min-height: 50px; padding: 12px 18px; font-size: 1rem; }
 
         .detail-grid {
             display: grid;
@@ -413,6 +611,108 @@
             margin-top: 10px;
         }
 
+        .detail-hero {
+            margin-bottom: 14px;
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 106, 26, 0.35);
+            background: rgba(255, 106, 26, 0.08);
+        }
+
+        .detail-customer-name {
+            font-size: 1.45rem;
+            font-weight: 700;
+            line-height: 1.25;
+            margin-bottom: 8px;
+        }
+
+        .detail-customer-phone {
+            display: inline-block;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--orange);
+            text-decoration: none;
+            margin-bottom: 12px;
+        }
+
+        .detail-customer-phone:hover { text-decoration: underline; }
+
+        .detail-comment-block {
+            margin-top: 4px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .detail-comment-block h3 {
+            margin: 0 0 6px;
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .detail-comment {
+            margin: 0;
+            font-size: 1.15rem;
+            line-height: 1.45;
+            font-weight: 500;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .detail-comment.is-empty { color: var(--muted); font-weight: 400; }
+
+        .detail-note-section {
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .detail-note-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .detail-note-section textarea {
+            width: 100%;
+            min-height: 110px;
+            font-size: 1.05rem;
+            line-height: 1.4;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            resize: vertical;
+            pointer-events: auto;
+            touch-action: manipulation;
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        .detail-note-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-end;
+            margin-top: 12px;
+        }
+
+        .detail-note-actions select {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 14px;
+            font-size: 1rem;
+            background: var(--card);
+            color: var(--text);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
         .detail-actions {
             display: flex;
             flex-wrap: wrap;
@@ -456,8 +756,8 @@
 
             .layout { grid-template-columns: 1fr; }
 
-            .sidebar { display: none; max-height: none; }
-            .sidebar.is-visible { display: flex; }
+            .sidebar { display: none; height: 100%; }
+            .sidebar.is-visible { display: grid; }
             .detail-panel { display: none; }
             .detail-panel.is-visible { display: block; }
             .back-mobile { display: block; }
@@ -481,28 +781,38 @@
             <div>
                 <h1><span class="live-dot" id="liveDot"></span>Заказы</h1>
                 <small id="ordersCount">—</small>
+                <small id="crmVersion" style="display:block;color:var(--muted);font-size:0.75rem;margin-top:2px;">CRM v3.2</small>
             </div>
             <div class="topbar-actions">
-                <button type="button" class="btn-ghost" id="soundToggleBtn" title="Включить звук новых заказов">🔊 Звук</button>
+                <div class="bulk-bar" id="bulkBar" hidden>
+                    <button type="button" class="btn-ok" id="bulkDoneBtn">Выполнено</button>
+                    <button type="button" class="btn-danger" id="bulkDeleteBtn">Удалить</button>
+                </div>
                 <button type="button" class="btn-ghost" id="logoutBtn">Выйти</button>
             </div>
         </header>
 
+        <div class="sound-banner" id="soundBanner" hidden>
+            <span class="sound-banner__text">Чтобы слышать новые заказы, один раз включите звук — так требует браузер (не планшет «глухой»).</span>
+            <button type="button" class="btn-primary" id="soundUnlockBtn">Включить звук</button>
+        </div>
+
         <div class="layout">
             <aside class="sidebar is-visible" id="sidebar">
-                <div class="sidebar-head">
+                <div class="sidebar-frame sidebar-frame--tabs">
                     <div class="view-tabs">
                         <button type="button" data-view="active" class="is-active">Активные</button>
                         <button type="button" data-view="archive">Архив</button>
                         <button type="button" data-view="deleted">Удалённые</button>
                     </div>
-                    <div class="bulk-bar" id="bulkBar">
-                        <button type="button" class="btn-ok" id="bulkDoneBtn">Выполнено</button>
-                        <button type="button" class="btn-danger" id="bulkDeleteBtn">Удалить</button>
-                    </div>
-                    <div class="filters" style="margin-top:8px;">
-                        <input type="search" id="searchInput" placeholder="Поиск…">
-                        <select id="statusFilter">
+                </div>
+                <div class="sidebar-frame sidebar-frame--toolbar">
+                    <div class="toolbar-row">
+                        <div class="search-wrap" id="searchWrap">
+                            <button type="button" class="btn-icon" id="searchToggleBtn" title="Поиск" aria-label="Поиск">🔍</button>
+                            <input type="search" class="search-input" id="searchInput" placeholder="Поиск…" autocomplete="off">
+                        </div>
+                        <select id="statusFilter" aria-label="Статус">
                             <option value="all">Все статусы</option>
                             <option value="new">Новые</option>
                             <option value="confirmed">Подтверждены</option>
@@ -510,8 +820,9 @@
                             <option value="delivery">В доставке</option>
                             <option value="cancelled">Отменены</option>
                         </select>
-                        <label style="display:flex;align-items:center;gap:8px;margin:4px 0 0;font-size:0.78rem;color:var(--muted);">
-                            <input type="checkbox" id="selectAllCb" style="width:auto;"> Выбрать все
+                        <label class="select-all-label" title="Выбрать все">
+                            <input type="checkbox" id="selectAllCb">
+                            <span>Все</span>
                         </label>
                     </div>
                 </div>
@@ -523,6 +834,17 @@
                 <div class="detail-empty" id="detailEmpty">Выберите заказ</div>
                 <div id="detailContent" hidden></div>
             </main>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="deleteModal" aria-hidden="true">
+        <div class="modal-card modal-card--delete">
+            <h3>Удалить заказ?</h3>
+            <p id="deleteModalText">Заказ попадёт в «Удалённые» на 7 дней. Это действие нельзя отменить.</p>
+            <div class="modal-actions modal-actions--stack">
+                <button type="button" class="btn-danger btn-lg" id="deleteModalConfirm">Да, удалить</button>
+                <button type="button" class="btn-ghost btn-lg" id="deleteModalClose">Отмена</button>
+            </div>
         </div>
     </div>
 
@@ -617,69 +939,219 @@
         let currentLocation = 'all';
         let pollTimer = null;
         let knownOrderIds = new Set();
-        let newOrderAudio = null;
-        let audioCtx = null;
-        let soundEnabled = false;
-        let soundFileOk = false;
-        let resolvedSoundUrl = '';
-        let soundResolvePromise = null;
-
-        function getNewOrderSoundCandidates() {
+        const SOUND_SESSION_KEY = 'emika-crm-sound-on';
+        const ORDER_SOUND_URLS = (() => {
             const urls = [new URL('neworder.mp3', location.href).href];
-            const path = location.pathname || '/';
-            if (/\/shop\/?/i.test(path)) {
-                urls.push(`${location.origin}/shop/neworder.mp3`);
-            }
             urls.push('https://emikashotchicken.ru/shop/neworder.mp3');
             return [...new Set(urls)];
+        })();
+
+        const SOUND_MAX_MS = 14000;
+        const SOUND_MIN_GAP_MS = 2500;
+        const REMIND_SOUND_MS = 2 * 60 * 1000;
+
+        let orderSound = null;
+        let orderSoundUrlIndex = 0;
+        let soundOn = sessionStorage.getItem(SOUND_SESSION_KEY) === '1';
+        let soundStopTimer = null;
+        let soundPlaying = false;
+        let lastSoundAt = 0;
+        let soundRemindTimer = null;
+        let ordersInitialized = false;
+        const unreadOrderIds = new Set();
+        let faviconTimer = null;
+        let faviconLinkEl = null;
+        const FAVICON_DEFAULT = '/images/favicon.ico';
+        const FAVICON_ALERT = "data:image/svg+xml," + encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="82" font-size="72">🔥</text></svg>'
+        );
+
+        const soundBanner = document.getElementById('soundBanner');
+        const soundUnlockBtn = document.getElementById('soundUnlockBtn');
+
+        function getOrderSound() {
+            if (!orderSound) {
+                orderSound = new Audio(ORDER_SOUND_URLS[orderSoundUrlIndex]);
+                orderSound.preload = 'auto';
+                orderSound.loop = false;
+                orderSound.addEventListener('ended', () => {
+                    soundPlaying = false;
+                });
+                orderSound.addEventListener('error', () => {
+                    soundPlaying = false;
+                    if (orderSoundUrlIndex >= ORDER_SOUND_URLS.length - 1) return;
+                    orderSoundUrlIndex += 1;
+                    orderSound.src = ORDER_SOUND_URLS[orderSoundUrlIndex];
+                    orderSound.load();
+                });
+            }
+            orderSound.loop = false;
+            return orderSound;
         }
 
-        function probeAudioUrl(url) {
-            return new Promise((resolve) => {
-                const test = new Audio();
-                test.preload = 'auto';
-                const finish = (ok) => {
-                    test.removeAttribute('src');
-                    resolve(ok);
+        function stopOrderSound() {
+            if (soundStopTimer) {
+                clearTimeout(soundStopTimer);
+                soundStopTimer = null;
+            }
+            soundPlaying = false;
+            if (!orderSound) return;
+            try {
+                orderSound.pause();
+                orderSound.currentTime = 0;
+            } catch (_) {}
+        }
+
+        function updateSoundBanner() {
+            if (!soundBanner) return;
+            soundBanner.hidden = soundOn;
+        }
+
+        async function unlockOrderSound() {
+            const audio = getOrderSound();
+            stopOrderSound();
+            audio.loop = false;
+            audio.volume = 0.001;
+            audio.currentTime = 0;
+            try {
+                await audio.play();
+                setTimeout(() => {
+                    stopOrderSound();
+                    audio.volume = 1;
+                }, 120);
+                soundOn = true;
+                sessionStorage.setItem(SOUND_SESSION_KEY, '1');
+                updateSoundBanner();
+                showToast('Звук включён');
+                return true;
+            } catch {
+                audio.volume = 1;
+                showToast('Не удалось включить звук. Проверьте громкость и беззвучный режим.');
+                return false;
+            }
+        }
+
+        function hasUnreadOrders() {
+            return unreadOrderIds.size > 0;
+        }
+
+        function acknowledgeOrder(id) {
+            if (!unreadOrderIds.delete(id)) return;
+            if (!hasUnreadOrders()) {
+                stopOrderSound();
+                stopFaviconAlert();
+                stopSoundRemindLoop();
+            }
+            updateFaviconAlert();
+        }
+
+        function pruneUnreadOrders(orderList) {
+            const ids = new Set(orderList.map((o) => o.id));
+            unreadOrderIds.forEach((id) => {
+                const o = orderList.find((x) => x.id === id);
+                if (!ids.has(id) || !o || o.status !== 'new') unreadOrderIds.delete(id);
+            });
+            if (!hasUnreadOrders()) {
+                stopFaviconAlert();
+                stopSoundRemindLoop();
+            }
+        }
+
+        function getFaviconLink() {
+            if (!faviconLinkEl) {
+                faviconLinkEl = document.querySelector('link[rel*="icon"]');
+                if (!faviconLinkEl) {
+                    faviconLinkEl = document.createElement('link');
+                    faviconLinkEl.rel = 'shortcut icon';
+                    document.head.appendChild(faviconLinkEl);
+                }
+            }
+            return faviconLinkEl;
+        }
+
+        function stopFaviconAlert() {
+            if (faviconTimer) {
+                clearInterval(faviconTimer);
+                faviconTimer = null;
+            }
+            const link = getFaviconLink();
+            link.href = new URL(FAVICON_DEFAULT, location.href).href;
+        }
+
+        function updateFaviconAlert() {
+            if (!hasUnreadOrders()) {
+                stopFaviconAlert();
+                return;
+            }
+            if (faviconTimer) return;
+            const link = getFaviconLink();
+            const defHref = new URL(FAVICON_DEFAULT, location.href).href;
+            let showAlert = false;
+            faviconTimer = setInterval(() => {
+                showAlert = !showAlert;
+                link.href = showAlert ? FAVICON_ALERT : defHref;
+            }, 700);
+        }
+
+        function stopSoundRemindLoop() {
+            if (soundRemindTimer) {
+                clearInterval(soundRemindTimer);
+                soundRemindTimer = null;
+            }
+        }
+
+        function startSoundRemindLoop() {
+            if (soundRemindTimer || !hasUnreadOrders()) return;
+            soundRemindTimer = setInterval(() => {
+                if (hasUnreadOrders() && soundOn) playNewOrderSoundOnce();
+                else stopSoundRemindLoop();
+            }, REMIND_SOUND_MS);
+        }
+
+        function onUnreadOrdersAdded() {
+            updateFaviconAlert();
+            startSoundRemindLoop();
+            playNewOrderSoundOnce();
+        }
+
+        function playNewOrderSoundOnce() {
+            if (!soundOn) {
+                updateSoundBanner();
+                return;
+            }
+            const now = Date.now();
+            if (soundPlaying || now - lastSoundAt < SOUND_MIN_GAP_MS) return;
+
+            const audio = getOrderSound();
+            stopOrderSound();
+            audio.loop = false;
+            audio.volume = 1;
+            audio.currentTime = 0;
+            soundPlaying = true;
+            lastSoundAt = now;
+
+            soundStopTimer = setTimeout(() => stopOrderSound(), SOUND_MAX_MS);
+
+            audio.play().then(() => {
+                audio.onended = () => {
+                    soundPlaying = false;
+                    if (soundStopTimer) {
+                        clearTimeout(soundStopTimer);
+                        soundStopTimer = null;
+                    }
                 };
-                const timer = setTimeout(() => finish(false), 12000);
-                test.addEventListener('canplaythrough', () => {
-                    clearTimeout(timer);
-                    finish(true);
-                }, { once: true });
-                test.addEventListener('error', () => {
-                    clearTimeout(timer);
-                    finish(false);
-                }, { once: true });
-                test.src = url;
-                test.load();
+            }).catch(() => {
+                stopOrderSound();
+                soundOn = false;
+                sessionStorage.removeItem(SOUND_SESSION_KEY);
+                updateSoundBanner();
             });
         }
 
-        async function resolveNewOrderSoundUrl() {
-            for (const url of getNewOrderSoundCandidates()) {
-                if (await probeAudioUrl(url)) return url;
-            }
-            return '';
-        }
-
-        function ensureSoundResolved() {
-            if (!soundResolvePromise) {
-                soundResolvePromise = resolveNewOrderSoundUrl().then((url) => {
-                    resolvedSoundUrl = url;
-                    soundFileOk = Boolean(url);
-                    if (url && !newOrderAudio) {
-                        newOrderAudio = new Audio(url);
-                        newOrderAudio.preload = 'auto';
-                    }
-                    updateSoundButton();
-                    return url;
-                });
-            }
-            return soundResolvePromise;
-        }
         let cancelTargetId = null;
+        let deleteTargetIds = [];
         const cancelModal = document.getElementById('cancelModal');
+        const deleteModal = document.getElementById('deleteModal');
         const bulkBar = document.getElementById('bulkBar');
 
         function esc(text) {
@@ -703,89 +1175,6 @@
             toast.textContent = msg;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3500);
-        }
-
-        function getNewOrderAudio() {
-            if (!newOrderAudio && resolvedSoundUrl) {
-                newOrderAudio = new Audio(resolvedSoundUrl);
-                newOrderAudio.preload = 'auto';
-            }
-            return newOrderAudio;
-        }
-
-        function updateSoundButton() {
-            const btn = document.getElementById('soundToggleBtn');
-            if (!btn) return;
-            if (!soundEnabled) {
-                btn.textContent = '🔇 Звук';
-                btn.title = 'Нажмите, чтобы включить звук';
-                return;
-            }
-            btn.textContent = soundFileOk ? '🔊 Звук' : '🔊 …';
-            btn.title = soundFileOk
-                ? 'Звук включён (neworder.mp3)'
-                : 'Файл neworder.mp3 не найден — короткий сигнал';
-        }
-
-        function playBeepFallback() {
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                const playTone = (freq, start) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.value = freq;
-                    gain.gain.setValueAtTime(0.3, start);
-                    gain.gain.exponentialRampToValueAtTime(0.01, start + 0.22);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(start);
-                    osc.stop(start + 0.24);
-                };
-                const t = audioCtx.currentTime;
-                playTone(880, t);
-                playTone(1100, t + 0.28);
-            } catch (_) {}
-        }
-
-        async function enableSound() {
-            soundEnabled = true;
-            updateSoundButton();
-            await ensureSoundResolved();
-            const audio = getNewOrderAudio();
-            if (!audio) {
-                soundFileOk = false;
-                playBeepFallback();
-                updateSoundButton();
-                return;
-            }
-            try {
-                audio.volume = 1;
-                await audio.play();
-                audio.pause();
-                audio.currentTime = 0;
-                soundFileOk = true;
-            } catch {
-                soundFileOk = false;
-                playBeepFallback();
-            }
-            updateSoundButton();
-        }
-
-        function playNewOrderSound() {
-            if (!soundEnabled) return;
-            if (soundFileOk && newOrderAudio) {
-                try {
-                    newOrderAudio.currentTime = 0;
-                    const p = newOrderAudio.play();
-                    if (p && typeof p.catch === 'function') {
-                        p.catch(() => playBeepFallback());
-                    }
-                    return;
-                } catch (_) {}
-            }
-            playBeepFallback();
         }
 
         async function api(path, options = {}) {
@@ -844,7 +1233,37 @@
 
         function syncBulkBar() {
             if (!bulkBar) return;
-            bulkBar.style.display = currentView === 'deleted' ? 'none' : 'flex';
+            bulkBar.hidden = selectedIds.size === 0 || currentView === 'deleted';
+        }
+
+        function openDeleteModal(ids) {
+            deleteTargetIds = Array.isArray(ids) ? ids.filter(Boolean) : [];
+            if (!deleteTargetIds.length) return;
+            const text = document.getElementById('deleteModalText');
+            if (text) {
+                text.textContent = deleteTargetIds.length === 1
+                    ? 'Заказ попадёт в «Удалённые» на 7 дней.'
+                    : `Удалить ${deleteTargetIds.length} заказ(ов)? Они попадут в «Удалённые» на 7 дней.`;
+            }
+            if (deleteModal) {
+                deleteModal.classList.add('is-open');
+                deleteModal.setAttribute('aria-hidden', 'false');
+            }
+        }
+
+        function closeDeleteModal() {
+            deleteTargetIds = [];
+            if (deleteModal) {
+                deleteModal.classList.remove('is-open');
+                deleteModal.setAttribute('aria-hidden', 'true');
+            }
+        }
+
+        async function confirmDeleteOrders() {
+            const ids = deleteTargetIds.slice();
+            closeDeleteModal();
+            if (!ids.length) return;
+            await bulkAction('delete', ids, true);
         }
 
         function openCancelModal(orderId) {
@@ -904,7 +1323,11 @@
             orders.forEach((order) => {
                 const row = document.createElement('button');
                 row.type = 'button';
-                row.className = 'order-row' + (order.id === selectedId ? ' is-active' : '');
+                let rowClass = 'order-row';
+                if (order.id === selectedId) rowClass += ' is-active';
+                if (unreadOrderIds.has(order.id)) rowClass += ' order-row--unread';
+                if (selectedIds.has(order.id)) rowClass += ' order-row--picked';
+                row.className = rowClass;
                 row.dataset.id = order.id;
 
                 const cb = document.createElement('input');
@@ -915,6 +1338,8 @@
                     if (cb.checked) selectedIds.add(order.id);
                     else selectedIds.delete(order.id);
                     syncSelectAllCheckbox();
+                    syncBulkBar();
+                    renderOrdersList();
                 });
 
                 const thumb = document.createElement('img');
@@ -937,19 +1362,79 @@
 
                 row.append(cb, thumb, main, badge);
 
+                let longPressFired = false;
+                let pressTimer = null;
+
+                const clearPress = () => {
+                    if (pressTimer) clearTimeout(pressTimer);
+                    pressTimer = null;
+                };
+
+                row.addEventListener('pointerdown', (e) => {
+                    if (e.target.tagName === 'INPUT') return;
+                    longPressFired = false;
+                    clearPress();
+                    pressTimer = setTimeout(() => {
+                        pressTimer = null;
+                        longPressFired = true;
+                        if (selectedIds.has(order.id)) selectedIds.delete(order.id);
+                        else selectedIds.add(order.id);
+                        syncSelectAllCheckbox();
+                        syncBulkBar();
+                        renderOrdersList();
+                    }, 480);
+                });
+                row.addEventListener('pointerup', clearPress);
+                row.addEventListener('pointercancel', clearPress);
+                row.addEventListener('pointerleave', clearPress);
+
                 row.addEventListener('click', (e) => {
                     if (e.target.tagName === 'INPUT') return;
+                    if (longPressFired) {
+                        longPressFired = false;
+                        return;
+                    }
                     selectOrder(order.id);
                 });
+
                 ordersList.appendChild(row);
             });
             syncSelectAllCheckbox();
+            syncBulkBar();
         }
 
         function syncSelectAllCheckbox() {
             if (!selectAllCb) return;
             const visible = orders.map((o) => o.id);
             selectAllCb.checked = visible.length > 0 && visible.every((id) => selectedIds.has(id));
+        }
+
+        let detailRenderKey = '';
+
+        function getDetailRenderKey(order) {
+            if (!order) return '';
+            return [
+                order.id,
+                order.updatedAt || '',
+                order.status,
+                order.managerNote || '',
+                order.comment || '',
+                order.total
+            ].join('|');
+        }
+
+        function refreshDetailPanel(force) {
+            const order = selectedId ? orders.find((o) => o.id === selectedId) : null;
+            if (!order) {
+                detailRenderKey = '';
+                renderDetail(null);
+                return;
+            }
+            if (!force && document.activeElement?.id === 'managerNote') return;
+            const key = getDetailRenderKey(order);
+            if (!force && key === detailRenderKey) return;
+            detailRenderKey = key;
+            renderDetail(order);
         }
 
         function renderDetail(order) {
@@ -1003,12 +1488,18 @@
                     ${showCancel ? '<button type="button" class="btn-cancel-sm" id="cancelOneBtn">Отмена</button>' : ''}
                     ${showDeleteBtn ? '<button type="button" class="btn-danger" id="deleteOneBtn">Удалить</button>' : ''}
                 </div>
+                <div class="detail-hero">
+                    <div class="detail-customer-name">${esc(order.customer?.name || '—')}</div>
+                    <a class="detail-customer-phone" href="tel:${esc((order.customer?.phone || '').replace(/\s/g, ''))}">${esc(order.customer?.phone || '—')}</a>
+                    <div class="detail-comment-block">
+                        <h3>Комментарий гостя</h3>
+                        <p class="detail-comment${order.comment ? '' : ' is-empty'}">${order.comment ? esc(order.comment) : 'Без комментария'}</p>
+                    </div>
+                </div>
                 <div class="detail-grid">
                     <div class="info-block">
-                        <h3>Клиент</h3>
-                        <p><strong>${esc(order.customer?.name || '—')}</strong></p>
-                        <p><a href="tel:${esc((order.customer?.phone || '').replace(/\s/g, ''))}" style="color:var(--orange)">${esc(order.customer?.phone || '—')}</a></p>
-                        ${order.customer?.email ? `<p>${esc(order.customer.email)}</p>` : ''}
+                        <h3>Контакты</h3>
+                        ${order.customer?.email ? `<p>${esc(order.customer.email)}</p>` : '<p style="color:var(--muted);">Email не указан</p>'}
                     </div>
                     <div class="info-block">
                         <h3>Точка</h3>
@@ -1022,30 +1513,37 @@
                     </div>
                 </div>
                 ${order.status === 'cancelled' && cancelReasonText(order) ? `<div class="info-block" style="margin-bottom:10px;"><h3>Причина отмены</h3><p>${esc(cancelReasonText(order))}</p></div>` : ''}
-                ${order.comment ? `<div class="info-block" style="margin-bottom:10px;"><h3>Комментарий</h3><p>${esc(order.comment)}</p></div>` : ''}
                 <div class="info-block">
                     <h3>Состав</h3>
                     <div class="items-list">${itemsHtml}</div>
                     <div class="total-line">Итого: ${order.total} ₽</div>
                 </div>
                 ${isDeletedView ? '' : `
-                <div class="detail-actions">
-                    <div>
-                        <label for="statusSelect">Статус</label>
-                        <select id="statusSelect">
+                <div class="detail-note-section">
+                    <label for="managerNote">Заметка менеджера</label>
+                    <textarea id="managerNote" rows="4" placeholder="Внутренняя заметка по заказу…">${esc(order.managerNote || '')}</textarea>
+                    <div class="detail-note-actions">
+                        <select id="statusSelect" aria-label="Статус">
                             ${Object.entries(STATUS_LABELS).map(([k, v]) => `<option value="${k}" ${order.status === k ? 'selected' : ''}>${v}</option>`).join('')}
                         </select>
+                        <button type="button" class="btn-primary" id="saveOrderBtn">Сохранить</button>
                     </div>
-                    <div style="flex:2;">
-                        <label for="managerNote">Заметка</label>
-                        <textarea id="managerNote">${esc(order.managerNote || '')}</textarea>
-                    </div>
-                    <button type="button" class="btn-primary" id="saveOrderBtn" style="margin-top:20px;">Сохранить</button>
                 </div>`}
             `;
 
+            detailRenderKey = getDetailRenderKey(order);
+
             if (!isDeletedView) {
                 document.getElementById('saveOrderBtn').addEventListener('click', () => saveOrder(order.id));
+                const noteEl = document.getElementById('managerNote');
+                if (noteEl) {
+                    let noteSaveTimer = null;
+                    noteEl.addEventListener('blur', () => saveManagerNoteOnly(order.id));
+                    noteEl.addEventListener('input', () => {
+                        clearTimeout(noteSaveTimer);
+                        noteSaveTimer = setTimeout(() => saveManagerNoteOnly(order.id), 1200);
+                    });
+                }
             }
             if (showCooking) {
                 document.getElementById('cookingBtn').addEventListener('click', () => setOrderStatus(order.id, 'cooking'));
@@ -1057,9 +1555,7 @@
                 document.getElementById('cancelOneBtn').addEventListener('click', () => openCancelModal(order.id));
             }
             if (showDeleteBtn) {
-                document.getElementById('deleteOneBtn').addEventListener('click', () => {
-                    if (confirm('Переместить в архив удалённых на 7 дней?')) bulkAction('delete', [order.id]);
-                });
+                document.getElementById('deleteOneBtn').addEventListener('click', () => openDeleteModal([order.id]));
             }
         }
 
@@ -1078,13 +1574,19 @@
 
         async function selectOrder(id) {
             selectedId = id;
+            acknowledgeOrder(id);
             await markOrderSeen(id);
             renderOrdersList();
             renderDetail(orders.find((o) => o.id === id));
             showDetailOnMobile();
         }
 
+        let ordersLoadInFlight = false;
+
         async function loadOrders() {
+            if (ordersLoadInFlight) return;
+            ordersLoadInFlight = true;
+            try {
             const params = new URLSearchParams();
             params.set('view', currentView);
             if (currentLocation !== 'all') params.set('location', currentLocation);
@@ -1095,32 +1597,41 @@
             const nextOrders = data.orders || [];
 
             const nextIds = new Set(nextOrders.map((o) => o.id));
-            const newOnes = nextOrders.filter((o) => o.status === 'new' && !knownOrderIds.has(o.id));
 
-            if (knownOrderIds.size && newOnes.length && currentView === 'active') {
-                playNewOrderSound();
-                const label = newOnes.length === 1
-                    ? `Новый заказ ${newOnes[0].orderNumber}`
-                    : `Новых заказов: ${newOnes.length}`;
-                showToast(label);
-                if (Notification.permission === 'granted') {
-                    new Notification('Emika\'s — новый заказ', { body: label });
+            if (!ordersInitialized) {
+                nextOrders.filter((o) => o.status === 'new').forEach((o) => unreadOrderIds.add(o.id));
+                ordersInitialized = true;
+                knownOrderIds = nextIds;
+                orders = nextOrders;
+                if (hasUnreadOrders()) {
+                    updateFaviconAlert();
+                    startSoundRemindLoop();
                 }
+            } else {
+                const brandNew = nextOrders.filter((o) =>
+                    o.status === 'new' && !knownOrderIds.has(o.id)
+                );
+                if (knownOrderIds.size && brandNew.length && currentView === 'active') {
+                    brandNew.forEach((o) => unreadOrderIds.add(o.id));
+                    onUnreadOrdersAdded();
+                }
+                pruneUnreadOrders(nextOrders);
+                knownOrderIds = nextIds;
+                orders = nextOrders;
             }
-
-            knownOrderIds = nextIds;
-            orders = nextOrders;
 
             if (selectedId && !orders.find((o) => o.id === selectedId)) {
                 const gone = selectedId;
-                selectedId = orders[0]?.id || null;
+                selectedId = null;
                 selectedIds.delete(gone);
             }
-            if (!selectedId && orders.length) selectedId = orders[0].id;
 
             syncBulkBar();
             renderOrdersList();
-            renderDetail(orders.find((o) => o.id === selectedId));
+            refreshDetailPanel(false);
+            } finally {
+                ordersLoadInFlight = false;
+            }
         }
 
         async function cancelOrder(id, reason) {
@@ -1162,6 +1673,26 @@
             }
         }
 
+        async function saveManagerNoteOnly(id) {
+            const noteEl = document.getElementById('managerNote');
+            if (!noteEl) return;
+            const order = orders.find((o) => o.id === id);
+            if (!order) return;
+            const managerNote = noteEl.value;
+            if ((order.managerNote || '') === managerNote.trim()) return;
+            try {
+                const data = await api(`/api/orders/${id}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ status: order.status, managerNote })
+                });
+                const idx = orders.findIndex((o) => o.id === id);
+                if (idx !== -1) orders[idx] = data.order;
+                detailRenderKey = getDetailRenderKey(data.order);
+            } catch (e) {
+                showToast(e.message || 'Не удалось сохранить заметку');
+            }
+        }
+
         async function saveOrder(id) {
             const status = document.getElementById('statusSelect').value;
             const managerNote = document.getElementById('managerNote').value;
@@ -1183,12 +1714,15 @@
             showToast('Сохранено');
         }
 
-        async function bulkAction(action, ids) {
+        async function bulkAction(action, ids, skipDeleteConfirm) {
             if (!ids?.length) {
                 showToast('Выберите заказы');
                 return;
             }
-            if (action === 'delete' && !confirm(`Переместить ${ids.length} заказ(ов) в архив удалённых на 7 дней?`)) return;
+            if (action === 'delete' && !skipDeleteConfirm) {
+                openDeleteModal(ids);
+                return;
+            }
 
             try {
                 await api('/api/orders/bulk', {
@@ -1218,7 +1752,10 @@
                 }
             }
 
-            ids.forEach((id) => selectedIds.delete(id));
+            ids.forEach((id) => {
+                selectedIds.delete(id);
+                acknowledgeOrder(id);
+            });
             if (selectedId && ids.includes(selectedId)) selectedId = null;
             await loadOrders();
             showToast(action === 'done' ? 'Перенесено в архив' : action === 'cooking' ? 'Отдано на кухню' : 'В архиве удалённых');
@@ -1233,12 +1770,19 @@
             loginScreen.style.display = 'none';
             app.classList.add('is-ready');
             if (isMobileLayout()) showListOnMobile();
+            updateSoundBanner();
+            getOrderSound();
         }
 
         function showLogin() {
             loginScreen.style.display = 'grid';
             app.classList.remove('is-ready');
             if (pollTimer) clearInterval(pollTimer);
+            stopOrderSound();
+            stopFaviconAlert();
+            stopSoundRemindLoop();
+            unreadOrderIds.clear();
+            ordersInitialized = false;
         }
 
         async function tryBoot() {
@@ -1247,11 +1791,8 @@
                 orders = [];
                 knownOrderIds = new Set();
                 await loadOrders();
-                knownOrderIds = new Set(orders.map((o) => o.id));
                 showApp();
                 syncBulkBar();
-                getNewOrderAudio();
-                updateSoundButton();
                 if (Notification.permission === 'default') {
                     Notification.requestPermission().catch(() => {});
                 }
@@ -1272,7 +1813,6 @@
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             loginError.style.display = 'none';
-            enableSound();
             try {
                 const password = document.getElementById('crmPassword').value;
                 const data = await api('/api/auth/login', {
@@ -1307,7 +1847,7 @@
                 selectedId = null;
                 statusFilter.value = 'all';
                 syncBulkBar();
-                loadOrders();
+                loadOrders().then(() => refreshDetailPanel(true));
             });
         });
 
@@ -1326,7 +1866,13 @@
         });
 
         document.getElementById('bulkDoneBtn').addEventListener('click', () => bulkAction('done', getSelectedIds()));
-        document.getElementById('bulkDeleteBtn').addEventListener('click', () => bulkAction('delete', getSelectedIds()));
+        document.getElementById('bulkDeleteBtn').addEventListener('click', () => openDeleteModal(getSelectedIds()));
+
+        document.getElementById('deleteModalClose')?.addEventListener('click', closeDeleteModal);
+        document.getElementById('deleteModalConfirm')?.addEventListener('click', () => confirmDeleteOrders());
+        deleteModal?.addEventListener('click', (e) => {
+            if (e.target === deleteModal) closeDeleteModal();
+        });
 
         selectAllCb.addEventListener('change', () => {
             if (selectAllCb.checked) {
@@ -1335,29 +1881,47 @@
                 orders.forEach((o) => selectedIds.delete(o.id));
             }
             renderOrdersList();
+            syncBulkBar();
         });
 
         statusFilter.addEventListener('change', () => loadOrders());
+
+        const searchWrap = document.getElementById('searchWrap');
+        const searchToggleBtn = document.getElementById('searchToggleBtn');
+
+        function setSearchOpen(open) {
+            if (!searchWrap || !searchToggleBtn) return;
+            searchWrap.classList.toggle('is-open', open);
+            searchToggleBtn.classList.toggle('is-active', open);
+            if (open) {
+                searchInput.focus();
+            } else if (searchInput.value.trim()) {
+                searchInput.value = '';
+                loadOrders();
+            }
+        }
+
+        searchToggleBtn?.addEventListener('click', () => {
+            setSearchOpen(!searchWrap.classList.contains('is-open'));
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && searchWrap?.classList.contains('is-open')) {
+                setSearchOpen(false);
+            }
+        });
+
         searchInput.addEventListener('input', () => {
             clearTimeout(searchInput._t);
             searchInput._t = setTimeout(() => loadOrders(), 300);
         });
 
-        document.getElementById('soundToggleBtn')?.addEventListener('click', async () => {
-            await enableSound();
-            playNewOrderSound();
-            showToast(
-                soundFileOk
-                    ? 'Звук: neworder.mp3'
-                    : 'Сигнал (бип) — загрузите shop/neworder.mp3 на сервер'
-            );
+        soundUnlockBtn?.addEventListener('click', () => unlockOrderSound());
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) stopOrderSound();
         });
 
-        document.addEventListener('click', () => {
-            if (!soundEnabled) enableSound();
-        }, { once: true });
-
-        ensureSoundResolved();
         window.addEventListener('resize', () => {
             if (!isMobileLayout()) {
                 sidebar.classList.add('is-visible');

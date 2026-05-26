@@ -7,6 +7,7 @@
     <title>CRM — заказы | Emika's</title>
     <link rel="shortcut icon" href="../images/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="emika-guard.js"></script>
     <style>
         :root {
             --orange: #ff6a1a;
@@ -661,6 +662,18 @@
             return type === 'pickup' ? 'Самовывоз' : 'Доставка';
         }
 
+        function paymentLabel(method) {
+            return method === 'transfer' ? 'Оплата: перевод' : 'Оплата: на кассе';
+        }
+
+        function pickupTimeLabel(order) {
+            if (order.pickupTimeMode === 'hour') return 'Забрать: в течение часа';
+            if (order.pickupTimeMode === 'at' && order.pickupTimeAt) {
+                return `Забрать: к ${order.pickupTimeAt}`;
+            }
+            return 'Забрать: как можно скорее';
+        }
+
         function orderLocation(order) {
             return order.location === 'poselok' ? 'poselok' : 'eat-arena';
         }
@@ -843,7 +856,8 @@
                         <p>${esc(deliveryLabel(order.deliveryType))}</p>
                         <p>${esc(order.address || '—')}</p>
                         ${order.addressExtra ? `<p>${esc(order.addressExtra)}</p>` : ''}
-                        <p style="color:var(--muted);font-size:0.82rem;">Оплата на кассе или переводом</p>
+                        <p style="color:var(--muted);font-size:0.82rem;">${esc(paymentLabel(order.paymentMethod))}</p>
+                        <p style="color:var(--muted);font-size:0.82rem;">${esc(pickupTimeLabel(order))}</p>
                         ${order.promoCode ? `<p>Промокод: ${esc(order.promoCode)}</p>` : ''}
                     </div>
                 </div>

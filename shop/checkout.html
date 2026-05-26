@@ -6,6 +6,7 @@
   <title>Оформление заказа — Emika's</title>
   <link rel="shortcut icon" href="../images/favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="emika-guard.js"></script>
   <style>
     :root { --orange:#ff6a1a; --bg:#0d0d0f; --card:rgba(20,20,24,.92); --text:#f5f5f5; --muted:#c9c9ce; }
     * { box-sizing: border-box; }
@@ -23,9 +24,20 @@
     input, textarea, select { width:100%; border-radius:10px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.05); color:var(--text); padding:10px; font-family:inherit; }
     textarea { min-height:80px; resize:vertical; }
     .row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .type-row { display:flex; gap:10px; flex-wrap:wrap; margin:8px 0 4px; }
-    .type-row label { display:inline-flex; align-items:center; gap:8px; margin:0; font-weight:600; color:var(--text); cursor:pointer; }
+    .type-row { display:flex; gap:8px; flex-wrap:wrap; margin:4px 0 10px; }
+    .type-row label {
+      display:inline-flex; align-items:center; gap:6px; margin:0;
+      font-weight:600; color:var(--text); cursor:pointer;
+      padding:8px 12px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.04);
+      font-size:0.85rem;
+    }
+    .type-row label:has(input:checked) {
+      border-color:rgba(255,106,26,.55); background:rgba(255,106,26,.12);
+    }
     .type-row input { width:auto; }
+    #pickupTimeAt { margin-top:4px; max-width:160px; }
+    #pickupTimeAt[hidden] { display:none !important; }
     .actions { display:flex; gap:10px; margin-top:12px; }
     button, a.btn { padding:12px 16px; border-radius:999px; border:none; background:var(--orange); color:#fff; font-weight:700; cursor:pointer; text-decoration:none; font-family:inherit; }
     button:disabled { opacity:.6; cursor:not-allowed; }
@@ -51,12 +63,12 @@
       </section>
 
       <section class="card">
-        <h3>Самовывоз и контакты</h3>
+        <h3>Контакты</h3>
         <form id="checkoutForm" novalidate>
           <input type="hidden" name="deliveryType" value="pickup">
           <input type="hidden" name="pickupLocation" value="eat-arena">
 
-          <p class="pickup-point muted">Самовывоз: <strong>Eat Arena</strong><br><span style="font-size:0.85rem;">Мичуринский пр., 13А, стр. 1, Eat Arena, 2 этаж</span></p>
+          <p class="pickup-point muted"><strong>Eat Arena</strong> · самовывоз, 2 этаж</p>
 
           <div id="deliveryTypeRow" hidden>
             <label>Способ получения</label>
@@ -74,22 +86,33 @@
             <input id="addressExtra" type="text" placeholder="Необязательно">
           </div>
 
-          <label for="name">Имя *</label>
-          <input id="name" type="text" placeholder="Например: Артур">
-
           <div class="row">
             <div>
-              <label for="phone">Телефон *</label>
-              <input id="phone" type="tel" placeholder="+7 999 123 45 67">
+              <label for="name">Имя *</label>
+              <input id="name" type="text" placeholder="Имя" required>
             </div>
             <div>
-              <label for="email">Почта</label>
-              <input id="email" type="email" placeholder="you@email.com">
+              <label for="phone">Телефон *</label>
+              <input id="phone" type="tel" placeholder="+7 999 000 00 00" required>
             </div>
           </div>
 
+          <label>Оплата</label>
+          <div class="type-row">
+            <label><input type="radio" name="paymentMethod" value="transfer" checked> Перевод</label>
+            <label><input type="radio" name="paymentMethod" value="counter"> На кассе</label>
+          </div>
+
+          <label>Когда забрать</label>
+          <div class="type-row">
+            <label><input type="radio" name="pickupTime" value="asap" checked> Быстрее</label>
+            <label><input type="radio" name="pickupTime" value="hour"> В течение часа</label>
+            <label><input type="radio" name="pickupTime" value="at"> Ко времени</label>
+          </div>
+          <input type="time" id="pickupTimeAt" hidden>
+
           <label for="comment">Комментарий</label>
-          <textarea id="comment" placeholder="Время самовывоза, пожелания…"></textarea>
+          <textarea id="comment" rows="2" placeholder="Пожелания (необязательно)"></textarea>
 
           <p class="error" id="formError"></p>
           <div class="actions">
@@ -223,14 +246,8 @@
     }
 
     async function redirectToShopServerIfNeeded() {
-      if (!isLocalDevContext()) return false;
-
-      const needsRedirect =
-        location.protocol === 'file:' ||
-        DEV_PORTS.has(location.port) ||
-        location.pathname.includes('/shop/');
-
-      if (!needsRedirect) return false;
+      // Редирект на localhost только при открытии файла с диска (разработка)
+      if (location.protocol !== 'file:') return false;
 
       for (const origin of LOCAL_API_ORIGINS) {
         if (!(await pingApi(origin))) continue;
@@ -313,6 +330,19 @@
       return false;
     }
 
+    const pickupTimeAtInput = document.getElementById('pickupTimeAt');
+
+    function syncPickupTimeField() {
+      const mode = document.querySelector('input[name="pickupTime"]:checked')?.value || 'asap';
+      pickupTimeAtInput.hidden = mode !== 'at';
+      pickupTimeAtInput.required = mode === 'at';
+    }
+
+    document.querySelectorAll('input[name="pickupTime"]').forEach((el) => {
+      el.addEventListener('change', syncPickupTimeField);
+    });
+    syncPickupTimeField();
+
     (async () => {
       if (await redirectToShopServerIfNeeded()) return;
       refreshApiStatus();
@@ -328,26 +358,35 @@
       const address = '';
 
       if (!name || !phone) {
-        err.textContent = 'Введите имя и телефон.';
+        err.textContent = 'Укажите имя и телефон.';
         err.style.display = 'block';
         return;
       }
       if (!cart.length) return;
 
+      const pickupTimeMode = document.querySelector('input[name="pickupTime"]:checked')?.value || 'asap';
+      const pickupTimeAt = pickupTimeAtInput.value.trim();
+      if (pickupTimeMode === 'at' && !pickupTimeAt) {
+        err.textContent = 'Укажите время самовывоза.';
+        err.style.display = 'block';
+        return;
+      }
+
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'counter';
+
       submitBtn.disabled = true;
       submitBtn.textContent = 'Отправляем…';
 
       const payload = {
-        customer: {
-          name,
-          phone,
-          email: document.getElementById('email').value.trim()
-        },
+        customer: { name, phone, email: '' },
         deliveryType,
         location: 'eat-arena',
         address: PICKUP_ADDRESS,
-        addressExtra: document.getElementById('addressExtra').value.trim(),
+        addressExtra: document.getElementById('addressExtra')?.value.trim() || '',
         comment: document.getElementById('comment').value.trim(),
+        paymentMethod,
+        pickupTimeMode,
+        pickupTimeAt: pickupTimeMode === 'at' ? pickupTimeAt : '',
         promoCode: meta.promoCode || '',
         items: cart,
         total
@@ -375,7 +414,10 @@
         localStorage.setItem('emika-last-order', JSON.stringify({
           orderNumber: data.orderNumber,
           id: data.id,
-          total
+          total,
+          paymentMethod,
+          pickupTimeMode,
+          pickupTimeAt: pickupTimeMode === 'at' ? pickupTimeAt : ''
         }));
 
         window.location.href = `order-success.html?order=${encodeURIComponent(data.orderNumber)}`;

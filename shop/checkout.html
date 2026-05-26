@@ -4,60 +4,370 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Оформление заказа — Emika's</title>
-  <link rel="shortcut icon" href="../images/favicon.ico">
+  <link rel="shortcut icon" href="/images/favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      const saved = localStorage.getItem('emika-theme');
+      document.documentElement.setAttribute('data-theme', saved === 'light' || saved === 'dark' ? saved : 'dark');
+    })();
+  </script>
+  <script>
+    (function () {
+      var fb = 'https://chickenjokey.onrender.com';
+      if (typeof window.emikaApiUrl !== 'function') {
+        window.emikaApiUrl = function (p) { return new URL(p, fb).href; };
+        window.emikaApiReady = Promise.resolve(fb);
+      }
+    })();
+  </script>
   <script src="emika-guard.js"></script>
+  <script src="emika-api.js"></script>
   <style>
-    :root { --orange:#ff6a1a; --bg:#0d0d0f; --card:rgba(20,20,24,.92); --text:#f5f5f5; --muted:#c9c9ce; }
+    :root {
+      --orange: #ff6a1a;
+      --orange-dark: #e2550f;
+      --bg: #0d0d0f;
+      --card: rgba(20, 20, 24, 0.92);
+      --text: #f5f5f5;
+      --muted: #c9c9ce;
+      --border: rgba(255, 255, 255, 0.1);
+      --input-bg: rgba(255, 255, 255, 0.06);
+      --input-border: rgba(255, 255, 255, 0.16);
+      --dropdown-bg: #1a1b22;
+      --dropdown-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+      --item-hover: rgba(255, 106, 26, 0.14);
+      --slot-h: 40px;
+      --slots-visible: 5;
+    }
+
+    html[data-theme="light"] {
+      --bg: #f6f6f7;
+      --card: rgba(255, 255, 255, 0.96);
+      --text: #121316;
+      --muted: #545863;
+      --border: rgba(0, 0, 0, 0.1);
+      --input-bg: #ffffff;
+      --input-border: rgba(0, 0, 0, 0.14);
+      --dropdown-bg: #ffffff;
+      --dropdown-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+      --item-hover: rgba(255, 106, 26, 0.12);
+    }
+
     * { box-sizing: border-box; }
-    body { margin:0; background:var(--bg); color:var(--text); font-family:'Montserrat', sans-serif; }
-    .wrap { max-width:980px; margin:0 auto; padding:22px 14px 40px; }
-    h1 { margin:0 0 14px; font-size:1.5rem; }
-    .grid { display:grid; grid-template-columns:1.2fr .8fr; gap:14px; }
-    .card { background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:14px; }
-    .items { display:grid; gap:10px; }
-    .item { display:grid; grid-template-columns:64px 1fr auto; gap:10px; align-items:center; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:8px; }
-    .item img { width:64px; height:64px; object-fit:contain; border-radius:8px; background:rgba(255,255,255,.04); }
-    .muted { color:var(--muted); font-size:.9rem; }
-    .total { font-size:1.2rem; font-weight:700; color:var(--orange); margin-top:10px; }
-    label { display:block; font-size:.88rem; margin:10px 0 6px; color:var(--muted); font-weight:600; }
-    input, textarea, select { width:100%; border-radius:10px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.05); color:var(--text); padding:10px; font-family:inherit; }
-    textarea { min-height:80px; resize:vertical; }
-    .row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .type-row { display:flex; gap:8px; flex-wrap:wrap; margin:4px 0 10px; }
-    .type-row label {
-      display:inline-flex; align-items:center; gap:6px; margin:0;
-      font-weight:600; color:var(--text); cursor:pointer;
-      padding:8px 12px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.04);
-      font-size:0.85rem;
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
     }
-    .type-row label:has(input:checked) {
-      border-color:rgba(255,106,26,.55); background:rgba(255,106,26,.12);
+
+    html[data-theme="dark"] body {
+      background: #0d0d0f url('/images/background.jpg') center top / cover no-repeat fixed;
     }
-    .type-row input { width:auto; }
-    #pickupTimeAt { margin-top:4px; max-width:160px; }
-    #pickupTimeAt[hidden] { display:none !important; }
-    .actions { display:flex; gap:10px; margin-top:12px; }
-    button, a.btn { padding:12px 16px; border-radius:999px; border:none; background:var(--orange); color:#fff; font-weight:700; cursor:pointer; text-decoration:none; font-family:inherit; }
-    button:disabled { opacity:.6; cursor:not-allowed; }
-    .back-to-menu { display:inline-block; margin-bottom:16px; color:var(--orange); font-weight:700; text-decoration:none; font-size:.95rem; }
-    .error { color:#ff8080; font-size:.88rem; display:none; margin-top:8px; }
-    #addressBlock[hidden], #deliveryTypeRow[hidden] { display:none !important; }
-    .pickup-point { margin:0 0 12px; padding:10px 12px; border-radius:10px; background:rgba(255,106,26,.08); border:1px solid rgba(255,106,26,.25); }
-    .pickup-point strong { color:var(--orange); }
-    @media (max-width:860px) { .grid { grid-template-columns:1fr; } }
-    @media (max-width:520px) { .row { grid-template-columns:1fr; } .actions { flex-direction:column; } .actions button { width:100%; } }
+
+    html[data-theme="dark"] body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.72));
+      z-index: 0;
+    }
+
+    html[data-theme="light"] body::before { display: none; }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 16px 12px 32px;
+    }
+
+    h1 { margin: 0 0 10px; font-size: 1.35rem; }
+    .grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 12px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      backdrop-filter: blur(8px);
+    }
+    .card h3 { margin: 0 0 10px; font-size: 1rem; }
+    .items { display: grid; gap: 8px; }
+    .cart-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .cart-card-head h3 { margin: 0; }
+    .btn-clear-cart {
+      border: 1px solid var(--input-border);
+      background: transparent;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-clear-cart:hover:not(:disabled) {
+      color: #e85c5c;
+      border-color: rgba(232, 92, 92, 0.45);
+    }
+    .btn-clear-cart:disabled { opacity: 0.45; cursor: not-allowed; }
+    .item {
+      display: grid;
+      grid-template-columns: 52px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 6px;
+    }
+    .item img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: var(--input-bg);
+    }
+    .item-main { min-width: 0; font-size: 0.9rem; line-height: 1.35; }
+    .item-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+    .qty {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .qty button {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0;
+    }
+    .qty button:hover { border-color: rgba(255, 106, 26, 0.45); }
+    .qty-input {
+      width: 40px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text);
+      text-align: center;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0 2px;
+      -moz-appearance: textfield;
+    }
+    .qty-input::-webkit-outer-spin-button,
+    .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .item-remove {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 107, 107, 0.35);
+      background: rgba(255, 107, 107, 0.1);
+      color: #ff8080;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0;
+    }
+    .item-remove:hover {
+      background: rgba(255, 107, 107, 0.2);
+      border-color: rgba(255, 107, 107, 0.55);
+    }
+    html[data-theme="light"] .item-remove {
+      color: #c62828;
+      border-color: rgba(198, 40, 40, 0.35);
+      background: rgba(198, 40, 40, 0.08);
+    }
+    .muted { color: var(--muted); font-size: 0.85rem; }
+    .total { font-size: 1.1rem; font-weight: 700; color: var(--orange); margin-top: 8px; }
+    .field { margin-bottom: 10px; }
+    .field > label {
+      display: block;
+      font-size: 0.8rem;
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    input, textarea {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text);
+      padding: 8px 10px;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+    input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.85; }
+    textarea { min-height: 56px; resize: vertical; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .inline-choices { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+    .inline-choices label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .inline-choices input { width: auto; margin: 0; accent-color: var(--orange); }
+    .actions { margin-top: 10px; }
+  button[type="submit"] {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 999px;
+      border: none;
+      background: var(--orange);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
+    .back-to-menu {
+      display: inline-block;
+      margin-bottom: 12px;
+      color: var(--orange);
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .error { color: #e85c5c; font-size: 0.85rem; display: none; margin-top: 6px; }
+    html[data-theme="light"] .error { color: #c62828; }
+    .pickup-point {
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(255, 106, 26, 0.08);
+      border: 1px solid rgba(255, 106, 26, 0.22);
+      font-size: 0.85rem;
+    }
+    .pickup-point strong { color: var(--orange); }
+
+    /* Custom time dropdown */
+    .pickup-select { position: relative; }
+    .pickup-select__trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 11px;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+    }
+    .pickup-select__trigger:hover { border-color: rgba(255, 106, 26, 0.45); }
+    .pickup-select.is-open .pickup-select__trigger {
+      border-color: rgba(255, 106, 26, 0.65);
+      box-shadow: 0 0 0 2px rgba(255, 106, 26, 0.15);
+    }
+    .pickup-select__chevron {
+      flex-shrink: 0;
+      font-size: 0.65rem;
+      color: var(--muted);
+      transition: transform 0.2s;
+    }
+    .pickup-select.is-open .pickup-select__chevron { transform: rotate(180deg); }
+    .pickup-select__panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 4px);
+      z-index: 30;
+      display: none;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      background: var(--dropdown-bg);
+      box-shadow: var(--dropdown-shadow);
+      overflow: hidden;
+    }
+    .pickup-select.is-open .pickup-select__panel { display: block; }
+    .pickup-select__list {
+      list-style: none;
+      margin: 0;
+      padding: 4px;
+      max-height: calc(var(--slot-h) * var(--slots-visible));
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    .pickup-select__list::-webkit-scrollbar { width: 6px; }
+    .pickup-select__list::-webkit-scrollbar-thumb {
+      background: rgba(255, 106, 26, 0.35);
+      border-radius: 999px;
+    }
+    .pickup-select__option {
+      min-height: var(--slot-h);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+    .pickup-select__option:hover,
+    .pickup-select__option:focus-visible {
+      background: var(--item-hover);
+      outline: none;
+    }
+    .pickup-select__option.is-selected {
+      color: var(--orange);
+      font-weight: 600;
+      background: var(--item-hover);
+    }
+    .pickup-select.is-disabled .pickup-select__trigger {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <div class="wrap">
     <a class="back-to-menu" href="./">&lt; назад в меню</a>
     <h1>Оформление заказа</h1>
-    <p id="apiStatus" class="muted" style="margin:0 0 12px;font-size:0.88rem;"></p>
+    <p id="apiStatus" class="muted" style="margin:0 0 8px;font-size:0.85rem;" hidden></p>
     <div class="grid">
       <section class="card">
-        <h3>Ваш заказ</h3>
+        <div class="cart-card-head">
+          <h3>Ваш заказ</h3>
+          <button type="button" class="btn-clear-cart" id="clearCartBtn" disabled>Очистить</button>
+        </div>
         <div class="items" id="checkoutItems"></div>
         <div class="total" id="checkoutTotal">0 ₽</div>
       </section>
@@ -70,49 +380,43 @@
 
           <p class="pickup-point muted"><strong>Eat Arena</strong> · самовывоз, 2 этаж</p>
 
-          <div id="deliveryTypeRow" hidden>
-            <label>Способ получения</label>
-            <div class="type-row">
-              <label><input type="radio" name="deliveryTypeVisible" value="delivery"> Доставка</label>
-              <label><input type="radio" name="deliveryTypeVisible" value="pickup" checked> Самовывоз</label>
-            </div>
-          </div>
-
-          <div id="addressBlock" hidden>
-            <label for="address">Адрес доставки *</label>
-            <input id="address" type="text" placeholder="Улица, дом, квартира">
-
-            <label for="addressExtra">Подъезд, этаж, домофон</label>
-            <input id="addressExtra" type="text" placeholder="Необязательно">
-          </div>
-
           <div class="row">
-            <div>
+            <div class="field">
               <label for="name">Имя *</label>
               <input id="name" type="text" placeholder="Имя" required>
             </div>
-            <div>
+            <div class="field">
               <label for="phone">Телефон *</label>
               <input id="phone" type="tel" placeholder="+7 999 000 00 00" required>
             </div>
           </div>
 
-          <label>Оплата</label>
-          <div class="type-row">
-            <label><input type="radio" name="paymentMethod" value="transfer" checked> Перевод</label>
-            <label><input type="radio" name="paymentMethod" value="counter"> На кассе</label>
+          <div class="field">
+            <label>Оплата</label>
+            <div class="inline-choices">
+              <label><input type="radio" name="paymentMethod" value="transfer" checked> Перевод</label>
+              <label><input type="radio" name="paymentMethod" value="counter"> На кассе</label>
+            </div>
           </div>
 
-          <label>Когда забрать</label>
-          <div class="type-row">
-            <label><input type="radio" name="pickupTime" value="asap" checked> Быстрее</label>
-            <label><input type="radio" name="pickupTime" value="hour"> В течение часа</label>
-            <label><input type="radio" name="pickupTime" value="at"> Ко времени</label>
+          <div class="field">
+            <label id="pickupTimeLabel">Когда забрать *</label>
+            <div class="pickup-select" id="pickupTimePicker">
+              <button type="button" class="pickup-select__trigger" id="pickupTimeTrigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="pickupTimeLabel">
+                <span id="pickupTimeValue">Как можно скорее</span>
+                <span class="pickup-select__chevron" aria-hidden="true">▼</span>
+              </button>
+              <div class="pickup-select__panel" id="pickupTimePanel">
+                <ul class="pickup-select__list" id="pickupTimeList" role="listbox" tabindex="-1"></ul>
+              </div>
+              <input type="hidden" id="pickupTime" name="pickupTime" value="asap">
+            </div>
           </div>
-          <input type="time" id="pickupTimeAt" hidden>
 
-          <label for="comment">Комментарий</label>
-          <textarea id="comment" rows="2" placeholder="Пожелания (необязательно)"></textarea>
+          <div class="field">
+            <label for="comment">Комментарий</label>
+            <textarea id="comment" rows="2" placeholder="Пожелания (необязательно)"></textarea>
+          </div>
 
           <p class="error" id="formError"></p>
           <div class="actions">
@@ -124,12 +428,63 @@
   </div>
 
   <script>
+    const EMIKA_API_FALLBACK = 'https://chickenjokey.onrender.com';
+    let emikaApiOrigin = location.origin;
+
+    async function emikaPingApi(base) {
+      try {
+        const res = await fetch(new URL('/api/health', base).href, { cache: 'no-store' });
+        if (!res.ok) return false;
+        const data = await res.json();
+        return Boolean(data?.ok);
+      } catch {
+        return false;
+      }
+    }
+
+    async function emikaResolveApiOrigin() {
+      const host = location.hostname;
+      if (host === 'localhost' || host === '127.0.0.1') return location.origin;
+      if (await emikaPingApi(location.origin)) return location.origin;
+      if (await emikaPingApi(EMIKA_API_FALLBACK)) return EMIKA_API_FALLBACK;
+      return EMIKA_API_FALLBACK;
+    }
+
+    const emikaApiReady = emikaResolveApiOrigin().then((origin) => {
+      emikaApiOrigin = origin;
+      return origin;
+    });
+
+    function emikaApiUrl(path) {
+      return new URL(path, emikaApiOrigin).href;
+    }
+
+    window.emikaApiReady = emikaApiReady;
+    window.emikaApiUrl = emikaApiUrl;
+
+    const MSK_TZ = 'Europe/Moscow';
+    const MSK_OPEN_MIN = 11 * 60;
+    const MSK_CLOSE_MIN = 22 * 60;
+    const MSK_STEP_MIN = 15;
+    const MSK_BUFFER_MIN = 30;
+
+    const CART_STORAGE_KEY = 'emika-cart';
+    const CHECKOUT_CART_KEY = 'emika-checkout-cart';
+    const CART_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
     const itemsWrap = document.getElementById('checkoutItems');
     const totalEl = document.getElementById('checkoutTotal');
     const form = document.getElementById('checkoutForm');
     const err = document.getElementById('formError');
     const submitBtn = document.getElementById('submitBtn');
-    const addressBlock = document.getElementById('addressBlock');
+    const clearCartBtn = document.getElementById('clearCartBtn');
+
+    const pickupPicker = document.getElementById('pickupTimePicker');
+    const pickupTrigger = document.getElementById('pickupTimeTrigger');
+    const pickupPanel = document.getElementById('pickupTimePanel');
+    const pickupList = document.getElementById('pickupTimeList');
+    const pickupValueEl = document.getElementById('pickupTimeValue');
+    const pickupHidden = document.getElementById('pickupTime');
 
     const prefContactRaw = localStorage.getItem('emika-checkout-contact');
     const metaRaw = localStorage.getItem('emika-checkout-meta');
@@ -147,63 +502,278 @@
       try { meta = JSON.parse(metaRaw) || {}; } catch (e) {}
     }
 
+    function getMoscowMinutes() {
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: MSK_TZ,
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).formatToParts(new Date());
+      const hour = Number(parts.find((p) => p.type === 'hour')?.value || 0);
+      const minute = Number(parts.find((p) => p.type === 'minute')?.value || 0);
+      return hour * 60 + minute;
+    }
+
+    function formatTime(totalMinutes) {
+      const h = Math.floor(totalMinutes / 60);
+      const m = totalMinutes % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    function roundUpToStep(minutes) {
+      return Math.ceil(minutes / MSK_STEP_MIN) * MSK_STEP_MIN;
+    }
+
+    function buildPickupTimeOptions() {
+      const earliest = roundUpToStep(getMoscowMinutes() + MSK_BUFFER_MIN);
+      const start = Math.max(earliest, MSK_OPEN_MIN);
+      const options = [{ value: 'asap', label: 'Как можно скорее' }];
+
+      for (let t = start; t <= MSK_CLOSE_MIN; t += MSK_STEP_MIN) {
+        options.push({ value: formatTime(t), label: formatTime(t) });
+      }
+
+      return options;
+    }
+
+    let pickupOptions = [];
+
+    function setPickupSelection(value, label) {
+      pickupHidden.value = value;
+      pickupValueEl.textContent = label;
+      pickupList.querySelectorAll('.pickup-select__option').forEach((el) => {
+        el.classList.toggle('is-selected', el.dataset.value === value);
+      });
+    }
+
+    function closePickupPanel() {
+      pickupPicker.classList.remove('is-open');
+      pickupTrigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function openPickupPanel() {
+      if (pickupPicker.classList.contains('is-disabled')) return;
+      pickupPicker.classList.add('is-open');
+      pickupTrigger.setAttribute('aria-expanded', 'true');
+      const selected = pickupList.querySelector('.pickup-select__option.is-selected');
+      if (selected) {
+        selected.scrollIntoView({ block: 'nearest' });
+      }
+    }
+
+    function fillPickupTimePicker() {
+      pickupOptions = buildPickupTimeOptions();
+      pickupList.innerHTML = '';
+
+      if (pickupOptions.length === 1) {
+        pickupPicker.classList.add('is-disabled');
+        setPickupSelection('', 'Сегодня приём заказов закончен');
+        submitBtn.disabled = true;
+        return;
+      }
+
+      pickupPicker.classList.remove('is-disabled');
+      pickupOptions.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = 'pickup-select__option';
+        li.dataset.value = item.value;
+        li.textContent = item.label;
+        li.setAttribute('role', 'option');
+        li.tabIndex = 0;
+        if (index === 0) li.classList.add('is-selected');
+        li.addEventListener('click', () => {
+          setPickupSelection(item.value, item.label);
+          closePickupPanel();
+        });
+        pickupList.appendChild(li);
+      });
+
+      setPickupSelection(pickupOptions[0].value, pickupOptions[0].label);
+    }
+
+    pickupTrigger.addEventListener('click', () => {
+      if (pickupPicker.classList.contains('is-open')) {
+        closePickupPanel();
+      } else {
+        openPickupPanel();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!pickupPicker.contains(e.target)) closePickupPanel();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePickupPanel();
+    });
+
+    fillPickupTimePicker();
+
+    function normalizeCartItem(item) {
+      return {
+        id: String(item?.id || ''),
+        titleRu: item?.titleRu || '',
+        titleEn: item?.titleEn || '',
+        price: Number(item?.price) || 0,
+        qty: Math.max(1, Math.min(99, Number(item?.qty) || 1)),
+        image: item?.image || '/images/logo.png'
+      };
+    }
+
     function loadCheckoutCart() {
       try {
-        const checkoutCart = JSON.parse(localStorage.getItem('emika-checkout-cart') || '[]');
-        if (Array.isArray(checkoutCart) && checkoutCart.length) return checkoutCart;
+        const checkoutCart = JSON.parse(localStorage.getItem(CHECKOUT_CART_KEY) || '[]');
+        if (Array.isArray(checkoutCart) && checkoutCart.length) {
+          return checkoutCart.map(normalizeCartItem);
+        }
       } catch (_) {}
 
       try {
-        const raw = localStorage.getItem('emika-cart');
+        const raw = localStorage.getItem(CART_STORAGE_KEY);
         const data = JSON.parse(raw || '{}');
         const items = Array.isArray(data?.items) ? data.items : [];
         const savedAt = Number(data?.savedAt || 0);
-        const CART_TTL_MS = 7 * 24 * 60 * 60 * 1000;
         if (!items.length) return [];
         if (savedAt && Date.now() - savedAt > CART_TTL_MS) return [];
-        return items.map((item) => ({
-          id: item.id,
-          titleRu: item.titleRu,
-          titleEn: item.titleEn,
-          price: Number(item.price) || 0,
-          qty: Number(item.qty) || 1,
-          image: item.image || '../images/logo.png'
-        }));
+        return items.map(normalizeCartItem);
       } catch (_) {
         return [];
       }
     }
 
-    const cart = loadCheckoutCart();
-    let total = 0;
+    let cart = loadCheckoutCart();
 
-    if (!cart.length) {
-      itemsWrap.innerHTML = '<p class="muted">Корзина пуста. <a href="./" style="color:var(--orange)">Вернитесь в меню</a>.</p>';
-      submitBtn.disabled = true;
-    } else {
-      cart.forEach((item) => {
+    function getCartTotal() {
+      return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+    }
+
+    function saveCart() {
+      localStorage.setItem(CHECKOUT_CART_KEY, JSON.stringify(cart));
+      if (cart.length) {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({
+          savedAt: Date.now(),
+          items: cart.map((item) => ({
+            id: item.id,
+            titleRu: item.titleRu,
+            titleEn: item.titleEn,
+            price: item.price,
+            qty: item.qty,
+            image: item.image
+          }))
+        }));
+      } else {
+        localStorage.removeItem(CART_STORAGE_KEY);
+        localStorage.removeItem(CHECKOUT_CART_KEY);
+      }
+    }
+
+    function setItemQty(index, nextQty) {
+      const item = cart[index];
+      if (!item) return;
+      const n = Math.floor(Number(nextQty));
+      if (!Number.isFinite(n) || n < 1) {
+        removeItem(index);
+        return;
+      }
+      item.qty = Math.min(99, n);
+      saveCart();
+      renderCart();
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      saveCart();
+      renderCart();
+    }
+
+    function clearCart() {
+      if (!cart.length) return;
+      if (!confirm('Очистить корзину?')) return;
+      cart = [];
+      saveCart();
+      renderCart();
+    }
+
+    function renderCart() {
+      itemsWrap.innerHTML = '';
+      const total = getCartTotal();
+      totalEl.textContent = `${total} ₽`;
+      clearCartBtn.disabled = !cart.length;
+
+      if (!cart.length) {
+        itemsWrap.innerHTML = '<p class="muted">Корзина пуста. <a href="./" style="color:var(--orange)">Вернитесь в меню</a>.</p>';
+        submitBtn.disabled = true;
+        return;
+      }
+
+      submitBtn.disabled = false;
+      cart.forEach((item, index) => {
         const sum = item.price * item.qty;
-        total += sum;
         const el = document.createElement('div');
         el.className = 'item';
+        el.dataset.index = String(index);
         el.innerHTML = `
           <img src="${item.image}" alt="">
-          <div>
+          <div class="item-main">
             <div>${item.titleRu || item.titleEn}</div>
-            <div class="muted">${item.qty} × ${item.price} ₽</div>
+            <div class="muted">${item.price} ₽ × ${item.qty} = ${sum} ₽</div>
           </div>
-          <strong>${sum} ₽</strong>
+          <div class="item-actions">
+            <div class="qty">
+              <button type="button" data-action="minus" aria-label="Меньше">−</button>
+              <input type="number" class="qty-input" data-action="qty" min="1" max="99" step="1" value="${item.qty}" inputmode="numeric" aria-label="Количество">
+              <button type="button" data-action="plus" aria-label="Больше">+</button>
+            </div>
+            <button type="button" class="item-remove" data-action="remove" aria-label="Удалить" title="Удалить">×</button>
+          </div>
         `;
         itemsWrap.appendChild(el);
       });
     }
-    totalEl.textContent = `${total} ₽`;
+
+    itemsWrap.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const row = e.target.closest('.item');
+      if (!row) return;
+      const index = Number(row.dataset.index);
+      const item = cart[index];
+      if (!item) return;
+      const action = btn.dataset.action;
+
+      if (action === 'plus') {
+        setItemQty(index, item.qty + 1);
+        return;
+      }
+      if (action === 'minus') {
+        if (item.qty > 1) setItemQty(index, item.qty - 1);
+        else removeItem(index);
+        return;
+      }
+      if (action === 'remove') {
+        removeItem(index);
+      }
+    });
+
+    itemsWrap.addEventListener('change', (e) => {
+      const input = e.target.closest('.qty-input');
+      if (!input) return;
+      const row = input.closest('.item');
+      if (!row) return;
+      setItemQty(Number(row.dataset.index), input.value);
+    });
+
+    itemsWrap.addEventListener('keydown', (e) => {
+      if (e.target.matches('.qty-input') && e.key === 'Enter') {
+        e.target.blur();
+      }
+    });
+
+    clearCartBtn.addEventListener('click', clearCart);
+
+    renderCart();
 
     const PICKUP_ADDRESS = 'Eat Arena, Мичуринский пр., 13А, стр. 1 — самовывоз';
-
-    function apiUrl(path) {
-      return new URL(path, location.origin).href;
-    }
 
     function orderServerErrorMessage() {
       return 'Не удалось отправить заказ. Обновите страницу или позвоните +7 977 838 98 98.';
@@ -218,12 +788,10 @@
       }
     }
 
-    const apiStatusEl = document.getElementById('apiStatus');
-    if (apiStatusEl) apiStatusEl.hidden = true;
-
     async function checkApi() {
       try {
-        const res = await fetch(apiUrl('/api/health'), { cache: 'no-store' });
+        await emikaApiReady;
+        const res = await fetch(emikaApiUrl('/api/health'), { cache: 'no-store' });
         if (!res.ok) return false;
         const data = await res.json();
         return Boolean(data?.ok);
@@ -232,18 +800,12 @@
       }
     }
 
-    const pickupTimeAtInput = document.getElementById('pickupTimeAt');
-
-    function syncPickupTimeField() {
-      const mode = document.querySelector('input[name="pickupTime"]:checked')?.value || 'asap';
-      pickupTimeAtInput.hidden = mode !== 'at';
-      pickupTimeAtInput.required = mode === 'at';
+    function readPickupTime() {
+      const value = pickupHidden.value;
+      if (!value) return { mode: '', at: '' };
+      if (value === 'asap') return { mode: 'asap', at: '' };
+      return { mode: 'at', at: value };
     }
-
-    document.querySelectorAll('input[name="pickupTime"]').forEach((el) => {
-      el.addEventListener('change', syncPickupTimeField);
-    });
-    syncPickupTimeField();
 
     try {
       sessionStorage.removeItem('emika-api-base');
@@ -256,7 +818,6 @@
       const name = document.getElementById('name').value.trim();
       const phone = document.getElementById('phone').value.trim();
       const deliveryType = 'pickup';
-      const address = '';
 
       if (!name || !phone) {
         err.textContent = 'Укажите имя и телефон.';
@@ -265,10 +826,9 @@
       }
       if (!cart.length) return;
 
-      const pickupTimeMode = document.querySelector('input[name="pickupTime"]:checked')?.value || 'asap';
-      const pickupTimeAt = pickupTimeAtInput.value.trim();
-      if (pickupTimeMode === 'at' && !pickupTimeAt) {
-        err.textContent = 'Укажите время самовывоза.';
+      const { mode: pickupTimeMode, at: pickupTimeAt } = readPickupTime();
+      if (!pickupTimeMode) {
+        err.textContent = 'Сегодня приём заказов закончен. Позвоните +7 977 838 98 98.';
         err.style.display = 'block';
         return;
       }
@@ -283,22 +843,23 @@
         deliveryType,
         location: 'eat-arena',
         address: PICKUP_ADDRESS,
-        addressExtra: document.getElementById('addressExtra')?.value.trim() || '',
+        addressExtra: '',
         comment: document.getElementById('comment').value.trim(),
         paymentMethod,
         pickupTimeMode,
-        pickupTimeAt: pickupTimeMode === 'at' ? pickupTimeAt : '',
+        pickupTimeAt,
         promoCode: meta.promoCode || '',
         items: cart,
-        total
+        total: getCartTotal()
       };
 
       try {
+        await emikaApiReady;
         if (!(await checkApi())) {
           throw new Error(orderServerErrorMessage());
         }
 
-        const res = await fetch(apiUrl('/api/orders'), {
+        const res = await fetch(emikaApiUrl('/api/orders'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -313,10 +874,10 @@
         localStorage.setItem('emika-last-order', JSON.stringify({
           orderNumber: data.orderNumber,
           id: data.id,
-          total,
+          total: getCartTotal(),
           paymentMethod,
           pickupTimeMode,
-          pickupTimeAt: pickupTimeMode === 'at' ? pickupTimeAt : ''
+          pickupTimeAt
         }));
 
         window.location.href = `order-success.html?order=${encodeURIComponent(data.orderNumber)}`;

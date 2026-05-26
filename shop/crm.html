@@ -7,6 +7,15 @@
     <title>CRM — заказы | Emika's</title>
     <link rel="shortcut icon" href="/images/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        (function () {
+            var fb = 'https://chickenjokey.onrender.com';
+            if (typeof window.emikaApiUrl !== 'function') {
+                window.emikaApiUrl = function (p) { return new URL(p, fb).href; };
+                window.emikaApiReady = Promise.resolve(fb);
+            }
+        })();
+    </script>
     <script src="emika-guard.js"></script>
     <script src="emika-api.js"></script>
     <style>
@@ -534,6 +543,40 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        const EMIKA_API_FALLBACK = 'https://chickenjokey.onrender.com';
+        let emikaApiOrigin = location.origin;
+
+        async function emikaPingApi(base) {
+            try {
+                const res = await fetch(new URL('/api/health', base).href, { cache: 'no-store' });
+                if (!res.ok) return false;
+                const data = await res.json();
+                return Boolean(data?.ok);
+            } catch {
+                return false;
+            }
+        }
+
+        async function emikaResolveApiOrigin() {
+            const host = location.hostname;
+            if (host === 'localhost' || host === '127.0.0.1') return location.origin;
+            if (await emikaPingApi(location.origin)) return location.origin;
+            if (await emikaPingApi(EMIKA_API_FALLBACK)) return EMIKA_API_FALLBACK;
+            return EMIKA_API_FALLBACK;
+        }
+
+        const emikaApiReady = emikaResolveApiOrigin().then((origin) => {
+            emikaApiOrigin = origin;
+            return origin;
+        });
+
+        function emikaApiUrl(path) {
+            return new URL(path, emikaApiOrigin).href;
+        }
+
+        window.emikaApiReady = emikaApiReady;
+        window.emikaApiUrl = emikaApiUrl;
+
         const TOKEN_KEY = 'emika-crm-token';
         const POLL_MS = 4000;
         const STATUS_LABELS = {
@@ -751,7 +794,7 @@
             const token = getToken();
             if (token) headers.Authorization = `Bearer ${token}`;
 
-            await window.emikaApiReady;
+            await emikaApiReady;
             const url = path.startsWith('http') ? path : emikaApiUrl(path);
             const res = await fetch(url, { ...options, headers });
             const data = await res.json().catch(() => ({}));

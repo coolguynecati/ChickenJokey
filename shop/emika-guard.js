@@ -1,6 +1,14 @@
 (function () {
     'use strict';
 
+    const FALLBACK_API = 'https://chickenjokey.onrender.com';
+    if (typeof window.emikaApiUrl !== 'function') {
+        window.emikaApiUrl = function (path) {
+            return new URL(path, FALLBACK_API).href;
+        };
+        window.emikaApiReady = window.emikaApiReady || Promise.resolve(FALLBACK_API);
+    }
+
     const host = location.hostname;
     const isLocal = host === 'localhost' || host === '127.0.0.1';
     const LOCAL_URL = /localhost|127\.0\.0\.1/i;

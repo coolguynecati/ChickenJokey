@@ -271,7 +271,9 @@ app.use(express.static(SHOP_ROOT));
 
 app.listen(PORT, () => {
     store.readOrders();
-    console.log(`Emika shop: http://localhost:${PORT}`);
-    console.log(`CRM: http://localhost:${PORT}/crm.html`);
+    const publicUrl = process.env.RENDER_EXTERNAL_URL || '';
+    console.log(`Emika shop listening on port ${PORT}`);
+    if (publicUrl) console.log(`Public URL: ${publicUrl}`);
+    console.log('CRM path: /crm.html');
     console.log(`CRM password: ${CRM_AUTH.source}, length ${CRM_PASSWORD.length}`);
 });

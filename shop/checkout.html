@@ -201,70 +201,12 @@
 
     const PICKUP_ADDRESS = 'Eat Arena, Мичуринский пр., 13А, стр. 1 — самовывоз';
 
-    const DEV_PORTS = new Set(['5500', '5501', '8080', '5173', '4173', '8888']);
-    const LOCAL_API_ORIGINS = ['http://127.0.0.1:3000', 'http://localhost:3000'];
-
-    function isLocalHostname() {
-      return location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-    }
-
-    function isLocalDevContext() {
-      return (
-        location.protocol === 'file:' ||
-        DEV_PORTS.has(location.port) ||
-        isLocalHostname()
-      );
-    }
-
-    function isOnlineSite() {
-      return location.protocol.startsWith('http') && !isLocalHostname();
-    }
-
-    function clearStaleApiBaseCache() {
-      const cached = sessionStorage.getItem('emika-api-base');
-      if (!cached) return;
-      if (isOnlineSite() && (cached.includes('localhost') || cached.includes('127.0.0.1'))) {
-        sessionStorage.removeItem('emika-api-base');
-      }
-    }
-
-    async function pingApi(base) {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 4000);
-      try {
-        const res = await fetch(`${base}/api/health`, { signal: ctrl.signal });
-        clearTimeout(timer);
-        if (!res.ok) return false;
-        const ct = (res.headers.get('content-type') || '').toLowerCase();
-        if (!ct.includes('json')) return false;
-        const data = await res.json();
-        return Boolean(data?.ok);
-      } catch {
-        clearTimeout(timer);
-        return false;
-      }
-    }
-
-    async function redirectToShopServerIfNeeded() {
-      // Редирект на localhost только при открытии файла с диска (разработка)
-      if (location.protocol !== 'file:') return false;
-
-      for (const origin of LOCAL_API_ORIGINS) {
-        if (!(await pingApi(origin))) continue;
-        const path = location.protocol === 'file:'
-          ? '/checkout.html'
-          : (location.pathname.match(/checkout\.html$/) ? '/checkout.html' : '/');
-        window.location.replace(`${origin}${path}${location.search}${location.hash}`);
-        return true;
-      }
-      return false;
+    function apiUrl(path) {
+      return new URL(path, location.origin).href;
     }
 
     function orderServerErrorMessage() {
-      if (isOnlineSite()) {
-        return 'Не удалось связаться с сервером. Обновите страницу или позвоните +7 977 838 98 98.';
-      }
-      return 'Сервер заказов не отвечает. Для разработки запустите start-shop.bat (папка shop).';
+      return 'Не удалось отправить заказ. Обновите страницу или позвоните +7 977 838 98 98.';
     }
 
     async function parseJsonResponse(res) {
@@ -277,57 +219,17 @@
     }
 
     const apiStatusEl = document.getElementById('apiStatus');
+    if (apiStatusEl) apiStatusEl.hidden = true;
 
-    async function resolveApiBase(force) {
-      clearStaleApiBaseCache();
-
-      if (isOnlineSite()) {
-        if (!force) {
-          const cached = sessionStorage.getItem('emika-api-base');
-          if (cached === '' && (await pingApi(''))) return '';
-        }
-        if (await pingApi('')) {
-          sessionStorage.setItem('emika-api-base', '');
-          return '';
-        }
-        sessionStorage.removeItem('emika-api-base');
-        return null;
+    async function checkApi() {
+      try {
+        const res = await fetch(apiUrl('/api/health'), { cache: 'no-store' });
+        if (!res.ok) return false;
+        const data = await res.json();
+        return Boolean(data?.ok);
+      } catch {
+        return false;
       }
-
-      if (!force) {
-        const cached = sessionStorage.getItem('emika-api-base');
-        if (cached !== null && (await pingApi(cached))) return cached;
-      }
-
-      const candidates = ['', ...LOCAL_API_ORIGINS];
-      for (const base of candidates) {
-        if (!(await pingApi(base))) continue;
-        sessionStorage.setItem('emika-api-base', base);
-        return base;
-      }
-      sessionStorage.removeItem('emika-api-base');
-      return null;
-    }
-
-    async function refreshApiStatus() {
-      if (!apiStatusEl) return (await resolveApiBase(true)) !== null;
-
-      if (isOnlineSite()) {
-        apiStatusEl.hidden = true;
-        return (await resolveApiBase(true)) !== null;
-      }
-
-      apiStatusEl.hidden = false;
-      apiStatusEl.textContent = 'Проверяем сервер заказов…';
-      const base = await resolveApiBase(true);
-      if (base !== null) {
-        apiStatusEl.innerHTML = 'Сервер заказов: <strong style="color:#3ecf8e">подключён</strong>';
-        return true;
-      }
-      apiStatusEl.innerHTML =
-        'Сервер заказов: <strong style="color:#ff8080">не найден</strong>. ' +
-        'Для локальной разработки запустите <code>start-shop.bat</code>.';
-      return false;
     }
 
     const pickupTimeAtInput = document.getElementById('pickupTimeAt');
@@ -343,10 +245,9 @@
     });
     syncPickupTimeField();
 
-    (async () => {
-      if (await redirectToShopServerIfNeeded()) return;
-      refreshApiStatus();
-    })();
+    try {
+      sessionStorage.removeItem('emika-api-base');
+    } catch (_) {}
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -393,13 +294,11 @@
       };
 
       try {
-        const apiBase = await resolveApiBase(true);
-        if (apiBase === null) {
-          await refreshApiStatus();
+        if (!(await checkApi())) {
           throw new Error(orderServerErrorMessage());
         }
 
-        const res = await fetch(`${apiBase}/api/orders`, {
+        const res = await fetch(apiUrl('/api/orders'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)

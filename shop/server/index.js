@@ -10,16 +10,18 @@ const PORT = Number(process.env.PORT) || 3000;
 const SHOP_ROOT = path.join(__dirname, '..');
 
 function loadCrmPassword() {
-    const filePath = path.join(SHOP_ROOT, 'crm-password.txt');
-    try {
-        if (fs.existsSync(filePath)) {
+    const fileNames = ['crm-password.txt', 'password-crm.txt'];
+    for (const name of fileNames) {
+        const filePath = path.join(SHOP_ROOT, name);
+        try {
+            if (!fs.existsSync(filePath)) continue;
             const fromFile = fs.readFileSync(filePath, 'utf8').trim();
             if (fromFile) {
-                return { password: fromFile, source: 'crm-password.txt' };
+                return { password: fromFile, source: name };
             }
+        } catch {
+            /* ignore */
         }
-    } catch {
-        /* ignore */
     }
     const fromEnv = String(process.env.CRM_PASSWORD || '').trim();
     if (fromEnv) {

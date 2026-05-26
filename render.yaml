@@ -12,5 +12,3 @@ services:
         value: "22"
       - key: NPM_CONFIG_PRODUCTION
         value: "false"
-      - key: CRM_PASSWORD
-        generateValue: true

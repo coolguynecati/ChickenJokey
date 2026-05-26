@@ -6,7 +6,7 @@ const cloud = require('./cloud');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
-const CRM_PASSWORD = process.env.CRM_PASSWORD || 'emika2025';
+const CRM_PASSWORD = String(process.env.CRM_PASSWORD || 'emika2025').trim();
 const SHOP_ROOT = path.join(__dirname, '..');
 const REPO_ROOT = path.join(SHOP_ROOT, '..');
 const CLOUD_ROOT = path.join(REPO_ROOT, 'cloud');
@@ -54,7 +54,7 @@ app.use((req, res, next) => {
 });
 
 app.post('/api/auth/login', (req, res) => {
-    const password = String(req.body?.password || '');
+    const password = String(req.body?.password || '').trim();
     if (password !== CRM_PASSWORD) {
         return res.status(401).json({ error: 'Неверный пароль' });
     }
@@ -236,6 +236,8 @@ app.use(express.static(SHOP_ROOT));
 
 app.listen(PORT, () => {
     store.readOrders();
+    const crmSource = process.env.CRM_PASSWORD ? 'Render Environment' : 'default (emika2025)';
     console.log(`Emika shop: http://localhost:${PORT}`);
     console.log(`CRM: http://localhost:${PORT}/crm.html`);
+    console.log(`CRM password: ${crmSource}, length ${CRM_PASSWORD.length}`);
 });

@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const express = require('express');
@@ -6,8 +7,29 @@ const cloud = require('./cloud');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
-const CRM_PASSWORD = String(process.env.CRM_PASSWORD || 'emika2025').trim();
 const SHOP_ROOT = path.join(__dirname, '..');
+
+function loadCrmPassword() {
+    const filePath = path.join(SHOP_ROOT, 'crm-password.txt');
+    try {
+        if (fs.existsSync(filePath)) {
+            const fromFile = fs.readFileSync(filePath, 'utf8').trim();
+            if (fromFile) {
+                return { password: fromFile, source: 'crm-password.txt' };
+            }
+        }
+    } catch {
+        /* ignore */
+    }
+    const fromEnv = String(process.env.CRM_PASSWORD || '').trim();
+    if (fromEnv) {
+        return { password: fromEnv, source: 'CRM_PASSWORD env' };
+    }
+    return { password: 'emika2025', source: 'default' };
+}
+
+const CRM_AUTH = loadCrmPassword();
+const CRM_PASSWORD = CRM_AUTH.password;
 const REPO_ROOT = path.join(SHOP_ROOT, '..');
 const CLOUD_ROOT = path.join(REPO_ROOT, 'cloud');
 
@@ -53,10 +75,21 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get('/api/auth/check', (_req, res) => {
+    res.json({
+        ok: true,
+        source: CRM_AUTH.source,
+        passwordLength: CRM_PASSWORD.length
+    });
+});
+
 app.post('/api/auth/login', (req, res) => {
     const password = String(req.body?.password || '').trim();
     if (password !== CRM_PASSWORD) {
-        return res.status(401).json({ error: 'Неверный пароль' });
+        return res.status(401).json({
+            error: 'Неверный пароль',
+            hint: `Длина введённого: ${password.length}, ожидается: ${CRM_PASSWORD.length} (источник: ${CRM_AUTH.source})`
+        });
     }
     const token = createToken();
     res.json({ token, expiresInHours: 12 });
@@ -236,8 +269,7 @@ app.use(express.static(SHOP_ROOT));
 
 app.listen(PORT, () => {
     store.readOrders();
-    const crmSource = process.env.CRM_PASSWORD ? 'Render Environment' : 'default (emika2025)';
     console.log(`Emika shop: http://localhost:${PORT}`);
     console.log(`CRM: http://localhost:${PORT}/crm.html`);
-    console.log(`CRM password: ${crmSource}, length ${CRM_PASSWORD.length}`);
+    console.log(`CRM password: ${CRM_AUTH.source}, length ${CRM_PASSWORD.length}`);
 });

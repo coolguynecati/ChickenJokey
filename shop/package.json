@@ -8,6 +8,9 @@
     "dev": "node server/index.js",
     "tunnel": "npx cloudflared tunnel --url http://127.0.0.1:3000"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "express": "^4.21.2"
   }

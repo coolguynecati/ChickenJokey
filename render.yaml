@@ -4,11 +4,13 @@ services:
     runtime: node
     rootDir: shop
     plan: free
-    buildCommand: npm install
+    buildCommand: npm ci --omit=dev || npm install --omit=dev
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
         value: "22"
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
       - key: CRM_PASSWORD
         generateValue: true

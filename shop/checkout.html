@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Оформление заказа — Emika's</title>
   <link rel="shortcut icon" href="/images/favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
   <script>
     (function () {
       const saved = localStorage.getItem('emika-theme');
@@ -88,7 +88,7 @@
     }
 
     h1 { margin: 0 0 10px; font-size: 1.35rem; }
-    .grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 12px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -203,35 +203,120 @@
     .muted { color: var(--muted); font-size: 0.85rem; }
     .total { font-size: 1.1rem; font-weight: 700; color: var(--orange); margin-top: 8px; }
     .recommendations {
-      margin-top: 10px;
-      padding: 10px;
+      margin-top: 8px;
+      padding: 8px;
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 8px;
       background: rgba(255, 255, 255, 0.03);
     }
     html[data-theme="light"] .recommendations {
       background: rgba(0, 0, 0, 0.025);
     }
     .recommendations h4 {
-      margin: 0 0 8px;
-      font-size: 0.84rem;
+      margin: 0 0 6px;
+      font-size: 0.78rem;
       color: var(--muted);
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.02em;
     }
-    .recommendations-list {
-      margin: 0;
-      padding-left: 16px;
-      display: grid;
-      gap: 4px;
-      font-size: 0.86rem;
+    .recommendations-hint {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 0.75rem;
       line-height: 1.35;
+    }
+    .recommendations-line {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(132px, 1fr);
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 1px;
+      overscroll-behavior-x: contain;
+    }
+    .recommendation-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 7px;
+      display: grid;
+      gap: 5px;
+    }
+    html[data-theme="light"] .recommendation-card {
+      background: rgba(0, 0, 0, 0.02);
+    }
+    .recommendation-card img {
+      width: 100%;
+      height: 58px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: var(--input-bg);
+    }
+    .recommendation-title {
+      font-size: 0.74rem;
+      font-weight: 600;
+      line-height: 1.3;
+      min-height: 1.9em;
+    }
+    .recommendation-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .recommendation-price {
+      font-size: 0.76rem;
+      color: var(--orange);
+      font-weight: 700;
+    }
+    .recommendation-add {
+      border: 1px solid rgba(255, 106, 26, 0.5);
+      background: transparent;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .recommendation-add:hover {
+      border-color: var(--orange);
+      background: rgba(255, 106, 26, 0.12);
+    }
+    .recommendation-add.is-added {
+      background: rgba(255, 106, 26, 0.2);
+      border-color: var(--orange);
+    }
+    .item.cart-flash {
+      animation: cartFlash 0.42s ease;
+    }
+    @keyframes cartFlash {
+      0% { box-shadow: 0 0 0 0 rgba(255, 106, 26, 0.55); }
+      100% { box-shadow: 0 0 0 10px rgba(255, 106, 26, 0); }
+    }
+    .fly-chip {
+      position: fixed;
+      z-index: 9999;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      pointer-events: none;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.32);
     }
     .recommendations-empty {
       margin: 0;
       color: var(--muted);
-      font-size: 0.84rem;
+      font-size: 0.78rem;
+    }
+    h1 {
+      font-family: 'Dela Gothic One', cursive;
+      font-size: 1.2rem;
+      letter-spacing: 0.02em;
     }
     .field { margin-bottom: 10px; }
     .field > label {
@@ -427,8 +512,8 @@
           </div>
 
           <div class="field">
-            <label for="email">Email</label>
-            <input id="email" type="email" placeholder="name@example.com">
+            <label for="email">e-mail/TG</label>
+            <input id="email" type="text" placeholder="@username или name@example.com">
           </div>
 
           <div class="field">
@@ -709,7 +794,26 @@
       };
     }
 
-    function getRecommendations() {
+    const RECOMMENDED_PRODUCTS = {
+      'drink-choco': { id: 'drink-choco', titleRu: 'Милкшейк — Шоколад', titleEn: 'Chocolate milkshake', price: 290, image: '/images/drink3.png' },
+      'drink-straw': { id: 'drink-straw', titleRu: 'Милкшейк — Клубника', titleEn: 'Strawberry milkshake', price: 290, image: '/images/drink4.png' },
+      'drink-van': { id: 'drink-van', titleRu: 'Милкшейк — Ваниль', titleEn: 'Vanilla milkshake', price: 290, image: '/images/drink5.png' },
+      coleslaw: { id: 'coleslaw', titleRu: 'Салат Коул Слоу', titleEn: 'Coleslaw', price: 229, image: '/images/sal2.png' },
+      mac: { id: 'mac', titleRu: "Мак'н'Чиз", titleEn: 'Mac & cheese', price: 249, image: '/images/sal4.png' },
+      fries: { id: 'fries', titleRu: 'Картошка фри', titleEn: 'Fries', price: 229, image: '/images/burg2.png' },
+      sauce: { id: 'sauce', titleRu: "Соус Emika's", titleEn: "Emika's sauce", price: 199, image: '/images/sal1.png' },
+      bowl1: { id: 'bowl1', titleRu: "Emika's Боул", titleEn: "Emika's Bowl", price: 799, image: '/images/bowl1.png' },
+      bowl2: { id: 'bowl2', titleRu: "Мак'н'Чиз Боул", titleEn: 'Mac & Cheese Bowl', price: 799, image: '/images/bowl2.png' }
+    };
+
+    let recentlyAddedProductId = '';
+
+    function hasProductInCart(productId) {
+      const pid = normalizeText(productId);
+      return cart.some((item) => normalizeText(item.id).includes(pid));
+    }
+
+    function getRecommendedProductIds() {
       const recs = [];
       const seen = new Set();
       const total = getCartTotal();
@@ -738,37 +842,88 @@
         if (item.price < 500) state.hasItemUnder500 = true;
       });
 
-      const addRec = (text) => {
-        if (seen.has(text)) return;
-        seen.add(text);
-        recs.push(text);
+      const addRec = (id) => {
+        if (!RECOMMENDED_PRODUCTS[id] || seen.has(id) || hasProductInCart(id)) return;
+        seen.add(id);
+        recs.push(id);
       };
 
       if (state.hasItemOver1000 && !state.hasMilkshake) {
-        addRec('К блюдам дороже 1000 ₽ добавьте милкшейк (любой вкус).');
+        addRec('drink-choco');
+        addRec('drink-straw');
+        addRec('drink-van');
       }
 
       if (state.hasItemUnder500) {
-        if (!state.hasColeslaw) addRec('Недорогой заказ хорошо дополняет Салат Коул Слоу.');
-        if (!state.hasMac) addRec('Добавьте Мак н Чиз для более сытного набора.');
-        if (!state.hasFries) addRec('Картошка Фри усилит заказ и повысит средний чек.');
+        if (!state.hasColeslaw) addRec('coleslaw');
+        if (!state.hasMac) addRec('mac');
+        if (!state.hasFries) addRec('fries');
       }
 
       if (state.hasSauceRequiredItem && !state.hasEmikaSauce) {
-        addRec('Для выбранных позиций обязателен Соус Emika — добавьте его в заказ.');
+        addRec('sauce');
       }
 
       if (total >= 1500) {
-        if (!state.hasBowl) addRec('Чек выше 1500 ₽: предложите один из Боулов.');
-        if (!state.hasMac) addRec('Чек выше 1500 ₽: добавьте Мак н Чиз как горячий гарнир.');
+        if (!state.hasBowl) {
+          addRec('bowl1');
+          addRec('bowl2');
+        }
+        if (!state.hasMac) addRec('mac');
       }
 
       return recs;
     }
 
+    function animateFlyToCart(fromEl) {
+      if (!fromEl || !totalEl) return;
+      const source = fromEl.closest('.recommendation-card')?.querySelector('img');
+      if (!source) return;
+      const srcRect = source.getBoundingClientRect();
+      const dstRect = totalEl.getBoundingClientRect();
+      const chip = document.createElement('span');
+      chip.className = 'fly-chip';
+      chip.style.left = `${srcRect.left + srcRect.width / 2 - 17}px`;
+      chip.style.top = `${srcRect.top + srcRect.height / 2 - 17}px`;
+      chip.style.backgroundImage = `url("${source.getAttribute('src')}")`;
+      document.body.appendChild(chip);
+      requestAnimationFrame(() => {
+        chip.style.transition = 'transform 380ms ease, opacity 380ms ease';
+        chip.style.transform = `translate(${dstRect.left - srcRect.left}px, ${dstRect.top - srcRect.top}px) scale(0.45)`;
+        chip.style.opacity = '0.2';
+      });
+      setTimeout(() => chip.remove(), 420);
+    }
+
+    function addRecommendedProduct(productId, triggerEl) {
+      const product = RECOMMENDED_PRODUCTS[productId];
+      if (!product) return;
+      const existingIndex = cart.findIndex((item) => normalizeText(item.id) === normalizeText(product.id));
+      if (existingIndex >= 0) {
+        cart[existingIndex].qty = Math.min(99, cart[existingIndex].qty + 1);
+      } else {
+        cart.push({
+          id: product.id,
+          titleRu: product.titleRu,
+          titleEn: product.titleEn,
+          price: product.price,
+          qty: 1,
+          image: product.image
+        });
+      }
+      recentlyAddedProductId = product.id;
+      if (triggerEl) {
+        triggerEl.classList.add('is-added');
+        setTimeout(() => triggerEl.classList.remove('is-added'), 240);
+      }
+      animateFlyToCart(triggerEl);
+      saveCart();
+      renderCart();
+    }
+
     function renderRecommendations() {
       if (!recommendationsEl) return;
-      const recs = getRecommendations();
+      const recs = getRecommendedProductIds();
       if (!cart.length) {
         recommendationsEl.innerHTML = `
           <h4>Рекомендации к заказу</h4>
@@ -785,9 +940,22 @@
       }
       recommendationsEl.innerHTML = `
         <h4>Рекомендации к заказу</h4>
-        <ul class="recommendations-list">
-          ${recs.map((line) => `<li>${line}</li>`).join('')}
-        </ul>
+        <p class="recommendations-hint">Добавьте в заказ в один тап:</p>
+        <div class="recommendations-line">
+          ${recs.map((id) => {
+            const p = RECOMMENDED_PRODUCTS[id];
+            return `
+              <article class="recommendation-card">
+                <img src="${p.image}" alt="">
+                <div class="recommendation-title">${p.titleRu}</div>
+                <div class="recommendation-row">
+                  <span class="recommendation-price">${p.price} ₽</span>
+                  <button type="button" class="recommendation-add" data-action="add-reco" data-product="${p.id}">Добавить</button>
+                </div>
+              </article>
+            `;
+          }).join('')}
+        </div>
       `;
     }
 
@@ -856,6 +1024,9 @@
         const sum = item.price * item.qty;
         const el = document.createElement('div');
         el.className = 'item';
+        if (normalizeText(item.id) === normalizeText(recentlyAddedProductId)) {
+          el.classList.add('cart-flash');
+        }
         el.dataset.index = String(index);
         el.innerHTML = `
           <img src="${item.image}" alt="">
@@ -874,6 +1045,7 @@
         `;
         itemsWrap.appendChild(el);
       });
+      recentlyAddedProductId = '';
       renderRecommendations();
     }
 
@@ -913,6 +1085,11 @@
       if (e.target.matches('.qty-input') && e.key === 'Enter') {
         e.target.blur();
       }
+    });
+    recommendationsEl?.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-action="add-reco"]');
+      if (!btn) return;
+      addRecommendedProduct(btn.dataset.product, btn);
     });
 
     clearCartBtn.addEventListener('click', clearCart);

@@ -4054,7 +4054,6 @@
                     cartPreview.classList.remove('open');
                 }, 120);
             };
-            const isMobileCartMode = () => window.matchMedia('(max-width: 720px)').matches;
             const togglePreview = () => {
                 if (!cartPreview) return;
                 const willOpen = !cartPreview.classList.contains('open');
@@ -4067,34 +4066,18 @@
             };
 
             if (cartIndicator) {
-                cartIndicator.addEventListener('mouseenter', () => {
-                    if (isMobileCartMode()) return;
-                    showPreview();
-                });
-                cartIndicator.addEventListener('mouseleave', () => {
-                    if (isMobileCartMode()) return;
-                    hidePreview();
-                });
+                cartIndicator.addEventListener('mouseenter', showPreview);
+                cartIndicator.addEventListener('mouseleave', hidePreview);
                 cartIndicator.addEventListener('click', () => {
-                    if (isMobileCartMode()) {
-                        togglePreview();
-                        return;
-                    }
-                    openCart();
+                    togglePreview();
                 });
             }
             if (cartPreview) {
-                cartPreview.addEventListener('mouseenter', () => {
-                    if (isMobileCartMode()) return;
-                    showPreview();
-                });
-                cartPreview.addEventListener('mouseleave', () => {
-                    if (isMobileCartMode()) return;
-                    hidePreview();
-                });
+                cartPreview.addEventListener('mouseenter', showPreview);
+                cartPreview.addEventListener('mouseleave', hidePreview);
             }
             document.addEventListener('click', (e) => {
-                if (!isMobileCartMode() || !cartPreview?.classList.contains('open')) return;
+                if (!cartPreview?.classList.contains('open')) return;
                 if (cartIndicator?.contains(e.target) || cartPreview.contains(e.target)) return;
                 cartPreview.classList.remove('open');
             });

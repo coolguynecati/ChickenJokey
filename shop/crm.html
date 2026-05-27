@@ -8,6 +8,9 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>CRM — заказы | Emika's</title>
+    <link rel="manifest" href="crm-manifest.webmanifest">
+    <meta name="theme-color" content="#ff6a1a">
+    <meta name="apple-mobile-web-app-title" content="Emika CRM">
     <link rel="shortcut icon" href="/images/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
@@ -781,7 +784,8 @@
             <div>
                 <h1><span class="live-dot" id="liveDot"></span>Заказы</h1>
                 <small id="ordersCount">—</small>
-                <small id="crmVersion" style="display:block;color:var(--muted);font-size:0.75rem;margin-top:2px;">CRM v3.2</small>
+                <small id="crmVersion" style="display:block;color:var(--muted);font-size:0.75rem;margin-top:2px;">CRM v3.4</small>
+                <small id="pollStatus" style="display:block;color:var(--muted);font-size:0.7rem;margin-top:2px;"></small>
             </div>
             <div class="topbar-actions">
                 <div class="bulk-bar" id="bulkBar" hidden>
@@ -793,7 +797,7 @@
         </header>
 
         <div class="sound-banner" id="soundBanner" hidden>
-            <span class="sound-banner__text">Чтобы слышать новые заказы, один раз включите звук — так требует браузер (не планшет «глухой»).</span>
+            <span class="sound-banner__text">Включите звук и разрешите уведомления браузера. Добавьте CRM на главный экран — так заказы приходят, даже если вкладка свёрнута (на iPhone: «Поделиться» → «На экран Домой»).</span>
             <button type="button" class="btn-primary" id="soundUnlockBtn">Включить звук</button>
         </div>
 
@@ -900,7 +904,10 @@
         window.emikaApiUrl = emikaApiUrl;
 
         const TOKEN_KEY = 'emika-crm-token';
-        const POLL_MS = 4000;
+        const POLL_VISIBLE_MS = 3000;
+        const POLL_HIDDEN_MS = 12000;
+        const API_TIMEOUT_MS = 22000;
+        const POLL_STALE_LOCK_MS = 28000;
         const STATUS_LABELS = {
             new: 'Новый',
             confirmed: 'Подтверждён',
@@ -937,7 +944,12 @@
         let selectedIds = new Set();
         let currentView = 'active';
         let currentLocation = 'all';
-        let pollTimer = null;
+        let pollTimeout = null;
+        let ordersLoadStartedAt = 0;
+        let lastPollOkAt = 0;
+        let pollFailStreak = 0;
+        const liveDot = document.getElementById('liveDot');
+        const pollStatusEl = document.getElementById('pollStatus');
         let knownOrderIds = new Set();
         const SOUND_SESSION_KEY = 'emika-crm-sound-on';
         const ORDER_SOUND_URLS = (() => {
@@ -997,9 +1009,13 @@
             soundPlaying = false;
             if (!orderSound) return;
             try {
+                orderSound.loop = false;
                 orderSound.pause();
                 orderSound.currentTime = 0;
             } catch (_) {}
+            if ('mediaSession' in navigator) {
+                try { navigator.mediaSession.playbackState = 'none'; } catch (_) {}
+            }
         }
 
         function updateSoundBanner() {
@@ -1103,18 +1119,152 @@
         function startSoundRemindLoop() {
             if (soundRemindTimer || !hasUnreadOrders()) return;
             soundRemindTimer = setInterval(() => {
-                if (hasUnreadOrders() && soundOn) playNewOrderSoundOnce();
-                else stopSoundRemindLoop();
+                if (!hasUnreadOrders() || !soundOn) {
+                    stopSoundRemindLoop();
+                    return;
+                }
+                const audio = getOrderSound();
+                if (!soundPlaying || audio.paused) startUnreadAlertSound();
             }, REMIND_SOUND_MS);
         }
 
-        function onUnreadOrdersAdded() {
+        function startUnreadAlertSound() {
+            if (!soundOn) {
+                updateSoundBanner();
+                return;
+            }
+            if (!hasUnreadOrders()) return;
+
+            const audio = getOrderSound();
+            if (soundPlaying && audio.loop && !audio.paused) return;
+
+            if (soundStopTimer) {
+                clearTimeout(soundStopTimer);
+                soundStopTimer = null;
+            }
+
+            audio.loop = true;
+            audio.volume = 1;
+            audio.currentTime = 0;
+            soundPlaying = true;
+            lastSoundAt = Date.now();
+
+            if ('mediaSession' in navigator) {
+                try {
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title: 'Новый заказ — Emika\'s',
+                        artist: 'CRM'
+                    });
+                    navigator.mediaSession.playbackState = 'playing';
+                } catch (_) {}
+            }
+
+            audio.play().catch(() => {
+                soundPlaying = false;
+                audio.loop = false;
+            });
+        }
+
+        function notifyNewOrders(newOrders) {
+            if (!newOrders?.length || typeof Notification === 'undefined') return;
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().catch(() => {});
+                return;
+            }
+            if (Notification.permission !== 'granted') return;
+            newOrders.forEach((o) => {
+                const name = o.customer?.name || 'Гость';
+                const phone = o.customer?.phone || '';
+                try {
+                    const n = new Notification(`Новый заказ ${o.orderNumber}`, {
+                        body: `${name}${phone ? ' · ' + phone : ''} — ${o.total} ₽`,
+                        tag: `emika-order-${o.id}`,
+                        renotify: true,
+                        requireInteraction: true
+                    });
+                    n.onclick = () => {
+                        window.focus();
+                        n.close();
+                    };
+                } catch (_) {}
+            });
+        }
+
+        function onUnreadOrdersAdded(newOrders) {
             updateFaviconAlert();
             startSoundRemindLoop();
-            playNewOrderSoundOnce();
+            startUnreadAlertSound();
+            notifyNewOrders(newOrders);
+        }
+
+        function setConnectionStatus(ok, message) {
+            if (liveDot) {
+                liveDot.style.background = ok ? 'var(--ok)' : 'var(--danger)';
+                liveDot.title = ok ? 'Связь с сервером OK' : (message || 'Нет связи');
+            }
+            if (pollStatusEl) {
+                if (!ok) {
+                    pollStatusEl.textContent = message || 'Нет связи — проверяем…';
+                    pollStatusEl.style.color = 'var(--danger)';
+                } else if (lastPollOkAt) {
+                    const sec = Math.max(0, Math.round((Date.now() - lastPollOkAt) / 1000));
+                    pollStatusEl.textContent = `Обновлено ${sec} с назад`;
+                    pollStatusEl.style.color = 'var(--muted)';
+                }
+            }
+        }
+
+        function stopPolling() {
+            if (pollTimeout) {
+                clearTimeout(pollTimeout);
+                pollTimeout = null;
+            }
+        }
+
+        function schedulePoll(delayMs) {
+            stopPolling();
+            if (!getToken()) return;
+            const delay = typeof delayMs === 'number' ? delayMs : (document.hidden ? POLL_HIDDEN_MS : POLL_VISIBLE_MS);
+            pollTimeout = setTimeout(async () => {
+                try {
+                    await loadOrders();
+                    pollFailStreak = 0;
+                } catch (e) {
+                    pollFailStreak += 1;
+                    setConnectionStatus(false, e.message || 'Ошибка связи');
+                    if (e.status === 401) {
+                        setToken('');
+                        showLogin();
+                        return;
+                    }
+                }
+                schedulePoll();
+            }, delay);
+        }
+
+        function startPolling() {
+            schedulePoll(0);
+        }
+
+        async function requestAlertsPermission() {
+            if (typeof Notification === 'undefined') return;
+            try {
+                if (Notification.permission === 'default') {
+                    await Notification.requestPermission();
+                }
+            } catch (_) {}
+        }
+
+        function registerCrmServiceWorker() {
+            if (!('serviceWorker' in navigator)) return;
+            navigator.serviceWorker.register(new URL('crm-sw.js', location.href).href).catch(() => {});
         }
 
         function playNewOrderSoundOnce() {
+            if (hasUnreadOrders()) {
+                startUnreadAlertSound();
+                return;
+            }
             if (!soundOn) {
                 updateSoundBanner();
                 return;
@@ -1123,28 +1273,14 @@
             if (soundPlaying || now - lastSoundAt < SOUND_MIN_GAP_MS) return;
 
             const audio = getOrderSound();
-            stopOrderSound();
             audio.loop = false;
             audio.volume = 1;
             audio.currentTime = 0;
             soundPlaying = true;
             lastSoundAt = now;
-
             soundStopTimer = setTimeout(() => stopOrderSound(), SOUND_MAX_MS);
-
-            audio.play().then(() => {
-                audio.onended = () => {
-                    soundPlaying = false;
-                    if (soundStopTimer) {
-                        clearTimeout(soundStopTimer);
-                        soundStopTimer = null;
-                    }
-                };
-            }).catch(() => {
+            audio.play().catch(() => {
                 stopOrderSound();
-                soundOn = false;
-                sessionStorage.removeItem(SOUND_SESSION_KEY);
-                updateSoundBanner();
             });
         }
 
@@ -1185,7 +1321,21 @@
 
             await emikaApiReady;
             const url = path.startsWith('http') ? path : emikaApiUrl(path);
-            const res = await fetch(url, { ...options, headers });
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+            let res;
+            try {
+                res = await fetch(url, { ...options, headers, signal: controller.signal });
+            } catch (e) {
+                if (e.name === 'AbortError') {
+                    const err = new Error('Сервер не отвечает (таймаут). Render мог уснуть — подождите.');
+                    err.status = 0;
+                    throw err;
+                }
+                throw e;
+            } finally {
+                clearTimeout(timer);
+            }
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
                 const msg = data.hint ? `${data.error || res.statusText}. ${data.hint}` : (data.error || res.statusText);
@@ -1584,8 +1734,11 @@
         let ordersLoadInFlight = false;
 
         async function loadOrders() {
-            if (ordersLoadInFlight) return;
+            if (ordersLoadInFlight) {
+                if (Date.now() - ordersLoadStartedAt < POLL_STALE_LOCK_MS) return;
+            }
             ordersLoadInFlight = true;
+            ordersLoadStartedAt = Date.now();
             try {
             const params = new URLSearchParams();
             params.set('view', currentView);
@@ -1613,7 +1766,7 @@
                 );
                 if (knownOrderIds.size && brandNew.length && currentView === 'active') {
                     brandNew.forEach((o) => unreadOrderIds.add(o.id));
-                    onUnreadOrdersAdded();
+                    onUnreadOrdersAdded(brandNew);
                 }
                 pruneUnreadOrders(nextOrders);
                 knownOrderIds = nextIds;
@@ -1629,6 +1782,11 @@
             syncBulkBar();
             renderOrdersList();
             refreshDetailPanel(false);
+            lastPollOkAt = Date.now();
+            setConnectionStatus(true);
+            } catch (e) {
+                setConnectionStatus(false, e.message || 'Ошибка загрузки');
+                throw e;
             } finally {
                 ordersLoadInFlight = false;
             }
@@ -1777,7 +1935,7 @@
         function showLogin() {
             loginScreen.style.display = 'grid';
             app.classList.remove('is-ready');
-            if (pollTimer) clearInterval(pollTimer);
+            stopPolling();
             stopOrderSound();
             stopFaviconAlert();
             stopSoundRemindLoop();
@@ -1793,17 +1951,9 @@
                 await loadOrders();
                 showApp();
                 syncBulkBar();
-                if (Notification.permission === 'default') {
-                    Notification.requestPermission().catch(() => {});
-                }
-                pollTimer = setInterval(() => {
-                    loadOrders().catch((e) => {
-                        if (e.status === 401) {
-                            setToken('');
-                            showLogin();
-                        }
-                    });
-                }, POLL_MS);
+                registerCrmServiceWorker();
+                await requestAlertsPermission();
+                startPolling();
             } catch (e) {
                 setToken('');
                 showLogin();
@@ -1919,8 +2069,29 @@
         soundUnlockBtn?.addEventListener('click', () => unlockOrderSound());
 
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden) stopOrderSound();
+            if (document.hidden) {
+                if (hasUnreadOrders() && soundOn) {
+                    getOrderSound().play().catch(() => {});
+                }
+            } else {
+                schedulePoll(0);
+                if (hasUnreadOrders() && soundOn) startUnreadAlertSound();
+            }
         });
+
+        window.addEventListener('focus', () => {
+            schedulePoll(0);
+            if (hasUnreadOrders() && soundOn) startUnreadAlertSound();
+        });
+        window.addEventListener('pageshow', () => {
+            if (getToken()) schedulePoll(0);
+        });
+        window.addEventListener('online', () => schedulePoll(0));
+        window.addEventListener('offline', () => setConnectionStatus(false, 'Нет интернета'));
+
+        setInterval(() => {
+            if (lastPollOkAt && getToken()) setConnectionStatus(true);
+        }, 5000);
 
         window.addEventListener('resize', () => {
             if (!isMobileLayout()) {

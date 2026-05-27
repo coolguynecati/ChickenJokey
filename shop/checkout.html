@@ -151,28 +151,28 @@
       gap: 4px;
     }
     .qty button {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
       border: 1px solid var(--input-border);
-      background: var(--input-bg);
+      background: transparent;
       color: var(--text);
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 0.85rem;
       line-height: 1;
       padding: 0;
     }
     .qty button:hover { border-color: rgba(255, 106, 26, 0.45); }
     .qty-input {
-      width: 40px;
-      height: 28px;
-      border-radius: 8px;
+      width: 30px;
+      height: 22px;
+      border-radius: 4px;
       border: 1px solid var(--input-border);
-      background: var(--input-bg);
+      background: transparent;
       color: var(--text);
       text-align: center;
       font-family: inherit;
-      font-size: 0.85rem;
+      font-size: 0.78rem;
       font-weight: 700;
       padding: 0 2px;
       -moz-appearance: textfield;
@@ -180,14 +180,14 @@
     .qty-input::-webkit-outer-spin-button,
     .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     .item-remove {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
       border: 1px solid rgba(255, 107, 107, 0.35);
-      background: rgba(255, 107, 107, 0.1);
+      background: transparent;
       color: #ff8080;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 0.9rem;
       line-height: 1;
       padding: 0;
     }
@@ -202,6 +202,37 @@
     }
     .muted { color: var(--muted); font-size: 0.85rem; }
     .total { font-size: 1.1rem; font-weight: 700; color: var(--orange); margin-top: 8px; }
+    .recommendations {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    html[data-theme="light"] .recommendations {
+      background: rgba(0, 0, 0, 0.025);
+    }
+    .recommendations h4 {
+      margin: 0 0 8px;
+      font-size: 0.84rem;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .recommendations-list {
+      margin: 0;
+      padding-left: 16px;
+      display: grid;
+      gap: 4px;
+      font-size: 0.86rem;
+      line-height: 1.35;
+    }
+    .recommendations-empty {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
     .field { margin-bottom: 10px; }
     .field > label {
       display: block;
@@ -370,6 +401,10 @@
         </div>
         <div class="items" id="checkoutItems"></div>
         <div class="total" id="checkoutTotal">0 ₽</div>
+        <section class="recommendations" id="checkoutRecommendations" aria-live="polite">
+          <h4>Рекомендации к заказу</h4>
+          <p class="recommendations-empty">Добавьте блюда в корзину, и здесь появятся рекомендации.</p>
+        </section>
       </section>
 
       <section class="card">
@@ -389,6 +424,11 @@
               <label for="phone">Телефон *</label>
               <input id="phone" type="tel" placeholder="+7 999 000 00 00" required>
             </div>
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" placeholder="name@example.com">
           </div>
 
           <div class="field">
@@ -474,6 +514,7 @@
 
     const itemsWrap = document.getElementById('checkoutItems');
     const totalEl = document.getElementById('checkoutTotal');
+    const recommendationsEl = document.getElementById('checkoutRecommendations');
     const form = document.getElementById('checkoutForm');
     const err = document.getElementById('formError');
     const submitBtn = document.getElementById('submitBtn');
@@ -494,6 +535,7 @@
         const pref = JSON.parse(prefContactRaw);
         if (pref?.name) document.getElementById('name').value = pref.name;
         if (pref?.phone) document.getElementById('phone').value = pref.phone;
+        if (pref?.email) document.getElementById('email').value = pref.email;
       } catch (e) {}
     }
 
@@ -647,6 +689,108 @@
       return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
     }
 
+    function normalizeText(value) {
+      return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function itemTags(item) {
+      const id = normalizeText(item.id);
+      const ru = normalizeText(item.titleRu);
+      const en = normalizeText(item.titleEn);
+      const text = `${id} ${ru} ${en}`;
+      return {
+        isMilkshake: /milkshake|милкшейк|drink-choco|drink-straw|drink-van/.test(text),
+        isColeslaw: /coleslaw|коул слоу/.test(text),
+        isMac: /mac|мак.?н.?чиз/.test(text),
+        isFries: /fries|картошка фри/.test(text),
+        isBowl: /bowl|боул/.test(text),
+        isEmikaSauce: /emika|эмика/.test(text) && /sauce|соус/.test(text),
+        needsSauce: /combo1|combo2|combo3|combo4|combo5|bites|tenders|fries|cheese-medallions|стрипс|байтс|байтсы|медальон/.test(text)
+      };
+    }
+
+    function getRecommendations() {
+      const recs = [];
+      const seen = new Set();
+      const total = getCartTotal();
+      const state = {
+        hasMilkshake: false,
+        hasColeslaw: false,
+        hasMac: false,
+        hasFries: false,
+        hasBowl: false,
+        hasEmikaSauce: false,
+        hasSauceRequiredItem: false,
+        hasItemOver1000: false,
+        hasItemUnder500: false
+      };
+
+      cart.forEach((item) => {
+        const tags = itemTags(item);
+        if (tags.isMilkshake) state.hasMilkshake = true;
+        if (tags.isColeslaw) state.hasColeslaw = true;
+        if (tags.isMac) state.hasMac = true;
+        if (tags.isFries) state.hasFries = true;
+        if (tags.isBowl) state.hasBowl = true;
+        if (tags.isEmikaSauce) state.hasEmikaSauce = true;
+        if (tags.needsSauce) state.hasSauceRequiredItem = true;
+        if (item.price > 1000) state.hasItemOver1000 = true;
+        if (item.price < 500) state.hasItemUnder500 = true;
+      });
+
+      const addRec = (text) => {
+        if (seen.has(text)) return;
+        seen.add(text);
+        recs.push(text);
+      };
+
+      if (state.hasItemOver1000 && !state.hasMilkshake) {
+        addRec('К блюдам дороже 1000 ₽ добавьте милкшейк (любой вкус).');
+      }
+
+      if (state.hasItemUnder500) {
+        if (!state.hasColeslaw) addRec('Недорогой заказ хорошо дополняет Салат Коул Слоу.');
+        if (!state.hasMac) addRec('Добавьте Мак н Чиз для более сытного набора.');
+        if (!state.hasFries) addRec('Картошка Фри усилит заказ и повысит средний чек.');
+      }
+
+      if (state.hasSauceRequiredItem && !state.hasEmikaSauce) {
+        addRec('Для выбранных позиций обязателен Соус Emika — добавьте его в заказ.');
+      }
+
+      if (total >= 1500) {
+        if (!state.hasBowl) addRec('Чек выше 1500 ₽: предложите один из Боулов.');
+        if (!state.hasMac) addRec('Чек выше 1500 ₽: добавьте Мак н Чиз как горячий гарнир.');
+      }
+
+      return recs;
+    }
+
+    function renderRecommendations() {
+      if (!recommendationsEl) return;
+      const recs = getRecommendations();
+      if (!cart.length) {
+        recommendationsEl.innerHTML = `
+          <h4>Рекомендации к заказу</h4>
+          <p class="recommendations-empty">Добавьте блюда в корзину, и здесь появятся рекомендации.</p>
+        `;
+        return;
+      }
+      if (!recs.length) {
+        recommendationsEl.innerHTML = `
+          <h4>Рекомендации к заказу</h4>
+          <p class="recommendations-empty">Состав заказа выглядит сбалансированно.</p>
+        `;
+        return;
+      }
+      recommendationsEl.innerHTML = `
+        <h4>Рекомендации к заказу</h4>
+        <ul class="recommendations-list">
+          ${recs.map((line) => `<li>${line}</li>`).join('')}
+        </ul>
+      `;
+    }
+
     function saveCart() {
       localStorage.setItem(CHECKOUT_CART_KEY, JSON.stringify(cart));
       if (cart.length) {
@@ -703,6 +847,7 @@
       if (!cart.length) {
         itemsWrap.innerHTML = '<p class="muted">Корзина пуста. <a href="./" style="color:var(--orange)">Вернитесь в меню</a>.</p>';
         submitBtn.disabled = true;
+        renderRecommendations();
         return;
       }
 
@@ -729,6 +874,7 @@
         `;
         itemsWrap.appendChild(el);
       });
+      renderRecommendations();
     }
 
     itemsWrap.addEventListener('click', (e) => {
@@ -817,6 +963,7 @@
 
       const name = document.getElementById('name').value.trim();
       const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
       const deliveryType = 'pickup';
 
       if (!name || !phone) {
@@ -839,7 +986,7 @@
       submitBtn.textContent = 'Отправляем…';
 
       const payload = {
-        customer: { name, phone, email: '' },
+        customer: { name, phone, email },
         deliveryType,
         location: 'eat-arena',
         address: PICKUP_ADDRESS,
@@ -867,7 +1014,7 @@
         const data = await parseJsonResponse(res);
         if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
 
-        localStorage.setItem('emika-checkout-contact', JSON.stringify({ name, phone }));
+        localStorage.setItem('emika-checkout-contact', JSON.stringify({ name, phone, email }));
         localStorage.removeItem('emika-checkout-cart');
         localStorage.removeItem('emika-checkout-meta');
         localStorage.removeItem('emika-cart');

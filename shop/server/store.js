@@ -4,6 +4,7 @@ const crypto = require('crypto');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
+const EMAILS_FILE = path.join(DATA_DIR, 'emails.json');
 const DELETED_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const CANCEL_REASONS = new Set(['guest_cancelled', 'guest_no_pickup']);
 
@@ -13,6 +14,9 @@ function ensureStore() {
     }
     if (!fs.existsSync(ORDERS_FILE)) {
         fs.writeFileSync(ORDERS_FILE, '[]', 'utf8');
+    }
+    if (!fs.existsSync(EMAILS_FILE)) {
+        fs.writeFileSync(EMAILS_FILE, '[]', 'utf8');
     }
 }
 
@@ -47,6 +51,63 @@ function cancelReasonLabel(reason) {
 function writeOrders(orders) {
     ensureStore();
     fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
+}
+
+function readEmails() {
+    ensureStore();
+    try {
+        const raw = fs.readFileSync(EMAILS_FILE, 'utf8');
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : [];
+    } catch {
+        return [];
+    }
+}
+
+function writeEmails(emails) {
+    ensureStore();
+    fs.writeFileSync(EMAILS_FILE, JSON.stringify(emails, null, 2), 'utf8');
+}
+
+function normalizeEmail(value) {
+    return String(value || '').trim().toLowerCase();
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function saveCustomerEmail(email, meta = {}) {
+    const normalized = normalizeEmail(email);
+    if (!normalized || !isValidEmail(normalized)) return null;
+
+    const emails = readEmails();
+    const now = new Date().toISOString();
+    const existing = emails.find((entry) => normalizeEmail(entry.email) === normalized);
+
+    if (existing) {
+        existing.updatedAt = now;
+        if (meta.orderId) existing.lastOrderId = meta.orderId;
+        if (meta.orderNumber) existing.lastOrderNumber = meta.orderNumber;
+        if (meta.name) existing.name = meta.name;
+        if (meta.phone) existing.phone = meta.phone;
+    } else {
+        emails.unshift({
+            email: normalized,
+            name: String(meta.name || '').trim(),
+            phone: String(meta.phone || '').trim(),
+            firstOrderId: meta.orderId || '',
+            firstOrderNumber: meta.orderNumber || '',
+            lastOrderId: meta.orderId || '',
+            lastOrderNumber: meta.orderNumber || '',
+            source: 'checkout',
+            createdAt: now,
+            updatedAt: now
+        });
+    }
+
+    writeEmails(emails);
+    return normalized;
 }
 
 const LOCATIONS = new Set(['eat-arena', 'poselok']);
@@ -100,7 +161,11 @@ function createOrder(payload) {
         address: String(payload.address || '').trim(),
         addressExtra: String(payload.addressExtra || '').trim(),
         comment: String(payload.comment || '').trim(),
-        paymentMethod: 'counter',
+        paymentMethod: payload.paymentMethod === 'transfer' ? 'transfer' : 'counter',
+        pickupTimeMode: ['asap', 'hour', 'at'].includes(payload.pickupTimeMode)
+            ? payload.pickupTimeMode
+            : 'asap',
+        pickupTimeAt: String(payload.pickupTimeAt || '').trim(),
         promoCode: String(payload.promoCode || '').trim(),
         items: Array.isArray(payload.items) ? payload.items : [],
         total: Number(payload.total) || 0,
@@ -109,6 +174,12 @@ function createOrder(payload) {
 
     orders.unshift(order);
     writeOrders(orders);
+    saveCustomerEmail(order.customer?.email, {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        name: order.customer?.name,
+        phone: order.customer?.phone
+    });
     return order;
 }
 
@@ -205,6 +276,7 @@ function bulkUpdateStatus(ids, status) {
 
 module.exports = {
     readOrders,
+    readEmails,
     createOrder,
     updateOrder,
     getOrder,

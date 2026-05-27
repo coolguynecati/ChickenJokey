@@ -5,8 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emika's Hot Chicken</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="shortcut icon" href="../images/favicon.ico">
+  <link rel="shortcut icon" href="/images/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        (function () {
+            const saved = localStorage.getItem('emika-theme');
+            document.documentElement.setAttribute('data-theme', saved === 'light' || saved === 'dark' ? saved : 'dark');
+        })();
+    </script>
     <script src="emika-guard.js"></script>
     <style>
         :root {
@@ -16,14 +22,22 @@
             --card: rgba(20, 20, 24, 0.8);
             --text: #f5f5f5;
             --muted: #c9c9ce;
+            --surface: rgba(20, 20, 24, 0.98);
+            --surface-2: rgba(255, 255, 255, 0.08);
+            --line: rgba(255, 255, 255, 0.08);
+            --line-strong: rgba(255, 255, 255, 0.16);
         }
 
         /* Light theme (optional) */
         html[data-theme="light"] {
             --bg: #f6f6f7;
-            --card: rgba(255,255,255,0.92);
+            --card: rgba(255, 255, 255, 0.96);
             --text: #121316;
             --muted: #545863;
+            --surface: rgba(255, 255, 255, 0.98);
+            --surface-2: rgba(10, 10, 12, 0.06);
+            --line: rgba(10, 10, 12, 0.1);
+            --line-strong: rgba(10, 10, 12, 0.14);
         }
 
         * { 
@@ -51,7 +65,7 @@
             font-family: 'Montserrat', sans-serif; 
             color: var(--text);
             background-color: #000000;
-            background-image: url('../images/background.jpg');
+            background-image: url('/images/background.jpg');
             background-position: center top;
             background-size: cover;
             background-repeat: no-repeat;
@@ -281,7 +295,7 @@
             content: "";
             position: absolute;
             inset: -40px -60px;
-            background: url('../images/hyp.png') center/contain no-repeat;
+            background: url('/images/hyp.png') center/contain no-repeat;
             opacity: 0.15;
             pointer-events: none;
             z-index: -1;
@@ -292,7 +306,7 @@
             font-weight: 400;
             font-size: clamp(1.65rem, 3.2vw, 2.35rem);
             margin: 0 0 18px;
-            color: #fff;
+            color: var(--text);
             letter-spacing: 0.1px;
             line-height: 1.12;
             white-space: nowrap;
@@ -418,9 +432,9 @@
         .ghost-btn {
             padding: 8px 14px;
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.25);
+            border: 1px solid var(--line-strong);
             background: transparent;
-            color: #fff;
+            color: var(--text);
             font-weight: 600;
             font-size: 0.9rem;
             transition: border 0.2s ease, transform 0.2s ease;
@@ -447,9 +461,9 @@
         .social-btn {
             padding: 8px 14px;
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.25);
+            border: 1px solid var(--line-strong);
             background: transparent;
-            color: #fff;
+            color: var(--text);
             font-weight: 600;
             font-size: 0.9rem;
             transition: border 0.2s ease, transform 0.2s ease, background 0.2s ease;
@@ -544,7 +558,7 @@
         .pill {
             padding: 6px 12px;
             border-radius: 999px;
-            background: rgba(255,255,255,0.08);
+            background: var(--surface-2);
             color: var(--muted);
             font-size: 0.85rem;
         }
@@ -558,7 +572,7 @@
 
         .card {
             background: var(--card);
-            border: 1px solid rgba(255,255,255,0.04);
+            border: 1px solid var(--line);
             border-radius: 16px;
             padding: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.35);
@@ -641,7 +655,7 @@
             align-items: center;
             gap: 8px;
             padding: 8px 16px;
-            background: rgba(255,255,255,0.1);
+            background: var(--surface-2);
             border-radius: 999px;
             font-weight: 700;
             font-size: 0.9rem;
@@ -651,7 +665,7 @@
         }
 
         .cart-indicator:hover {
-            background: rgba(255,255,255,0.15);
+            background: var(--line);
         }
 
         .cart-icon { font-size: 1.2rem; }
@@ -668,8 +682,9 @@
             right: 120px;
             top: calc(100% + 10px);
             width: min(360px, 90vw);
-            background: rgba(20, 20, 24, 0.98);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--text);
             border-radius: 14px;
             box-shadow: 0 18px 44px rgba(0,0,0,0.45);
             padding: 10px;
@@ -689,12 +704,45 @@
 
         .cart-preview-item {
             display: grid;
-            grid-template-columns: 44px 1fr auto;
+            grid-template-columns: 40px minmax(0, 1fr) auto;
             gap: 8px;
             align-items: center;
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid var(--line);
             border-radius: 10px;
-            padding: 6px;
+            padding: 6px 8px;
+            color: var(--text);
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+
+        .cart-preview-item-title {
+            font-size: 0.82rem;
+            line-height: 1.25;
+            min-width: 0;
+        }
+
+        .qty--compact {
+            gap: 3px;
+        }
+
+        .qty--compact button {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+        }
+
+        .qty--compact .qty-input {
+            width: 30px;
+            height: 22px;
+            border-radius: 4px;
+            font-size: 0.76rem;
+            font-weight: 600;
+        }
+
+        .cart-preview-item:hover,
+        .cart-item:hover {
+            background: var(--surface-2);
+            border-color: rgba(255, 106, 26, 0.35);
         }
 
         .cart-preview-item img {
@@ -702,7 +750,7 @@
             height: 44px;
             object-fit: contain;
             border-radius: 8px;
-            background: rgba(255,255,255,0.05);
+            background: var(--surface-2);
         }
 
         .cart-preview-total {
@@ -720,18 +768,14 @@
             right: 0;
             width: min(420px, 100vw);
             height: 100vh;
-            background: rgba(20, 20, 24, 0.98);
-            border-left: 1px solid rgba(255,255,255,0.08);
+            background: var(--surface);
+            border-left: 1px solid var(--line);
+            color: var(--text);
             z-index: 2300;
             transform: translateX(100%);
             transition: transform 0.25s ease;
             display: grid;
             grid-template-rows: auto 1fr auto;
-        }
-
-        html[data-theme="light"] .cart-drawer {
-            background: rgba(255,255,255,0.98);
-            border-left-color: rgba(10,10,12,0.12);
         }
 
         .cart-drawer.open {
@@ -758,11 +802,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 14px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-
-        html[data-theme="light"] .cart-head {
-            border-bottom-color: rgba(10,10,12,0.10);
+            border-bottom: 1px solid var(--line);
         }
 
         .cart-head h3 {
@@ -774,8 +814,8 @@
             width: 34px;
             height: 34px;
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.22);
-            background: transparent;
+            border: 1px solid var(--line-strong);
+            background: var(--surface-2);
             color: var(--text);
             cursor: pointer;
         }
@@ -788,14 +828,28 @@
         }
 
         .cart-item {
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid var(--line);
             border-radius: 12px;
             padding: 10px;
             display: grid;
             grid-template-columns: 1fr auto;
             gap: 10px;
             align-items: center;
-            transition: transform 0.25s ease, opacity 0.25s ease, filter 0.25s ease;
+            color: var(--text);
+            transition: transform 0.25s ease, opacity 0.25s ease, filter 0.25s ease, background 0.15s ease, border-color 0.15s ease;
+        }
+
+        .cart-item-main {
+            min-width: 0;
+        }
+
+        .cart-item-main > div:first-child {
+            font-size: 0.9rem;
+            line-height: 1.35;
+        }
+
+        .cart-item small {
+            color: var(--muted);
         }
 
         .cart-item.removing {
@@ -804,24 +858,111 @@
             filter: blur(1px);
         }
 
+        .cart-item-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
         .qty {
             display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .qty button {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid var(--line-strong);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.88rem;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .qty button:hover {
+            border-color: rgba(255, 106, 26, 0.45);
+        }
+
+        .qty-input {
+            width: 32px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid var(--line-strong);
+            background: transparent;
+            color: var(--text);
+            text-align: center;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0 2px;
+            -moz-appearance: textfield;
+        }
+
+        .qty-input::-webkit-outer-spin-button,
+        .qty-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .cart-remove {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 107, 107, 0.35);
+            background: transparent;
+            color: #ff8080;
+            cursor: pointer;
+            font-size: 0.95rem;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .cart-remove:hover {
+            background: rgba(255, 107, 107, 0.2);
+            border-color: rgba(255, 107, 107, 0.55);
+        }
+
+        .cart-head-actions {
+            display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .qty button {
-            width: 26px;
-            height: 26px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.08);
-            color: var(--text);
+        .cart-clear-btn {
+            border: 1px solid var(--line-strong);
+            background: transparent;
+            color: var(--muted);
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            font-weight: 600;
             cursor: pointer;
         }
 
+        .cart-clear-btn:hover {
+            color: #ff8080;
+            border-color: rgba(255, 107, 107, 0.45);
+        }
+
+        .cart-clear-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        html[data-theme="light"] .cart-remove {
+            color: #c62828;
+            border-color: rgba(198, 40, 40, 0.35);
+            background: rgba(198, 40, 40, 0.08);
+        }
+
         .cart-footer {
-            border-top: 1px solid rgba(255,255,255,0.08);
+            border-top: 1px solid var(--line);
             padding: 12px;
             display: grid;
             gap: 10px;
@@ -830,8 +971,8 @@
         .promo-input {
             width: 100%;
             border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.16);
-            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--line-strong);
+            background: var(--surface-2);
             color: var(--text);
             padding: 10px 12px;
         }
@@ -863,8 +1004,9 @@
             width: min(280px, 92vw);
             padding: 8px 10px;
             border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.10);
-            background: rgba(20,20,24,0.98);
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--text);
             box-shadow: 0 18px 44px rgba(0,0,0,0.45);
             z-index: 2300;
             flex-direction: column;
@@ -898,8 +1040,8 @@
             flex: 0 0 auto;
             padding: 10px 14px;
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.06);
-            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--line);
+            background: var(--surface-2);
             color: var(--text);
             font-weight: 800;
             font-size: 0.9rem;
@@ -924,15 +1066,15 @@
             align-items: center;
             gap: 8px;
             padding-right: 6px;
-            border-right: 1px solid rgba(255,255,255,0.10);
+            border-right: 1px solid var(--line);
             margin-right: 6px;
         }
 
         .top-link {
             padding: 8px 12px;
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.06);
-            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--line);
+            background: var(--surface-2);
             color: var(--text);
             font-weight: 800;
             font-size: 0.9rem;
@@ -951,14 +1093,14 @@
             grid-template-columns: 1fr 1fr;
             gap: 16px;
             align-items: center;
-            background: rgba(10,10,12,0.7);
-            border: 1px solid rgba(255,255,255,0.05);
+            background: var(--card);
+            border: 1px solid var(--line);
             border-radius: 18px;
             padding: 18px;
         }
 
         .about p { margin: 0 0 14px; color: var(--muted); line-height: 1.7; }
-        .about strong { color: #fff; }
+        .about strong { color: var(--text); }
 
         /* About block must stay black in all themes */
         #about .about {
@@ -1158,8 +1300,9 @@
         }
 
         .modal-content {
-            background: rgba(20, 20, 24, 0.92);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--text);
             border-radius: 20px;
             padding: 30px;
             max-width: 600px;
@@ -1170,11 +1313,6 @@
             transform: scale(0.9);
             transition: transform 0.3s ease;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-
-        html[data-theme="light"] .modal-content {
-            background: rgba(255,255,255,0.96);
-            border-color: rgba(10,10,12,0.12);
         }
 
         .product-modal-grid {
@@ -1198,8 +1336,8 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            background: rgba(255,255,255,0.1);
-            border: none;
+            background: var(--surface-2);
+            border: 1px solid var(--line);
             color: var(--text);
             font-size: 1.5rem;
             width: 36px;
@@ -1213,7 +1351,7 @@
         }
 
         .modal-close:hover {
-            background: rgba(255,255,255,0.2);
+            background: var(--line);
         }
 
         .modal-image {
@@ -1250,8 +1388,8 @@
         .meta-chip {
             padding: 8px 10px;
             border-radius: 999px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.06);
+            background: var(--surface-2);
+            border: 1px solid var(--line);
             color: var(--text);
             font-weight: 700;
             font-size: 0.85rem;
@@ -1271,7 +1409,7 @@
             gap: 12px;
             margin-bottom: 24px;
             padding: 16px;
-            background: rgba(255,255,255,0.05);
+            background: var(--surface-2);
             border-radius: 12px;
         }
 
@@ -1356,7 +1494,7 @@
             gap: 10px;
             margin-bottom: 18px;
             padding: 14px 16px;
-            background: rgba(255,255,255,0.05);
+            background: var(--surface-2);
             border-radius: 12px;
         }
 
@@ -1379,8 +1517,8 @@
         .modal-pack-btn {
             padding: 10px 14px;
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--line);
+            background: var(--surface-2);
             color: var(--text);
             font-weight: 700;
             cursor: pointer;
@@ -1395,21 +1533,6 @@
         .modal-pack-btn.is-active {
             background: rgba(255,106,26,0.22);
             border-color: rgba(255,106,26,0.45);
-        }
-
-        html[data-theme="light"] .modal-pack-control {
-            background: rgba(0,0,0,0.04);
-        }
-
-        html[data-theme="light"] .modal-pack-btn {
-            background: rgba(0,0,0,0.04);
-            border-color: rgba(0,0,0,0.12);
-            color: #111;
-        }
-
-        html[data-theme="light"] .modal-pack-btn.is-active {
-            background: rgba(255,106,26,0.18);
-            border-color: rgba(255,106,26,0.4);
         }
 
         .modal-add-btn {
@@ -1736,14 +1859,14 @@
             box-shadow: 0 8px 22px rgba(0,0,0,0.28);
         }
 
-        .pin-tile--1::before { background-image: url('../images/zkrp1.png'); }
-        .pin-tile--2::before { background-image: url('../images/zkrp2.png'); }
-        .pin-tile--3::before { background-image: url('../images/zkrp3.png'); }
-        .pin-tile--4::before { background-image: url('../images/zkrp4.png'); }
+        .pin-tile--1::before { background-image: url('/images/zkrp1.png'); }
+        .pin-tile--2::before { background-image: url('/images/zkrp2.png'); }
+        .pin-tile--3::before { background-image: url('/images/zkrp3.png'); }
+        .pin-tile--4::before { background-image: url('/images/zkrp4.png'); }
 
-        html[data-theme="light"] .pin-tile--1::before { background-image: url('../images/wkrp1.png'); }
-        html[data-theme="light"] .pin-tile--2::before { background-image: url('../images/wkrp2.png'); }
-        html[data-theme="light"] .pin-tile--3::before { background-image: url('../images/wkrp3.png'); }
+        html[data-theme="light"] .pin-tile--1::before { background-image: url('/images/wkrp1.png'); }
+        html[data-theme="light"] .pin-tile--2::before { background-image: url('/images/wkrp2.png'); }
+        html[data-theme="light"] .pin-tile--3::before { background-image: url('/images/wkrp3.png'); }
 
         .pin-tile__media {
             grid-column: 1;
@@ -2167,9 +2290,10 @@
         }
 
         .footer {
-            background: rgba(6,6,8,0.9);
-            border-top: 1px solid rgba(255,255,255,0.05);
+            background: var(--surface);
+            border-top: 1px solid var(--line);
             margin-top: 36px;
+            color: var(--text);
         }
 
         .footer-content {
@@ -2254,6 +2378,39 @@
             .theme-toggle {
                 width: 36px;
                 height: 32px;
+            }
+
+            .cart-preview {
+                right: 0;
+                top: calc(100% + 8px);
+                width: min(360px, calc(100vw - 20px));
+                padding: 10px;
+            }
+
+            .cart-preview-items {
+                max-height: 170px;
+                min-height: 0;
+                overflow-y: auto;
+            }
+
+            .cart-preview-item {
+                grid-template-columns: 36px minmax(0, 1fr) auto;
+                gap: 6px;
+                padding: 6px;
+                border-radius: 8px;
+            }
+
+            .cart-preview-item img {
+                width: 36px;
+                height: 36px;
+            }
+
+            .cart-preview-item-title {
+                font-size: 0.78rem;
+            }
+
+            .cart-drawer {
+                width: min(360px, 100vw);
             }
 
             .lang-toggle {
@@ -2381,13 +2538,112 @@
                 padding: 6px 10px 0;
             }
         }
+
+        html[data-theme="light"] body {
+            background-color: var(--bg);
+        }
+
+        html[data-theme="light"] .section-title h2 {
+            color: var(--text);
+        }
+
+        html[data-theme="light"] .promo-input {
+            background: #fff;
+        }
+
+        html[data-theme="light"] #about .about,
+        html[data-theme="light"] #about .about p,
+        html[data-theme="light"] #about .about strong {
+            color: #fff;
+        }
+
+        /* Корзина — светлая тема */
+        html[data-theme="light"] .cart-preview,
+        html[data-theme="light"] .cart-drawer {
+            background: #ffffff;
+            color: var(--text);
+            box-shadow: 0 18px 44px rgba(0, 0, 0, 0.12);
+        }
+
+        html[data-theme="light"] .cart-preview-item,
+        html[data-theme="light"] .cart-item {
+            background: #ffffff;
+            border-color: var(--line);
+            color: var(--text);
+        }
+
+        html[data-theme="light"] .cart-preview-item:hover,
+        html[data-theme="light"] .cart-item:hover {
+            background: var(--surface-2);
+            border-color: rgba(255, 106, 26, 0.35);
+        }
+
+        html[data-theme="light"] .cart-preview-item img {
+            background: rgba(10, 10, 12, 0.04);
+        }
+
+        html[data-theme="light"] .cart-indicator {
+            background: #ffffff;
+            border: 1px solid var(--line);
+        }
+
+        html[data-theme="light"] .cart-indicator:hover {
+            background: var(--surface-2);
+            border-color: rgba(255, 106, 26, 0.35);
+        }
+
+        html[data-theme="light"] .cart-overlay {
+            background: rgba(0, 0, 0, 0.28);
+        }
+
+        /* Жёлтый → оранжевый (светлая тема), цены .card-price / #modalPrice не трогаем */
+        html[data-theme="light"] .marquee-rail {
+            color: var(--orange);
+        }
+
+        html[data-theme="light"] .marquee-head {
+            background: rgba(255, 106, 26, 0.08);
+            border-color: rgba(255, 106, 26, 0.25);
+        }
+
+        html[data-theme="light"] .add-to-cart-btn {
+            background: var(--orange);
+            color: #fff;
+        }
+
+        html[data-theme="light"] .add-to-cart-btn:hover,
+        html[data-theme="light"] .add-to-cart-btn:active {
+            background: var(--orange-dark);
+        }
+
+        html[data-theme="light"] .cart-total {
+            color: var(--orange);
+        }
+
+        html[data-theme="light"] .spice-slider {
+            background: linear-gradient(to right, var(--orange-dark) 0%, var(--orange) 100%);
+        }
+
+        html[data-theme="light"] .spice-slider::-webkit-slider-thumb {
+            background: var(--orange);
+        }
+
+        html[data-theme="light"] .modal-add-btn {
+            background: var(--orange);
+            color: #fff;
+        }
+
+        html[data-theme="light"] .modal-add-btn:hover,
+        html[data-theme="light"] .modal-add-btn:active {
+            background: var(--orange-dark);
+        }
     </style>
 </head>
 <body>
     <header>
         <nav>
             <div class="brand">
-                <img src="../images/logo.png" alt="Emika's Hot Chicken логотип">
+                <img src="/images/logo.png" alt="Emika's Hot Chicken логотип">
             </div>
             <div style="display:flex;align-items:center;gap:20px;">
                 <div class="header-actions">
@@ -2461,27 +2717,27 @@
 
             <div class="logo-overlay" aria-hidden="true">
                 <div class="logo-overlay-bg"></div>
-                <img class="ring r1 fade-in-image" src="../images/circle1.png" alt="">
-                <img class="hero-logo fade-in-image" src="../images/circle2.png" alt="Emika's Hot Chicken">
+                <img class="ring r1 fade-in-image" src="/images/circle1.png" alt="">
+                <img class="hero-logo fade-in-image" src="/images/circle2.png" alt="Emika's Hot Chicken">
             </div>
 
             <section class="video-banner-section" id="banner">
                 <div class="slider-container">
                     <div class="slider-slide active" data-slide="0" data-action="scroll">
-                        <img src="../images/banner1.jpg" alt="Banner 1">
+                        <img src="/images/banner1.jpg" alt="Banner 1">
                     </div>
                     <div class="slider-slide" data-slide="1" data-action="next">
                         <video muted loop playsinline>
-                            <source src="../images/banner_1_720.mp4" type="video/mp4">
+                            <source src="/images/banner_1_720.mp4" type="video/mp4">
                         </video>
                     </div>
                     <div class="slider-slide" data-slide="2" data-action="next">
                         <video muted loop playsinline>
-                            <source src="../images/banner_2_720.mp4" type="video/mp4">
+                            <source src="/images/banner_2_720.mp4" type="video/mp4">
                         </video>
                     </div>
                     <div class="slider-slide" data-slide="3" data-action="franchise">
-                        <img src="../images/banner2.jpg" alt="Banner 2">
+                        <img src="/images/banner2.jpg" alt="Banner 2">
                     </div>
                 </div>
             </section>
@@ -2491,7 +2747,7 @@
             <div class="pinned-grid">
                 <a class="pin-tile pin-tile--1" id="pinTile1" href="eat-arena.html" data-page-new="eat-arena" aria-label="Eat Arena">
                     <div class="pin-tile__media">
-                        <img src="../images/place1.png" alt="">
+                        <img src="/images/place1.png" alt="">
                     </div>
                     <div class="pin-tile__text-wrap">
                         <div class="pin-tile__text lang-ru">
@@ -2506,7 +2762,7 @@
                 </a>
                 <button type="button" class="pin-tile pin-tile--2" id="pinTile2" aria-label="Новая точка">
                     <div class="pin-tile__media">
-                        <img src="../images/place2.png" alt="">
+                        <img src="/images/place2.png" alt="">
                     </div>
                     <div class="pin-tile__text-wrap">
                         <div class="pin-tile__text lang-ru">
@@ -2521,7 +2777,7 @@
                 </button>
                 <button type="button" class="pin-tile pin-tile--3" id="pinTile3" aria-label="Рилсы">
                     <div class="pin-tile__media">
-                        <video src="../images/reels.mp4" muted loop playsinline autoplay preload="metadata" aria-hidden="true"></video>
+                        <video src="/images/reels.mp4" muted loop playsinline autoplay preload="metadata" aria-hidden="true"></video>
                     </div>
                     <div class="pin-tile__text-wrap">
                         <div class="pin-tile__text lang-ru">
@@ -2537,17 +2793,17 @@
                 <a class="pin-tile pin-tile--4" href="https://eda.yandex.ru/moscow/r/emika_s_hot_chicken" target="_blank" rel="noopener" aria-label="Доставка Яндекс Еда">
                     <div class="pin-tile__media">
                         <span class="pin-kurica-bob" aria-hidden="true">
-                            <img src="../images/kurica.png" alt="">
+                            <img src="/images/kurica.png" alt="">
                         </span>
                     </div>
                     <div class="pin-tile__text-wrap">
                         <div class="pin-tile__text lang-ru">
                             <strong>Доставка</strong>
-                            <span class="pin-delivery-line">закажи в <img class="pin-yeda" src="../images/yeda.png" alt="Яндекс Еда"></span>
+                            <span class="pin-delivery-line">закажи в <img class="pin-yeda" src="/images/yeda.png" alt="Яндекс Еда"></span>
                         </div>
                         <div class="pin-tile__text lang-en">
                             <strong>Delivery</strong>
-                            <span class="pin-delivery-line">order on <img class="pin-yeda" src="../images/yeda.png" alt="Yandex Eda"></span>
+                            <span class="pin-delivery-line">order on <img class="pin-yeda" src="/images/yeda.png" alt="Yandex Eda"></span>
                         </div>
                     </div>
                 </a>
@@ -2639,7 +2895,7 @@
             </div>
             <div class="cards">
                 <div class="card fade-in-image" data-product="combo1">
-                    <img src="../images/combo1.png" alt="Комбо 1" class="product-image" data-modal="combo1">
+                    <img src="/images/combo1.png" alt="Комбо 1" class="product-image" data-modal="combo1">
                     <h3><span class="lang-ru">Комбо 1</span><span class="lang-en">Combo 1</span></h3>
                     <p class="lang-ru">1 MC Сэндвич, 1 тендер, картофель фри, огурчики, MC соус.</p>
                     <p class="lang-en">1 MC sandwich, 1 tender, seasoned fries, pickles, MC sauce.</p>
@@ -2652,7 +2908,7 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="combo2">
-                    <img src="../images/combo2.png" alt="Комбо 2" class="product-image" data-modal="combo2">
+                    <img src="/images/combo2.png" alt="Комбо 2" class="product-image" data-modal="combo2">
                     <h3><span class="lang-ru">Комбо 2</span><span class="lang-en">Combo 2</span></h3>
                     <p class="lang-ru">3 тендера, картофель фри, огурчики, MC соус.</p>
                     <p class="lang-en">3 tenders, seasoned fries, pickles, MC sauce.</p>
@@ -2665,7 +2921,7 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="combo3">
-                    <img src="../images/combo3.png" alt="Комбо 3" class="product-image" data-modal="combo3">
+                    <img src="/images/combo3.png" alt="Комбо 3" class="product-image" data-modal="combo3">
                     <h3><span class="lang-ru">Комбо 3</span><span class="lang-en">Combo 3</span></h3>
                     <p class="lang-ru">2 MC Сэндвича, картофель фри, MC соус.</p>
                     <p class="lang-en">2 MC sandwiches, seasoned fries, MC sauce.</p>
@@ -2678,7 +2934,7 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="combo4">
-                    <img src="../images/combo4.png" alt="Комбо 4" class="product-image" data-modal="combo4">
+                    <img src="/images/combo4.png" alt="Комбо 4" class="product-image" data-modal="combo4">
                     <h3><span class="lang-ru">Комбо 4</span><span class="lang-en">Combo 4</span></h3>
                     <p class="lang-ru">6 тендеров, картофель фри, огурчики, 3 MC соуса.</p>
                     <p class="lang-en">6 tenders, seasoned fries, pickles, 3 MC sauces.</p>
@@ -2691,13 +2947,13 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="combo5">
-                    <img src="../images/combo5.png" alt="Байтсы и картошка Фри" class="product-image" data-modal="combo5">
+                    <img src="/images/combo5.png" alt="Байтсы и картошка Фри" class="product-image" data-modal="combo5">
                     <h3><span class="lang-ru">Байтсы и картошка Фри</span><span class="lang-en">Bites & Fries</span></h3>
                     <p class="lang-ru">Байтсы из курочки и картофель фри — самый быстрый перекус.</p>
                     <p class="lang-en">Chicken bites and fries — the fastest snack.</p>
                     <div class="card-footer">
-                        <div class="card-price">123 ₽</div>
-                        <button class="add-to-cart-btn" data-product="combo5" data-price="123">
+                        <div class="card-price">599 ₽</div>
+                        <button class="add-to-cart-btn" data-product="combo5" data-price="599">
                             <span class="lang-ru">В корзину</span>
                             <span class="lang-en">Add</span>
                         </button>
@@ -2715,7 +2971,7 @@
             </div>
             <div class="cards">
                 <div class="card fade-in-image" data-product="bowl1">
-                    <img src="../images/bowl1.png" alt="Emika's Боул" class="product-image" data-modal="bowl1">
+                    <img src="/images/bowl1.png" alt="Emika's Боул" class="product-image" data-modal="bowl1">
                     <h3><span class="lang-ru">Emika's Боул</span><span class="lang-en">Emika's Bowl</span></h3>
                     <p class="lang-ru">Нэшвилл курица, фирменные специи, добавьте свой уровень огня.</p>
                     <p class="lang-en">Nashville chicken with our signature spice blend and your heat level.</p>
@@ -2728,7 +2984,7 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="bowl2">
-                    <img src="../images/bowl2.png" alt="Мак'н'Чиз Боул" class="product-image" data-modal="bowl2">
+                    <img src="/images/bowl2.png" alt="Мак'н'Чиз Боул" class="product-image" data-modal="bowl2">
                     <h3><span class="lang-ru">Мак'н'Чиз Боул</span><span class="lang-en">Mac & Cheese Bowl</span></h3>
                     <p class="lang-ru">Кремовый сырный мак-н-чиз и горячая курица — утешение в миске.</p>
                     <p class="lang-en">Creamy mac & cheese topped with hot chicken — comfort in a bowl.</p>
@@ -2752,7 +3008,7 @@
             </div>
             <div class="cards">
                 <div class="card fade-in-image" data-product="tenders">
-                    <img src="../images/burg3.png" alt="Стрипс" class="product-image" data-modal="tenders">
+                    <img src="/images/burg3.png" alt="Стрипс" class="product-image" data-modal="tenders">
                     <h3><span class="lang-ru">Стрипс</span><span class="lang-en">Tenders</span></h3>
                     <p class="lang-ru">Тендеры из сочной курицы с вашим уровнем остроты.</p>
                     <p class="lang-en">Juicy tenders with your heat level of choice.</p>
@@ -2765,7 +3021,7 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="bites">
-                    <img src="../images/bites.png" alt="Байтсы" class="product-image" data-modal="bites">
+                    <img src="/images/bites.png" alt="Байтсы" class="product-image" data-modal="bites">
                     <h3><span class="lang-ru">Байтсы</span><span class="lang-en">Bites</span></h3>
                     <p class="lang-ru">Кусочки горячей курицы — идеально, чтобы “перехватить”.</p>
                     <p class="lang-en">Bite-sized hot chicken — perfect for a quick snack.</p>
@@ -2789,7 +3045,7 @@
             </div>
             <div class="cards">
                 <div class="card fade-in-image" data-product="burger">
-                    <img src="../images/burg1.png" alt="Бургер" class="product-image" data-modal="burger">
+                    <img src="/images/burg1.png" alt="Бургер" class="product-image" data-modal="burger">
                     <h3><span class="lang-ru">Бургер</span><span class="lang-en">Sandwich</span></h3>
                     <p class="lang-ru">Сочный хот-чикен в мягкой булочке, идеальный баланс огня и вкуса.</p>
                     <p class="lang-en">Juicy hot chicken in a soft bun — the perfect fire/flavor balance.</p>
@@ -2802,7 +3058,7 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="fries">
-                    <img src="../images/burg2.png" alt="Картошка фри" class="product-image" data-modal="fries">
+                    <img src="/images/burg2.png" alt="Картошка фри" class="product-image" data-modal="fries">
                     <h3><span class="lang-ru">Картошка фри</span><span class="lang-en">Fries</span></h3>
                     <p class="lang-ru">Хрустящие, приправленные — лучшие друзья любого сэндвича.</p>
                     <p class="lang-en">Crispy seasoned fries — the only right sidekick.</p>
@@ -2815,7 +3071,7 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="cheese-medallions">
-                    <img src="../images/cheese.png" alt="Сырные медальоны" class="product-image" data-modal="cheese-medallions">
+                    <img src="/images/cheese.png" alt="Сырные медальоны" class="product-image" data-modal="cheese-medallions">
                     <h3><span class="lang-ru">Сырные медальоны</span><span class="lang-en">Cheese medallions</span></h3>
                     <p class="lang-ru">Нежные сырные медальоны с хрустящей корочкой.</p>
                     <p class="lang-en">Tender cheese medallions with a crispy crust.</p>
@@ -2839,7 +3095,7 @@
             </div>
             <div class="cards">
                 <div class="card fade-in-image" data-product="sauce">
-                    <img src="../images/sal1.png" alt="Соус Emika's" class="product-image" data-modal="sauce">
+                    <img src="/images/sal1.png" alt="Соус Emika's" class="product-image" data-modal="sauce">
                     <h3><span class="lang-ru">Соус Emika's</span><span class="lang-en">Emika's sauce</span></h3>
                     <p class="lang-ru">Фирменный соус, который собирает все вкусы воедино.</p>
                     <p class="lang-en">Our signature sauce tying every bite together.</p>
@@ -2852,7 +3108,7 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="coleslaw">
-                    <img src="../images/sal2.png" alt="Салат Коул Слоу" class="product-image" data-modal="coleslaw">
+                    <img src="/images/sal2.png" alt="Салат Коул Слоу" class="product-image" data-modal="coleslaw">
                     <h3><span class="lang-ru">Салат Коул Слоу</span><span class="lang-en">Coleslaw</span></h3>
                     <p class="lang-ru">Свежий хруст, чтобы сбалансировать остроту.</p>
                     <p class="lang-en">Fresh crunch to balance the spice.</p>
@@ -2865,7 +3121,7 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="pickles">
-                    <img src="../images/sal3.png" alt="Огурчики" class="product-image" data-modal="pickles">
+                    <img src="/images/sal3.png" alt="Огурчики" class="product-image" data-modal="pickles">
                     <h3><span class="lang-ru">Огурчики</span><span class="lang-en">Pickles</span></h3>
                     <p class="lang-ru">Классический акцент к горячей курице.</p>
                     <p class="lang-en">Classic pickles to cut through the heat.</p>
@@ -2878,7 +3134,7 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="mac">
-                    <img src="../images/sal4.png" alt="Мак'н'Чиз" class="product-image" data-modal="mac">
+                    <img src="/images/sal4.png" alt="Мак'н'Чиз" class="product-image" data-modal="mac">
                     <h3><span class="lang-ru">Мак'н'Чиз</span><span class="lang-en">Mac & cheese</span></h3>
                     <p class="lang-ru">Плотный сырный гарнир для настоящих фанатов комфорта.</p>
                     <p class="lang-en">Rich cheesy side for true comfort fans.</p>
@@ -2902,7 +3158,7 @@
             </div>
             <div class="cards">
                 <div class="card fade-in-image" data-product="drink-choco">
-                    <img src="../images/drink3.png" alt="Милкшейк Шоколад" class="product-image" data-modal="drink-choco">
+                    <img src="/images/drink3.png" alt="Милкшейк Шоколад" class="product-image" data-modal="drink-choco">
                     <h3><span class="lang-ru">Милкшейк — Шоколад</span><span class="lang-en">Chocolate milkshake</span></h3>
                     <p class="lang-ru">Плотный шоколадный шейк для десерта.</p>
                     <p class="lang-en">Thick chocolate shake to finish strong.</p>
@@ -2915,7 +3171,7 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="drink-straw">
-                    <img src="../images/drink4.png" alt="Милкшейк Клубника" class="product-image" data-modal="drink-straw">
+                    <img src="/images/drink4.png" alt="Милкшейк Клубника" class="product-image" data-modal="drink-straw">
                     <h3><span class="lang-ru">Милкшейк — Клубника</span><span class="lang-en">Strawberry milkshake</span></h3>
                     <p class="lang-ru">Классика с ноткой свежих ягод.</p>
                     <p class="lang-en">Classic strawberry with a fresh berry vibe.</p>
@@ -2928,7 +3184,7 @@
                     </div>
                 </div>
                 <div class="card fade-in-image" data-product="drink-van">
-                    <img src="../images/drink5.png" alt="Милкшейк Ваниль" class="product-image" data-modal="drink-van">
+                    <img src="/images/drink5.png" alt="Милкшейк Ваниль" class="product-image" data-modal="drink-van">
                     <h3><span class="lang-ru">Милкшейк — Ваниль</span><span class="lang-en">Vanilla milkshake</span></h3>
                     <p class="lang-ru">Нежный ванильный вкус, чтобы сбалансировать огонь.</p>
                     <p class="lang-en">Smooth vanilla to cool things down.</p>
@@ -3002,7 +3258,12 @@
     <aside class="cart-drawer" id="cartDrawer" aria-label="Cart">
         <div class="cart-head">
             <h3><span class="lang-ru">Корзина</span><span class="lang-en">Cart</span></h3>
-            <button class="cart-close" id="cartCloseBtn" type="button">×</button>
+            <div class="cart-head-actions">
+                <button type="button" class="cart-clear-btn" id="cartClearBtn" disabled>
+                    <span class="lang-ru">Очистить</span><span class="lang-en">Clear</span>
+                </button>
+                <button class="cart-close" id="cartCloseBtn" type="button" aria-label="Закрыть">×</button>
+            </div>
         </div>
         <div class="cart-items" id="cartItems">
             <p id="cartEmptyState"><span class="lang-ru">Пока пусто</span><span class="lang-en">Empty for now</span></p>
@@ -3022,7 +3283,7 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="brand">
-                <img src="../images/logo.png" alt="Emika's Hot Chicken логотип">
+                <img src="/images/logo.png" alt="Emika's Hot Chicken логотип">
             </div>
             <div style="flex: 1; text-align: center;">
                 <small class="lang-ru">© 2025 Emika's Hot Chicken. Вкус Нэшвилла в Москве.</small>
@@ -3100,7 +3361,7 @@
             const applyThemeUi = (theme) => {
                 if (themeIcon) themeIcon.textContent = theme === 'light' ? '☀️' : '🌙';
                 if (headerLogo) {
-                    headerLogo.src = theme === 'light' ? '../images/logo_white.png' : '../images/logo.png';
+                    headerLogo.src = theme === 'light' ? '/images/logo_white.png' : '/images/logo.png';
                 }
             };
 
@@ -3129,7 +3390,7 @@
                 ? Array.from(storiesPopup.querySelectorAll('.stories-progress-bar .fill'))
                 : [];
 
-            const storySources = ['../images/about_us.mp4', '../images/fran.mp4'];
+            const storySources = ['/images/about_us.mp4', '/images/fran.mp4'];
             let storyIndex = 0;
             let isScrubbing = false;
             let touchStartX = 0;
@@ -3395,25 +3656,25 @@
 
             // ===== Menu (frontend) =====
             const productData = {
-                combo1: { image: '../images/combo1.png', titleRu: 'Комбо 1', titleEn: 'Combo 1', price: 619, hasSpice: true, kcalRange: [980, 1280], baseRu: '1 MC Сэндвич, 1 тендер, картофель фри, огурчики, MC соус.', baseEn: '1 MC sandwich, 1 tender, seasoned fries, pickles, MC sauce.' },
-                combo2: { image: '../images/combo2.png', titleRu: 'Комбо 2', titleEn: 'Combo 2', price: 820, hasSpice: true, kcalRange: [1120, 1480], baseRu: '3 тендера, картофель фри, огурчики, MC соус.', baseEn: '3 tenders, seasoned fries, pickles, MC sauce.' },
-                combo3: { image: '../images/combo3.png', titleRu: 'Комбо 3', titleEn: 'Combo 3', price: 889, hasSpice: true, kcalRange: [1180, 1560], baseRu: '2 MC Сэндвича, картофель фри, MC соус.', baseEn: '2 MC sandwiches, seasoned fries, MC sauce.' },
-                combo4: { image: '../images/combo4.png', titleRu: 'Комбо 4', titleEn: 'Combo 4', price: 949, hasSpice: true, kcalRange: [1350, 1760], baseRu: '6 тендеров, картофель фри, огурчики, 3 MC соуса.', baseEn: '6 tenders, seasoned fries, pickles, 3 MC sauces.' },
-                combo5: { image: '../images/combo5.png', titleRu: 'Байтсы и картошка Фри', titleEn: 'Bites & Fries', price: 123, hasSpice: true, kcalRange: [620, 980], baseRu: 'Байтсы из курочки и картофель фри — самый быстрый перекус.', baseEn: 'Chicken bites and fries — the fastest snack.' },
-                bowl1: { image: '../images/bowl1.png', titleRu: "Emika's Боул", titleEn: "Emika's Bowl", price: 799, hasSpice: true, kcalRange: [740, 980], baseRu: 'Нэшвилл курица, фирменные специи, добавьте свой уровень огня.', baseEn: 'Nashville chicken with our signature spice blend and your heat level.' },
-                bowl2: { image: '../images/bowl2.png', titleRu: "Мак'н'Чиз Боул", titleEn: 'Mac & Cheese Bowl', price: 799, hasSpice: true, kcalRange: [820, 1090], baseRu: 'Кремовый сырный мак-н-чиз и горячая курица — утешение в миске.', baseEn: 'Creamy mac & cheese topped with hot chicken — comfort in a bowl.' },
-                burger: { image: '../images/burg1.png', titleRu: 'Бургер', titleEn: 'Sandwich', price: 429, hasSpice: true, kcalRange: [520, 760], baseRu: 'Сочный хот-чикен в мягкой булочке, идеальный баланс огня и вкуса.', baseEn: 'Juicy hot chicken in a soft bun — the perfect fire/flavor balance.' },
-                fries: { image: '../images/burg2.png', titleRu: 'Картошка фри', titleEn: 'Fries', price: 229, kcalRange: [280, 520], baseRu: 'Хрустящие, приправленные — лучшие друзья любого сэндвича.', baseEn: 'Crispy seasoned fries — the only right sidekick.' },
-                tenders: { image: '../images/burg3.png', titleRu: 'Стрипс', titleEn: 'Tenders', price: 329, hasSpice: true, kcalRange: [420, 720], baseRu: 'Тендеры из сочной курицы с вашим уровнем остроты.', baseEn: 'Juicy tenders with your heat level of choice.' },
-                bites: { image: '../images/bites.png', titleRu: 'Байтсы', titleEn: 'Bites', price: 350, hasSpice: true, kcalRange: [460, 780], baseRu: 'Кусочки горячей курицы — идеально, чтобы “перехватить”.', baseEn: 'Bite-sized hot chicken — perfect for a quick snack.' },
-                sauce: { image: '../images/sal1.png', titleRu: "Соус Emika's", titleEn: "Emika's sauce", price: 199, kcalRange: [90, 220], baseRu: 'Фирменный соус, который собирает все вкусы воедино.', baseEn: 'Our signature sauce tying every bite together.' },
-                coleslaw: { image: '../images/sal2.png', titleRu: 'Коулслоу', titleEn: 'Coleslaw', price: 229, kcalRange: [160, 340], baseRu: 'Свежий хруст, чтобы сбалансировать остроту.', baseEn: 'Fresh crunch to balance the spice.' },
-                pickles: { image: '../images/sal3.png', titleRu: 'Огурчики', titleEn: 'Pickles', price: 229, kcalRange: [25, 60], baseRu: 'Классический акцент к горячей курице.', baseEn: 'Classic pickles to cut through the heat.' },
-                mac: { image: '../images/sal4.png', titleRu: "Мак'н'Чиз", titleEn: 'Mac & cheese', price: 249, kcalRange: [320, 620], baseRu: 'Плотный сырный гарнир для настоящих фанатов комфорта.', baseEn: 'Rich cheesy side for true comfort fans.' },
-                "cheese-medallions": { image: '../images/cheese.png', titleRu: 'Сырные медальоны', titleEn: 'Cheese medallions', price: 179, quantityPrices: { 3: 179, 6: 309, 9: 409 }, defaultPackQty: 3, kcalRange: [290, 520], baseRu: 'Нежные сырные медальоны с хрустящей корочкой.', baseEn: 'Tender cheese medallions with a crispy crust.' },
-                "drink-choco": { image: '../images/drink3.png', titleRu: 'Милкшейк — Шоколад', titleEn: 'Chocolate milkshake', price: 290, kcalRange: [360, 620], baseRu: 'Плотный шоколадный шейк для десерта.', baseEn: 'Thick chocolate shake to finish strong.' },
-                "drink-straw": { image: '../images/drink4.png', titleRu: 'Милкшейк — Клубника', titleEn: 'Strawberry milkshake', price: 290, kcalRange: [340, 600], baseRu: 'Классика с ноткой свежих ягод.', baseEn: 'Classic strawberry with a fresh berry vibe.' },
-                "drink-van": { image: '../images/drink5.png', titleRu: 'Милкшейк — Ваниль', titleEn: 'Vanilla milkshake', price: 290, kcalRange: [330, 590], baseRu: 'Нежный ванильный вкус, чтобы сбалансировать огонь.', baseEn: 'Smooth vanilla to cool things down.' }
+                combo1: { image: '/images/combo1.png', titleRu: 'Комбо 1', titleEn: 'Combo 1', price: 619, hasSpice: true, kcalRange: [980, 1280], baseRu: '1 MC Сэндвич, 1 тендер, картофель фри, огурчики, MC соус.', baseEn: '1 MC sandwich, 1 tender, seasoned fries, pickles, MC sauce.' },
+                combo2: { image: '/images/combo2.png', titleRu: 'Комбо 2', titleEn: 'Combo 2', price: 820, hasSpice: true, kcalRange: [1120, 1480], baseRu: '3 тендера, картофель фри, огурчики, MC соус.', baseEn: '3 tenders, seasoned fries, pickles, MC sauce.' },
+                combo3: { image: '/images/combo3.png', titleRu: 'Комбо 3', titleEn: 'Combo 3', price: 889, hasSpice: true, kcalRange: [1180, 1560], baseRu: '2 MC Сэндвича, картофель фри, MC соус.', baseEn: '2 MC sandwiches, seasoned fries, MC sauce.' },
+                combo4: { image: '/images/combo4.png', titleRu: 'Комбо 4', titleEn: 'Combo 4', price: 949, hasSpice: true, kcalRange: [1350, 1760], baseRu: '6 тендеров, картофель фри, огурчики, 3 MC соуса.', baseEn: '6 tenders, seasoned fries, pickles, 3 MC sauces.' },
+                combo5: { image: '/images/combo5.png', titleRu: 'Байтсы и картошка Фри', titleEn: 'Bites & Fries', price: 599, hasSpice: true, kcalRange: [620, 980], baseRu: 'Байтсы из курочки и картофель фри — самый быстрый перекус.', baseEn: 'Chicken bites and fries — the fastest snack.' },
+                bowl1: { image: '/images/bowl1.png', titleRu: "Emika's Боул", titleEn: "Emika's Bowl", price: 799, hasSpice: true, kcalRange: [740, 980], baseRu: 'Нэшвилл курица, фирменные специи, добавьте свой уровень огня.', baseEn: 'Nashville chicken with our signature spice blend and your heat level.' },
+                bowl2: { image: '/images/bowl2.png', titleRu: "Мак'н'Чиз Боул", titleEn: 'Mac & Cheese Bowl', price: 799, hasSpice: true, kcalRange: [820, 1090], baseRu: 'Кремовый сырный мак-н-чиз и горячая курица — утешение в миске.', baseEn: 'Creamy mac & cheese topped with hot chicken — comfort in a bowl.' },
+                burger: { image: '/images/burg1.png', titleRu: 'Бургер', titleEn: 'Sandwich', price: 429, hasSpice: true, kcalRange: [520, 760], baseRu: 'Сочный хот-чикен в мягкой булочке, идеальный баланс огня и вкуса.', baseEn: 'Juicy hot chicken in a soft bun — the perfect fire/flavor balance.' },
+                fries: { image: '/images/burg2.png', titleRu: 'Картошка фри', titleEn: 'Fries', price: 229, kcalRange: [280, 520], baseRu: 'Хрустящие, приправленные — лучшие друзья любого сэндвича.', baseEn: 'Crispy seasoned fries — the only right sidekick.' },
+                tenders: { image: '/images/burg3.png', titleRu: 'Стрипс', titleEn: 'Tenders', price: 329, hasSpice: true, kcalRange: [420, 720], baseRu: 'Тендеры из сочной курицы с вашим уровнем остроты.', baseEn: 'Juicy tenders with your heat level of choice.' },
+                bites: { image: '/images/bites.png', titleRu: 'Байтсы', titleEn: 'Bites', price: 350, hasSpice: true, kcalRange: [460, 780], baseRu: 'Кусочки горячей курицы — идеально, чтобы “перехватить”.', baseEn: 'Bite-sized hot chicken — perfect for a quick snack.' },
+                sauce: { image: '/images/sal1.png', titleRu: "Соус Emika's", titleEn: "Emika's sauce", price: 199, kcalRange: [90, 220], baseRu: 'Фирменный соус, который собирает все вкусы воедино.', baseEn: 'Our signature sauce tying every bite together.' },
+                coleslaw: { image: '/images/sal2.png', titleRu: 'Коулслоу', titleEn: 'Coleslaw', price: 229, kcalRange: [160, 340], baseRu: 'Свежий хруст, чтобы сбалансировать остроту.', baseEn: 'Fresh crunch to balance the spice.' },
+                pickles: { image: '/images/sal3.png', titleRu: 'Огурчики', titleEn: 'Pickles', price: 229, kcalRange: [25, 60], baseRu: 'Классический акцент к горячей курице.', baseEn: 'Classic pickles to cut through the heat.' },
+                mac: { image: '/images/sal4.png', titleRu: "Мак'н'Чиз", titleEn: 'Mac & cheese', price: 249, kcalRange: [320, 620], baseRu: 'Плотный сырный гарнир для настоящих фанатов комфорта.', baseEn: 'Rich cheesy side for true comfort fans.' },
+                "cheese-medallions": { image: '/images/cheese.png', titleRu: 'Сырные медальоны', titleEn: 'Cheese medallions', price: 179, quantityPrices: { 3: 179, 6: 309, 9: 409 }, defaultPackQty: 3, kcalRange: [290, 520], baseRu: 'Нежные сырные медальоны с хрустящей корочкой.', baseEn: 'Tender cheese medallions with a crispy crust.' },
+                "drink-choco": { image: '/images/drink3.png', titleRu: 'Милкшейк — Шоколад', titleEn: 'Chocolate milkshake', price: 290, kcalRange: [360, 620], baseRu: 'Плотный шоколадный шейк для десерта.', baseEn: 'Thick chocolate shake to finish strong.' },
+                "drink-straw": { image: '/images/drink4.png', titleRu: 'Милкшейк — Клубника', titleEn: 'Strawberry milkshake', price: 290, kcalRange: [340, 600], baseRu: 'Классика с ноткой свежих ягод.', baseEn: 'Classic strawberry with a fresh berry vibe.' },
+                "drink-van": { image: '/images/drink5.png', titleRu: 'Милкшейк — Ваниль', titleEn: 'Vanilla milkshake', price: 290, kcalRange: [330, 590], baseRu: 'Нежный ванильный вкус, чтобы сбалансировать огонь.', baseEn: 'Smooth vanilla to cool things down.' }
             };
 
             function getSpiceLevelInfo(value) {
@@ -3539,6 +3800,45 @@
             const cartPreviewItems = document.getElementById('cartPreviewItems');
             const cartPreviewTotal = document.getElementById('cartPreviewTotal');
             const cartGoCheckoutBtn = document.getElementById('cartGoCheckoutBtn');
+            const cartClearBtn = document.getElementById('cartClearBtn');
+
+            function handleCartQtyClick(e, rootEl) {
+                const btn = e.target.closest('button[data-action]');
+                if (!btn) return;
+                const row = e.target.closest('[data-id]');
+                if (!row || !rootEl?.contains(row)) return;
+                const id = row.dataset.id;
+                const item = cartItems.get(id);
+                if (!item) return;
+                const action = btn.dataset.action;
+
+                if (action === 'plus') {
+                    setCartQty(id, item.qty + 1);
+                    return;
+                }
+                if (action === 'minus') {
+                    if (item.qty > 1) setCartQty(id, item.qty - 1);
+                    else removeCartLine(id, cartItemsEl?.querySelector(`.cart-item[data-id="${CSS.escape(id)}"]`));
+                    return;
+                }
+                if (action === 'remove') {
+                    removeCartLine(id, cartItemsEl?.querySelector(`.cart-item[data-id="${CSS.escape(id)}"]`));
+                }
+            }
+
+            function handleCartQtyChange(e, rootEl) {
+                const input = e.target.closest('.qty-input');
+                if (!input) return;
+                const row = input.closest('[data-id]');
+                if (!row || !rootEl?.contains(row)) return;
+                const raw = String(input.value || '').trim();
+                const n = parseInt(raw, 10);
+                if (!raw || !Number.isFinite(n) || n < 1) {
+                    removeCartLine(row.dataset.id, cartItemsEl?.querySelector(`.cart-item[data-id="${CSS.escape(row.dataset.id)}"]`));
+                    return;
+                }
+                setCartQty(row.dataset.id, n);
+            }
 
             function getCartTotal() {
                 let total = 0;
@@ -3553,8 +3853,43 @@
                 if (cartTotalElement) cartTotalElement.textContent = `${total} ₽`;
                 if (cartDrawerTotal) cartDrawerTotal.textContent = `${total} ₽`;
                 if (cartPreviewTotal) cartPreviewTotal.textContent = `${total} ₽`;
+                if (cartClearBtn) cartClearBtn.disabled = !cartItems.size;
                 if (cartItems.size) saveCartToStorage();
                 else localStorage.removeItem(CART_STORAGE_KEY);
+            }
+
+            function removeCartLine(id, rowEl) {
+                const row = rowEl || cartItemsEl?.querySelector(`.cart-item[data-id="${CSS.escape(id)}"]`);
+                const finish = () => {
+                    cartItems.delete(id);
+                    updateCart();
+                    renderCart();
+                };
+                if (row) {
+                    row.classList.add('removing');
+                    setTimeout(finish, 240);
+                } else {
+                    finish();
+                }
+            }
+
+            function setCartQty(id, nextQty) {
+                const item = cartItems.get(id);
+                if (!item) return;
+                const n = Math.max(1, Math.min(99, Math.floor(Number(nextQty) || 1)));
+                item.qty = n;
+                updateCart();
+                renderCart();
+            }
+
+            function clearCart() {
+                if (!cartItems.size) return;
+                const lang = getActiveLang();
+                const msg = lang === 'en' ? 'Clear the cart?' : 'Очистить корзину?';
+                if (!confirm(msg)) return;
+                cartItems.clear();
+                updateCart();
+                renderCart();
             }
 
             function buildCheckoutPayload() {
@@ -3615,6 +3950,7 @@
             }
 
             function openCart() {
+                if (cartPreview) cartPreview.classList.remove('open');
                 if (cartOverlay) cartOverlay.classList.add('open');
                 if (cartDrawer) cartDrawer.classList.add('open');
             }
@@ -3638,41 +3974,46 @@
                     return;
                 }
 
-                cartItems.forEach(item => {
+                cartItems.forEach((item) => {
                     const row = document.createElement('div');
                     row.className = 'cart-item';
                     row.dataset.id = item.id;
                     row.innerHTML = `
-                        <div>
+                        <div class="cart-item-main">
                             <div><span class="lang-ru">${item.titleRu}</span><span class="lang-en">${item.titleEn}</span></div>
-                            <small>${item.price} ₽</small>
+                            <small>${item.price} ₽ × ${item.qty} = ${item.price * item.qty} ₽</small>
                         </div>
-                        <div class="qty">
-                            <button type="button" data-action="minus">−</button>
-                            <strong>${item.qty}</strong>
-                            <button type="button" data-action="plus">+</button>
+                        <div class="cart-item-actions">
+                            <div class="qty">
+                                <button type="button" data-action="minus" aria-label="Меньше">−</button>
+                                <input type="number" class="qty-input" data-action="qty" min="1" max="99" step="1" value="${item.qty}" inputmode="numeric" aria-label="Количество">
+                                <button type="button" data-action="plus" aria-label="Больше">+</button>
+                            </div>
+                            <button type="button" class="cart-remove" data-action="remove" aria-label="Удалить" title="Удалить">×</button>
                         </div>
                     `;
                     cartItemsEl.appendChild(row);
                 });
                 switchLanguage(lang);
 
-                // Preview popover content
                 if (cartPreviewItems) {
                     cartPreviewItems.innerHTML = '';
                     if (!cartItems.size) {
                         cartPreviewItems.innerHTML = '<p class="muted"><span class="lang-ru">Корзина пуста</span><span class="lang-en">Cart is empty</span></p>';
                     } else {
-                        const previewList = Array.from(cartItems.values()).slice(0, 5);
-                        previewList.forEach(item => {
-                            const lineKey = Array.from(cartItems.keys()).find(k => cartItems.get(k) === item);
-                            const pid = item.productId ?? resolveProductIdFromLineKey(lineKey);
+                        cartItems.forEach((item, id) => {
+                            const pid = item.productId ?? resolveProductIdFromLineKey(id);
                             const row = document.createElement('div');
                             row.className = 'cart-preview-item';
+                            row.dataset.id = id;
                             row.innerHTML = `
                                 <img src="${productData[pid]?.image || ''}" alt="">
-                                <div><span class="lang-ru">${item.titleRu}</span><span class="lang-en">${item.titleEn}</span></div>
-                                <strong>x${item.qty}</strong>
+                                <div class="cart-preview-item-title"><span class="lang-ru">${item.titleRu}</span><span class="lang-en">${item.titleEn}</span></div>
+                                <div class="qty qty--compact">
+                                    <button type="button" data-action="minus" aria-label="Меньше">−</button>
+                                    <input type="number" class="qty-input" data-action="qty" min="1" max="99" step="1" value="${item.qty}" inputmode="numeric" aria-label="Количество">
+                                    <button type="button" data-action="plus" aria-label="Больше">+</button>
+                                </div>
                             `;
                             cartPreviewItems.appendChild(row);
                         });
@@ -3682,37 +4023,18 @@
             }
 
             if (cartItemsEl) {
-                cartItemsEl.addEventListener('click', (e) => {
-                    const btn = e.target.closest('button[data-action]');
-                    if (!btn) return;
-                    const row = e.target.closest('.cart-item');
-                    if (!row) return;
-                    const id = row.dataset.id;
-                    const item = cartItems.get(id);
-                    if (!item) return;
-                    const action = btn.dataset.action;
+                cartItemsEl.addEventListener('click', (e) => handleCartQtyClick(e, cartItemsEl));
+                cartItemsEl.addEventListener('change', (e) => handleCartQtyChange(e, cartItemsEl));
+                cartItemsEl.addEventListener('keydown', (e) => {
+                    if (e.target.matches('.qty-input') && e.key === 'Enter') e.target.blur();
+                });
+            }
 
-                    if (action === 'plus') {
-                        item.qty += 1;
-                        updateCart();
-                        renderCart();
-                        return;
-                    }
-
-                    if (action === 'minus') {
-                        if (item.qty > 1) {
-                            item.qty -= 1;
-                            updateCart();
-                            renderCart();
-                        } else {
-                            row.classList.add('removing');
-                            setTimeout(() => {
-                                cartItems.delete(id);
-                                updateCart();
-                                renderCart();
-                            }, 240);
-                        }
-                    }
+            if (cartPreviewItems) {
+                cartPreviewItems.addEventListener('click', (e) => handleCartQtyClick(e, cartPreviewItems));
+                cartPreviewItems.addEventListener('change', (e) => handleCartQtyChange(e, cartPreviewItems));
+                cartPreviewItems.addEventListener('keydown', (e) => {
+                    if (e.target.matches('.qty-input') && e.key === 'Enter') e.target.blur();
                 });
             }
 
@@ -3732,17 +4054,52 @@
                     cartPreview.classList.remove('open');
                 }, 120);
             };
+            const isMobileCartMode = () => window.matchMedia('(max-width: 720px)').matches;
+            const togglePreview = () => {
+                if (!cartPreview) return;
+                const willOpen = !cartPreview.classList.contains('open');
+                if (willOpen) {
+                    closeCart();
+                    cartPreview.classList.add('open');
+                } else {
+                    cartPreview.classList.remove('open');
+                }
+            };
+
             if (cartIndicator) {
-                cartIndicator.addEventListener('mouseenter', showPreview);
-                cartIndicator.addEventListener('mouseleave', hidePreview);
+                cartIndicator.addEventListener('mouseenter', () => {
+                    if (isMobileCartMode()) return;
+                    showPreview();
+                });
+                cartIndicator.addEventListener('mouseleave', () => {
+                    if (isMobileCartMode()) return;
+                    hidePreview();
+                });
                 cartIndicator.addEventListener('click', () => {
-                    if (!cartPreview) return;
-                    cartPreview.classList.toggle('open');
+                    if (isMobileCartMode()) {
+                        togglePreview();
+                        return;
+                    }
+                    openCart();
                 });
             }
             if (cartPreview) {
-                cartPreview.addEventListener('mouseenter', showPreview);
-                cartPreview.addEventListener('mouseleave', hidePreview);
+                cartPreview.addEventListener('mouseenter', () => {
+                    if (isMobileCartMode()) return;
+                    showPreview();
+                });
+                cartPreview.addEventListener('mouseleave', () => {
+                    if (isMobileCartMode()) return;
+                    hidePreview();
+                });
+            }
+            document.addEventListener('click', (e) => {
+                if (!isMobileCartMode() || !cartPreview?.classList.contains('open')) return;
+                if (cartIndicator?.contains(e.target) || cartPreview.contains(e.target)) return;
+                cartPreview.classList.remove('open');
+            });
+            if (cartClearBtn) {
+                cartClearBtn.addEventListener('click', clearCart);
             }
             if (cartGoCheckoutBtn) {
                 cartGoCheckoutBtn.addEventListener('click', goCheckout);
@@ -3871,7 +4228,7 @@
                     v.preload = 'auto';
                     v.muted = true;
                     v.playsInline = true;
-                    v.src = `../images/jar${n}.mp4`;
+                    v.src = `/images/jar${n}.mp4`;
                     v.load();
                     spiceJarPreloadVideos.push(v);
                 });
@@ -3879,7 +4236,7 @@
 
             function setSpiceVideoByLevel(jar) {
                 if (!spiceVideo) return;
-                const src = `../images/jar${jar}.mp4`;
+                const src = `/images/jar${jar}.mp4`;
 
                 const startPlayback = () => {
                     if (spiceVideo.getAttribute('data-src') !== src) return;

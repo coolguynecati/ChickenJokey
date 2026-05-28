@@ -263,6 +263,22 @@ app.get('/', (_req, res) => {
     res.redirect(302, '/shop/');
 });
 
+app.get('/media', (_req, res) => {
+    res.sendFile(path.join(REPO_ROOT, 'media.html'));
+});
+
+app.get('/media/', (_req, res) => {
+    res.sendFile(path.join(REPO_ROOT, 'media.html'));
+});
+
+app.get('/media.html', (_req, res) => {
+    res.redirect(302, '/media');
+});
+
+app.get('/shop/media.html', (_req, res) => {
+    res.redirect(302, '/media');
+});
+
 function resolveImagesDir() {
     const shopImages = path.join(SHOP_ROOT, 'images');
     const repoImages = path.join(REPO_ROOT, 'images');
@@ -279,7 +295,7 @@ app.get('/neworder.mp3', (_req, res) => {
 });
 
 app.use('/images', express.static(resolveImagesDir()));
-app.use('/media', express.static(path.join(REPO_ROOT, 'media'), { index: false }));
+app.use('/media-files', express.static(path.join(REPO_ROOT, 'media'), { index: false }));
 app.use('/cloud', express.static(CLOUD_ROOT, { index: false, dotfiles: 'deny' }));
 app.use('/shop', express.static(SHOP_ROOT));
 

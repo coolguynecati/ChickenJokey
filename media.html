@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Партнёрам — Видеоматериалы Emika's</title>
+  <link rel="shortcut icon" href="/images/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --orange:#ff6a1a; --orange-dark:#e2550f; --bg:#0d0d0f; --card:rgba(20,20,24,.9); --text:#f5f5f5; --muted:#c9c9ce; --line:rgba(255,255,255,.1); }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:'Montserrat',sans-serif; color:var(--text); background:#000 url('/images/background.jpg') center top/cover no-repeat fixed; min-height:100vh; }
+    main { max-width:1024px; margin:0 auto; padding:24px 16px 40px; }
+    h1 { margin:0 0 10px; font-family:'Dela Gothic One',sans-serif; font-size:clamp(1.45rem,3.6vw,2rem); line-height:1.15; font-weight:400; }
+    .lead { margin:0 0 18px; color:var(--muted); line-height:1.5; max-width:760px; }
+    .panel { border:1px solid var(--line); background:var(--card); border-radius:14px; padding:14px; margin-bottom:16px; }
+    .panel small { color:var(--muted); font-size:.78rem; display:block; margin-top:8px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:12px; }
+    .asset { border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--card); display:grid; grid-template-rows:auto 1fr; }
+    .asset img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; background:#111; }
+    .asset-body { padding:12px; display:grid; gap:8px; }
+    .asset-title { margin:0; font-size:.95rem; font-weight:700; line-height:1.35; word-break:break-word; }
+    .asset-desc { margin:0; color:var(--muted); font-size:.82rem; line-height:1.45; min-height:2.8em; }
+    .actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .btn { border:1px solid var(--line); border-radius:999px; padding:8px 12px; text-decoration:none; color:var(--text); font-size:.78rem; font-weight:700; background:rgba(255,255,255,.03); }
+    .btn:hover { border-color:rgba(255,106,26,.55); }
+    .btn.primary { background:var(--orange); border-color:transparent; color:#fff; }
+    .btn.primary:hover { background:var(--orange-dark); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Медиа материалы</h1>
+    <section class="panel">Доступные материалы:<small>Если нужен другой формат, свяжитесь с Артёмом Беляевым (руководитель по франшизам Emika's).</small></section>
+    <section class="grid" aria-label="Список видеоматериалов">
+      <article class="asset">
+        <img src="/media-files/previews/videomenu1_44min.jpg" alt="Превью videomenu1_44min.mp4" loading="lazy">
+        <div class="asset-body">
+          <h2 class="asset-title">videomenu1_44min.mp4</h2>
+          <p class="asset-desc">Горизонтальный видеоматериал для экранов меню 1. Повтор на 44 минуты, загрузите несколько копий видео, чтобы запустить на USB накопителе и воспроизводилось весь день.</p>
+          <div class="actions">
+            <a class="btn" href="/media-files/videomenu1_44min.mp4" target="_blank" rel="noopener">Открыть</a>
+            <a class="btn primary" href="/media-files/videomenu1_44min.mp4" download>Скачать</a>
+          </div>
+        </div>
+      </article>
+      <article class="asset">
+        <img src="/media-files/previews/vertical_screen_1080.jpg" alt="Превью vertical screen 1080.mp4" loading="lazy">
+        <div class="asset-body">
+          <h2 class="asset-title">vertical screen 1080.mp4</h2>
+          <p class="asset-desc">Экран вертикальный Eat Arena первый этаж.</p>
+          <div class="actions">
+            <a class="btn" href="/media-files/vertical%20screen%201080.mp4" target="_blank" rel="noopener">Открыть</a>
+            <a class="btn primary" href="/media-files/vertical%20screen%201080.mp4" download>Скачать</a>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

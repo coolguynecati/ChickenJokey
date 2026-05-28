@@ -226,22 +226,51 @@
       font-size: 0.75rem;
       line-height: 1.35;
     }
-    .recommendations-line {
+    .recommendations-carousel {
       display: grid;
-      grid-auto-flow: column;
-      grid-auto-columns: minmax(132px, 1fr);
+      grid-template-columns: 24px 1fr 24px;
+      align-items: center;
+      gap: 6px;
+    }
+    .recommendations-line {
+      display: flex;
       gap: 6px;
       overflow-x: auto;
       padding-bottom: 1px;
       overscroll-behavior-x: contain;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+    }
+    .recommendations-line::-webkit-scrollbar { display: none; }
+    .reco-nav {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 1px solid var(--input-border);
+      background: transparent;
+      color: var(--text);
+      font-size: 0.78rem;
+      line-height: 1;
+      padding: 0;
+      cursor: pointer;
+    }
+    .reco-nav:hover {
+      border-color: rgba(255, 106, 26, 0.65);
+      background: rgba(255, 106, 26, 0.08);
     }
     .recommendation-card {
+      flex: 0 0 calc((100% - 12px) / 3);
       border: 1px solid var(--border);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.02);
       padding: 7px;
       display: grid;
       gap: 5px;
+    }
+    @media (max-width: 760px) {
+      .recommendation-card {
+        flex-basis: calc((100% - 6px) / 2);
+      }
     }
     html[data-theme="light"] .recommendation-card {
       background: rgba(0, 0, 0, 0.02);
@@ -941,8 +970,10 @@
       recommendationsEl.innerHTML = `
         <h4>Рекомендации к заказу</h4>
         <p class="recommendations-hint">Добавьте в заказ в один тап:</p>
-        <div class="recommendations-line">
-          ${recs.map((id) => {
+        <div class="recommendations-carousel">
+          <button type="button" class="reco-nav" data-action="reco-prev" aria-label="Назад">‹</button>
+          <div class="recommendations-line" id="recommendationsLine">
+            ${recs.map((id) => {
             const p = RECOMMENDED_PRODUCTS[id];
             return `
               <article class="recommendation-card">
@@ -955,6 +986,8 @@
               </article>
             `;
           }).join('')}
+          </div>
+          <button type="button" class="reco-nav" data-action="reco-next" aria-label="Вперёд">›</button>
         </div>
       `;
     }
@@ -1088,8 +1121,18 @@
     });
     recommendationsEl?.addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-action="add-reco"]');
-      if (!btn) return;
-      addRecommendedProduct(btn.dataset.product, btn);
+      if (btn) {
+        addRecommendedProduct(btn.dataset.product, btn);
+        return;
+      }
+      const navBtn = e.target.closest('button[data-action^="reco-"]');
+      if (!navBtn) return;
+      const line = recommendationsEl.querySelector('#recommendationsLine');
+      if (!line) return;
+      const card = line.querySelector('.recommendation-card');
+      const cardWidth = card ? card.getBoundingClientRect().width + 6 : 140;
+      const direction = navBtn.dataset.action === 'reco-next' ? 1 : -1;
+      line.scrollBy({ left: direction * cardWidth, behavior: 'smooth' });
     });
 
     clearCartBtn.addEventListener('click', clearCart);

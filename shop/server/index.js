@@ -260,13 +260,7 @@ app.get('/api/cloud', (req, res) => {
 });
 
 app.get('/', (_req, res) => {
-    res.sendFile(path.join(SHOP_ROOT, 'index.html'));
-});
-
-app.get(['/shop', '/shop/'], (_req, res) => res.redirect(301, '/'));
-app.get('/shop/*', (req, res) => {
-    const target = req.path.replace(/^\/shop/, '') || '/';
-    res.redirect(301, target);
+    res.redirect(302, '/shop/');
 });
 
 function resolveImagesDir() {
@@ -285,8 +279,9 @@ app.get('/neworder.mp3', (_req, res) => {
 });
 
 app.use('/images', express.static(resolveImagesDir()));
+app.use('/media', express.static(path.join(REPO_ROOT, 'media'), { index: false }));
 app.use('/cloud', express.static(CLOUD_ROOT, { index: false, dotfiles: 'deny' }));
-app.use(express.static(SHOP_ROOT));
+app.use('/shop', express.static(SHOP_ROOT));
 
 app.listen(PORT, () => {
     store.readOrders();

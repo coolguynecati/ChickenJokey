@@ -664,6 +664,28 @@
             transition: background 0.2s ease;
         }
 
+        .cart-indicator.bump {
+            animation: cartBump 0.36s ease;
+        }
+
+        @keyframes cartBump {
+            0% { transform: scale(1); }
+            45% { transform: scale(1.14); }
+            100% { transform: scale(1); }
+        }
+
+        .cart-fly-token {
+            position: fixed;
+            z-index: 2600;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            background-size: cover;
+            background-position: center;
+        }
+
         .cart-indicator:hover {
             background: var(--line);
         }
@@ -2380,9 +2402,20 @@
                 height: 32px;
             }
 
+            .cart-indicator {
+                position: fixed;
+                right: 12px;
+                bottom: 14px;
+                z-index: 2400;
+                box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+                padding: 8px 12px;
+            }
+
             .cart-preview {
-                right: 0;
-                top: calc(100% + 8px);
+                position: fixed;
+                right: 10px;
+                bottom: 58px;
+                top: auto;
                 width: min(360px, calc(100vw - 20px));
                 padding: 10px;
             }
@@ -3949,6 +3982,31 @@
                 renderCart();
             }
 
+            function animateToCart(sourceEl, productId) {
+                if (!sourceEl || !cartIndicator) return;
+                const sourceRect = sourceEl.getBoundingClientRect();
+                const cartRect = cartIndicator.getBoundingClientRect();
+                const token = document.createElement('span');
+                token.className = 'cart-fly-token';
+                token.style.left = `${sourceRect.left + sourceRect.width / 2 - 15}px`;
+                token.style.top = `${sourceRect.top + sourceRect.height / 2 - 15}px`;
+                const image = productData[productId]?.image;
+                if (image) token.style.backgroundImage = `url("${image}")`;
+                else token.style.background = 'var(--orange)';
+                document.body.appendChild(token);
+                requestAnimationFrame(() => {
+                    token.style.transition = 'transform 420ms ease, opacity 420ms ease';
+                    token.style.transform = `translate(${cartRect.left - sourceRect.left}px, ${cartRect.top - sourceRect.top}px) scale(0.35)`;
+                    token.style.opacity = '0.15';
+                });
+                cartIndicator.classList.remove('bump');
+                requestAnimationFrame(() => cartIndicator.classList.add('bump'));
+                setTimeout(() => {
+                    token.remove();
+                    cartIndicator.classList.remove('bump');
+                }, 450);
+            }
+
             function openCart() {
                 if (cartPreview) cartPreview.classList.remove('open');
                 if (cartOverlay) cartOverlay.classList.add('open');
@@ -4377,7 +4435,10 @@
                     btn.innerHTML = `<span class="lang-ru">В корзину</span><span class="lang-en">Add</span>`;
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        if (id) addToCart(id, 1);
+                        if (id) {
+                            addToCart(id, 1);
+                            animateToCart(btn, id);
+                        }
                     });
                 }
             });
@@ -4401,6 +4462,7 @@
                     } else {
                         addToCart(currentProduct, 1, p.hasSpice ? { spiceLevel } : {});
                     }
+                    animateToCart(modalAddBtn, currentProduct);
                     closeModal();
                 });
             }

@@ -4,7 +4,7 @@ services:
     runtime: node
     rootDir: shop
     plan: free
-    buildCommand: npm ci --omit=dev || npm install --omit=dev
+    buildCommand: npm ci --omit=dev || npm install --omit=dev; node scripts/copy-images.js
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:

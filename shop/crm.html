@@ -279,7 +279,7 @@
         .sidebar {
             border-right: 1px solid var(--border);
             display: grid;
-            grid-template-rows: auto auto minmax(0, 1fr);
+            grid-template-rows: auto auto auto minmax(0, 1fr);
             min-height: 0;
             height: 100%;
             background: rgba(0, 0, 0, 0.15);
@@ -462,17 +462,158 @@
 
         @keyframes order-unread-blink {
             0%, 49.9% {
-                background: rgba(255, 106, 26, 0.38);
-                border-color: var(--orange);
+                background: rgba(255, 215, 0, 0.22);
+                border-color: rgba(255, 215, 0, 0.65);
+                box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.25);
             }
             50%, 100% {
                 background: rgba(255, 255, 255, 0.04);
                 border-color: var(--border);
+                box-shadow: none;
+            }
+        }
+
+        @keyframes order-unread-urgent {
+            0%, 49.9% {
+                background: rgba(255, 107, 107, 0.35);
+                border-color: var(--danger);
+                box-shadow: 0 0 12px rgba(255, 107, 107, 0.45);
+            }
+            50%, 100% {
+                background: rgba(255, 255, 255, 0.04);
+                border-color: var(--border);
+                box-shadow: none;
             }
         }
 
         .order-row--unread {
-            animation: order-unread-blink 10s ease-in-out infinite;
+            animation: order-unread-blink 2.8s ease-in-out infinite;
+        }
+
+        .order-row--unread-urgent {
+            animation: order-unread-urgent 0.85s ease-in-out infinite;
+        }
+
+        .order-row--urgency-blue { border-left: 4px solid #5b9bd5; }
+        .order-row--urgency-green { border-left: 4px solid var(--ok); }
+        .order-row--urgency-yellow { border-left: 4px solid var(--warn); }
+        .order-row--urgency-red { border-left: 4px solid var(--danger); }
+
+        .urgency-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-right: 4px;
+        }
+
+        .urgency-dot--blue { background: #5b9bd5; }
+        .urgency-dot--green { background: var(--ok); }
+        .urgency-dot--yellow { background: var(--warn); }
+        .urgency-dot--red { background: var(--danger); }
+
+        .location-tabs {
+            display: flex;
+            gap: 6px;
+            padding: 0 12px 8px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .location-tabs[hidden] { display: none !important; }
+
+        .location-tabs button {
+            flex: 1;
+            padding: 10px 6px;
+            font-size: 0.8rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        .location-tabs button.is-active {
+            background: rgba(255, 106, 26, 0.15);
+            border-color: rgba(255, 106, 26, 0.45);
+            color: var(--text);
+        }
+
+        .status-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .status-btn {
+            min-height: 56px;
+            padding: 14px 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            touch-action: manipulation;
+        }
+
+        .status-btn--prep {
+            grid-column: 1 / -1;
+            background: rgba(255, 106, 26, 0.2);
+            color: #ffb07a;
+            border-color: rgba(255, 106, 26, 0.5);
+        }
+
+        .status-btn--delivery {
+            background: rgba(100, 149, 237, 0.2);
+            color: #9ec5ff;
+            border-color: rgba(100, 149, 237, 0.45);
+        }
+
+        .status-btn--done {
+            background: rgba(62, 207, 142, 0.2);
+            color: var(--ok);
+            border-color: rgba(62, 207, 142, 0.45);
+        }
+
+        .status-btn--cancel {
+            background: rgba(255, 107, 107, 0.12);
+            color: var(--danger);
+            border-color: rgba(255, 107, 107, 0.4);
+        }
+
+        .status-btn.is-current {
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
+            transform: scale(0.98);
+        }
+
+        .status-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .contact-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        .contact-links a {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--orange);
+            text-decoration: none;
+        }
+
+        .contact-links a:hover { text-decoration: underline; }
+
+        .contact-links .tg-mini {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 8px;
+            background: rgba(0, 136, 204, 0.15);
+            border: 1px solid rgba(0, 136, 204, 0.35);
+            color: #7cc8f5;
         }
 
         .order-row input[type="checkbox"] {
@@ -784,7 +925,8 @@
             <div>
                 <h1><span class="live-dot" id="liveDot"></span>Заказы</h1>
                 <small id="ordersCount">—</small>
-                <small id="crmVersion" style="display:block;color:var(--muted);font-size:0.75rem;margin-top:2px;">CRM v3.4</small>
+                <small id="crmAccountLabel" style="display:block;color:var(--orange);font-size:0.8rem;margin-top:2px;"></small>
+                <small id="crmVersion" style="display:block;color:var(--muted);font-size:0.75rem;margin-top:2px;">CRM v4.1</small>
                 <small id="pollStatus" style="display:block;color:var(--muted);font-size:0.7rem;margin-top:2px;"></small>
             </div>
             <div class="topbar-actions">
@@ -797,8 +939,9 @@
         </header>
 
         <div class="sound-banner" id="soundBanner" hidden>
-            <span class="sound-banner__text">Включите звук и разрешите уведомления браузера. Добавьте CRM на главный экран — так заказы приходят, даже если вкладка свёрнута (на iPhone: «Поделиться» → «На экран Домой»).</span>
+            <span class="sound-banner__text">Один раз нажмите «Включить звук» на этом планшете. При заказе — сигнал, потом каждые 2 мин, пока заказ не откроете. Вкладку CRM не закрывайте.</span>
             <button type="button" class="btn-primary" id="soundUnlockBtn">Включить звук</button>
+            <button type="button" class="btn-ghost" id="soundTestBtn" hidden>Проверить звук</button>
         </div>
 
         <div class="layout">
@@ -810,6 +953,11 @@
                         <button type="button" data-view="deleted">Удалённые</button>
                     </div>
                 </div>
+                <div class="location-tabs" id="locationTabs" hidden>
+                    <button type="button" data-location="all" class="is-active">Все</button>
+                    <button type="button" data-location="eat-arena">Eat Arena</button>
+                    <button type="button" data-location="poselok">Посёлок</button>
+                </div>
                 <div class="sidebar-frame sidebar-frame--toolbar">
                     <div class="toolbar-row">
                         <div class="search-wrap" id="searchWrap">
@@ -819,8 +967,7 @@
                         <select id="statusFilter" aria-label="Статус">
                             <option value="all">Все статусы</option>
                             <option value="new">Новые</option>
-                            <option value="confirmed">Подтверждены</option>
-                            <option value="cooking">Готовятся</option>
+                            <option value="preparing">Готовим</option>
                             <option value="delivery">В доставке</option>
                             <option value="cancelled">Отменены</option>
                         </select>
@@ -904,8 +1051,14 @@
         window.emikaApiUrl = emikaApiUrl;
 
         const TOKEN_KEY = 'emika-crm-token';
+        const ACCOUNT_KEY = 'emika-crm-account';
+        const LOCATION_SCOPE_KEY = 'emika-crm-location-scope';
+        const ACCOUNT_LABEL_KEY = 'emika-crm-account-label';
+        const OPENED_ORDERS_KEY = 'emika-crm-opened-orders';
+        const UNREAD_URGENT_MS = 5 * 60 * 1000;
+        const MSK_TZ = 'Europe/Moscow';
         const POLL_VISIBLE_MS = 3000;
-        const POLL_HIDDEN_MS = 12000;
+        const POLL_HIDDEN_MS = 8000;
         const API_TIMEOUT_MS = 22000;
         const POLL_STALE_LOCK_MS = 28000;
         const STATUS_LABELS = {
@@ -917,7 +1070,7 @@
             cancelled: 'Отменён'
         };
 
-        const LOCATION_LABELS = { 'eat-arena': 'Eat Arena' };
+        const LOCATION_LABELS = { 'eat-arena': 'Eat Arena', poselok: 'Посёлок' };
 
         const CANCEL_REASON_LABELS = {
             guest_cancelled: 'Гость отменил',
@@ -944,6 +1097,10 @@
         let selectedIds = new Set();
         let currentView = 'active';
         let currentLocation = 'all';
+        let crmLocationScope = 'all';
+        let crmAccountLabel = '';
+        const openedOrderIds = new Set();
+        let urgencyTickTimer = null;
         let pollTimeout = null;
         let ordersLoadStartedAt = 0;
         let lastPollOkAt = 0;
@@ -952,22 +1109,22 @@
         const pollStatusEl = document.getElementById('pollStatus');
         let knownOrderIds = new Set();
         const SOUND_SESSION_KEY = 'emika-crm-sound-on';
-        const ORDER_SOUND_URLS = (() => {
-            const urls = [new URL('neworder.mp3', location.href).href];
-            urls.push('https://emikashotchicken.ru/shop/neworder.mp3');
-            return [...new Set(urls)];
-        })();
+        const SOUND_STORAGE_KEY = 'emika-crm-sound-on';
 
         const SOUND_MAX_MS = 14000;
         const SOUND_MIN_GAP_MS = 2500;
         const REMIND_SOUND_MS = 2 * 60 * 1000;
 
+        let orderSoundUrls = [];
+        let orderSoundUrlsReady = null;
         let orderSound = null;
         let orderSoundUrlIndex = 0;
-        let soundOn = sessionStorage.getItem(SOUND_SESSION_KEY) === '1';
+        let soundOn = false;
         let soundStopTimer = null;
         let soundPlaying = false;
         let lastSoundAt = 0;
+        let lastRemindAt = 0;
+        let pendingSoundPlay = false;
         let soundRemindTimer = null;
         let ordersInitialized = false;
         const unreadOrderIds = new Set();
@@ -980,10 +1137,255 @@
 
         const soundBanner = document.getElementById('soundBanner');
         const soundUnlockBtn = document.getElementById('soundUnlockBtn');
+        const soundTestBtn = document.getElementById('soundTestBtn');
 
-        function getOrderSound() {
+        function wasSoundEnabledBefore() {
+            try {
+                return localStorage.getItem(SOUND_STORAGE_KEY) === '1'
+                    || sessionStorage.getItem(SOUND_SESSION_KEY) === '1';
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function persistSoundEnabled(on) {
+            try {
+                if (on) {
+                    localStorage.setItem(SOUND_STORAGE_KEY, '1');
+                    sessionStorage.setItem(SOUND_SESSION_KEY, '1');
+                } else {
+                    localStorage.removeItem(SOUND_STORAGE_KEY);
+                    sessionStorage.removeItem(SOUND_SESSION_KEY);
+                }
+            } catch (_) {}
+        }
+
+        async function resolveOrderSoundUrls() {
+            if (orderSoundUrls.length) return orderSoundUrls;
+            if (orderSoundUrlsReady) return orderSoundUrlsReady;
+            orderSoundUrlsReady = (async () => {
+                const urls = [];
+                const add = (u) => {
+                    try {
+                        if (u) urls.push(new URL(u).href);
+                    } catch (_) {}
+                };
+                add(new URL('neworder.mp3', location.href).href);
+                add(new URL('/shop/neworder.mp3', location.origin).href);
+                add(new URL('/neworder.mp3', location.origin).href);
+                try {
+                    await emikaApiReady;
+                    add(new URL('neworder.mp3', emikaApiOrigin).href);
+                    add(new URL('/shop/neworder.mp3', emikaApiOrigin).href);
+                    add(new URL('/neworder.mp3', emikaApiOrigin).href);
+                } catch (_) {}
+                add('https://emikashotchicken.ru/shop/neworder.mp3');
+                add('https://chickenjokey.onrender.com/shop/neworder.mp3');
+                add('https://chickenjokey.onrender.com/neworder.mp3');
+                orderSoundUrls = [...new Set(urls)];
+                orderSoundUrlsReady = null;
+                return orderSoundUrls;
+            })();
+            return orderSoundUrlsReady;
+        }
+
+        function resetOrderSoundElement() {
+            orderSound = null;
+        }
+
+        function advanceOrderSoundUrl() {
+            if (!orderSoundUrls.length || orderSoundUrlIndex >= orderSoundUrls.length - 1) return false;
+            orderSoundUrlIndex += 1;
+            orderSound = null;
+            return true;
+        }
+        const locationTabs = document.getElementById('locationTabs');
+        const crmAccountLabelEl = document.getElementById('crmAccountLabel');
+
+        function loadOpenedOrderIds() {
+            openedOrderIds.clear();
+            try {
+                const raw = localStorage.getItem(OPENED_ORDERS_KEY);
+                const arr = JSON.parse(raw || '[]');
+                if (Array.isArray(arr)) arr.forEach((id) => openedOrderIds.add(id));
+            } catch (_) {}
+        }
+
+        function saveOpenedOrderIds() {
+            try {
+                localStorage.setItem(OPENED_ORDERS_KEY, JSON.stringify([...openedOrderIds]));
+            } catch (_) {}
+        }
+
+        function markOrderOpened(id) {
+            if (!id) return;
+            openedOrderIds.add(id);
+            saveOpenedOrderIds();
+        }
+
+        function getMoscowMinutesNow() {
+            const parts = new Intl.DateTimeFormat('en-GB', {
+                timeZone: MSK_TZ,
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            }).formatToParts(new Date());
+            const hour = Number(parts.find((p) => p.type === 'hour')?.value || 0);
+            const minute = Number(parts.find((p) => p.type === 'minute')?.value || 0);
+            return hour * 60 + minute;
+        }
+
+        /** @returns {number|null} minutes until pickup */
+        function minutesUntilPickup(order) {
+            if (!order) return null;
+            if (order.pickupTimeMode === 'asap') return 0;
+            if (order.pickupTimeMode === 'hour') return 60;
+            if (order.pickupTimeMode === 'at' && order.pickupTimeAt) {
+                const m = String(order.pickupTimeAt).match(/^(\d{1,2}):(\d{2})$/);
+                if (!m) return null;
+                const pickupMin = Number(m[1]) * 60 + Number(m[2]);
+                let diff = pickupMin - getMoscowMinutesNow();
+                if (diff < 0) diff += 24 * 60;
+                return diff;
+            }
+            return null;
+        }
+
+        function urgencyLevel(order) {
+            const mins = minutesUntilPickup(order);
+            if (mins === null) return '';
+            if (mins > 120) return 'blue';
+            if (mins > 60) return 'green';
+            if (mins > 30) return 'yellow';
+            return 'red';
+        }
+
+        function isUnreadUrgent(order) {
+            if (!unreadOrderIds.has(order.id)) return false;
+            if (order.pickupTimeMode !== 'asap') return false;
+            const age = Date.now() - new Date(order.createdAt || 0).getTime();
+            return age >= UNREAD_URGENT_MS;
+        }
+
+        function orderRowClasses(order) {
+            let cls = 'order-row';
+            if (order.id === selectedId) cls += ' is-active';
+            if (selectedIds.has(order.id)) cls += ' order-row--picked';
+            if (unreadOrderIds.has(order.id)) {
+                cls += isUnreadUrgent(order) ? ' order-row--unread-urgent' : ' order-row--unread';
+            } else if (openedOrderIds.has(order.id) && !['done', 'cancelled'].includes(order.status)) {
+                const u = urgencyLevel(order);
+                if (u) cls += ` order-row--urgency-${u}`;
+            }
+            return cls;
+        }
+
+        function parseTelegramUsername(raw) {
+            const s = String(raw || '').trim();
+            if (!s) return null;
+            const atMatch = s.match(/@([a-zA-Z][a-zA-Z0-9_]{4,31})/);
+            if (atMatch) return atMatch[1];
+            const plain = s.replace(/^@/, '');
+            if (/^[a-zA-Z][a-zA-Z0-9_]{4,31}$/.test(plain)) return plain;
+            return null;
+        }
+
+        function findTelegramInText(text) {
+            const s = String(text || '');
+            const m = s.match(/@([a-zA-Z][a-zA-Z0-9_]{4,31})/);
+            return m ? m[1] : null;
+        }
+
+        function telegramPhoneHref(phone) {
+            let digits = String(phone || '').replace(/\D/g, '');
+            if (digits.length === 11 && digits.startsWith('8')) digits = '7' + digits.slice(1);
+            if (digits.length === 10) digits = '7' + digits;
+            if (digits.length < 11) return null;
+            return `https://t.me/+${digits}`;
+        }
+
+        function formatGuestComment(text) {
+            if (!text) return '';
+            return esc(text).replace(
+                /@([a-zA-Z][a-zA-Z0-9_]{4,31})/g,
+                '<a href="https://t.me/$1" target="_blank" rel="noopener" style="color:var(--orange);">@$1</a>'
+            );
+        }
+
+        function formatContactField(value, { allowMailto = true } = {}) {
+            const raw = String(value || '').trim();
+            if (!raw) return '';
+            const tg = parseTelegramUsername(raw);
+            if (tg) {
+                return `<a href="https://t.me/${esc(tg)}" target="_blank" rel="noopener">@${esc(tg)}</a>`;
+            }
+            if (allowMailto && raw.includes('@') && /\.[a-z]{2,}$/i.test(raw)) {
+                return `<a href="mailto:${encodeURIComponent(raw)}">${esc(raw)}</a>`;
+            }
+            return esc(raw);
+        }
+
+        function contactLinksHtml(order) {
+            const parts = [];
+            const phone = order.customer?.phone || '';
+            const telHref = phone ? `tel:${phone.replace(/\s/g, '')}` : '';
+            const tgPhone = telegramPhoneHref(phone);
+            const emailRaw = order.customer?.email || '';
+            const tgUser = parseTelegramUsername(emailRaw) || findTelegramInText(order.comment);
+
+            if (tgPhone) {
+                parts.push(`<a class="tg-mini" href="${esc(tgPhone)}" target="_blank" rel="noopener">TG по телефону</a>`);
+            }
+            if (tgUser) {
+                parts.push(`<a class="tg-mini" href="https://t.me/${esc(tgUser)}" target="_blank" rel="noopener">@${esc(tgUser)}</a>`);
+            }
+            return parts.length ? `<div class="contact-links">${parts.join('')}</div>` : '';
+        }
+
+        function updateLocationTabsUi() {
+            if (!locationTabs) return;
+            const show = crmLocationScope === 'all';
+            locationTabs.hidden = !show;
+            if (!show) return;
+            locationTabs.querySelectorAll('button[data-location]').forEach((btn) => {
+                btn.classList.toggle('is-active', btn.dataset.location === currentLocation);
+            });
+        }
+
+        function updateAccountLabelUi() {
+            if (!crmAccountLabelEl) return;
+            if (!crmAccountLabel) {
+                crmAccountLabelEl.textContent = '';
+                return;
+            }
+            const locPart = crmLocationScope === 'all'
+                ? (currentLocation === 'all' ? 'все точки' : LOCATION_LABELS[currentLocation])
+                : LOCATION_LABELS[crmLocationScope] || crmLocationScope;
+            crmAccountLabelEl.textContent = `${crmAccountLabel} · ${locPart}`;
+        }
+
+        function startUrgencyTick() {
+            if (urgencyTickTimer) return;
+            urgencyTickTimer = setInterval(() => {
+                if (!getToken() || !orders.length) return;
+                renderOrdersList();
+            }, 30000);
+        }
+
+        function stopUrgencyTick() {
+            if (urgencyTickTimer) {
+                clearInterval(urgencyTickTimer);
+                urgencyTickTimer = null;
+            }
+        }
+
+        async function getOrderSound() {
+            await resolveOrderSoundUrls();
+            if (!orderSoundUrls.length) {
+                throw new Error('Нет URL для звука заказа');
+            }
             if (!orderSound) {
-                orderSound = new Audio(ORDER_SOUND_URLS[orderSoundUrlIndex]);
+                orderSound = new Audio(orderSoundUrls[orderSoundUrlIndex]);
                 orderSound.preload = 'auto';
                 orderSound.loop = false;
                 orderSound.addEventListener('ended', () => {
@@ -991,10 +1393,11 @@
                 });
                 orderSound.addEventListener('error', () => {
                     soundPlaying = false;
-                    if (orderSoundUrlIndex >= ORDER_SOUND_URLS.length - 1) return;
-                    orderSoundUrlIndex += 1;
-                    orderSound.src = ORDER_SOUND_URLS[orderSoundUrlIndex];
-                    orderSound.load();
+                    if (advanceOrderSoundUrl()) {
+                        orderSound = new Audio(orderSoundUrls[orderSoundUrlIndex]);
+                        orderSound.preload = 'auto';
+                        orderSound.load();
+                    }
                 });
             }
             orderSound.loop = false;
@@ -1021,29 +1424,95 @@
         function updateSoundBanner() {
             if (!soundBanner) return;
             soundBanner.hidden = soundOn;
+            if (soundTestBtn) soundTestBtn.hidden = !soundOn;
+        }
+
+        async function tryPlayOrderSound({ quiet = false } = {}) {
+            const audio = await getOrderSound();
+            stopOrderSound();
+            audio.loop = false;
+            audio.volume = quiet ? 0.001 : 1;
+            audio.currentTime = 0;
+            await audio.play();
+            if (quiet) {
+                await new Promise((r) => setTimeout(r, 80));
+                stopOrderSound();
+                audio.volume = 1;
+            }
+            return audio;
         }
 
         async function unlockOrderSound() {
-            const audio = getOrderSound();
-            stopOrderSound();
-            audio.loop = false;
-            audio.volume = 0.001;
-            audio.currentTime = 0;
             try {
-                await audio.play();
-                setTimeout(() => {
-                    stopOrderSound();
-                    audio.volume = 1;
-                }, 120);
+                await tryPlayOrderSound({ quiet: true });
                 soundOn = true;
-                sessionStorage.setItem(SOUND_SESSION_KEY, '1');
+                persistSoundEnabled(true);
                 updateSoundBanner();
+                startSoundRemindLoop();
+                installSoundGestureFallback();
+                if (hasUnreadOrders()) {
+                    pendingSoundPlay = true;
+                    playOrderAlert('catchup');
+                }
                 showToast('Звук включён');
                 return true;
-            } catch {
-                audio.volume = 1;
-                showToast('Не удалось включить звук. Проверьте громкость и беззвучный режим.');
+            } catch (e) {
+                soundOn = false;
+                persistSoundEnabled(false);
+                if (advanceOrderSoundUrl()) {
+                    return unlockOrderSound();
+                }
+                updateSoundBanner();
+                showToast('Не удалось включить звук. Нажмите «Проверить звук» или проверьте громкость.');
                 return false;
+            }
+        }
+
+        async function restoreSoundState() {
+            if (!wasSoundEnabledBefore()) {
+                soundOn = false;
+                updateSoundBanner();
+                if (hasUnreadOrders()) pendingSoundPlay = true;
+                return;
+            }
+            try {
+                await tryPlayOrderSound({ quiet: true });
+                soundOn = true;
+                persistSoundEnabled(true);
+                updateSoundBanner();
+                startSoundRemindLoop();
+                installSoundGestureFallback();
+                if (hasUnreadOrders()) {
+                    pendingSoundPlay = true;
+                    playOrderAlert('catchup');
+                }
+            } catch (_) {
+                soundOn = false;
+                pendingSoundPlay = hasUnreadOrders();
+                updateSoundBanner();
+            }
+        }
+
+        let soundGestureInstalled = false;
+        function installSoundGestureFallback() {
+            if (soundGestureInstalled) return;
+            soundGestureInstalled = true;
+            document.addEventListener('click', () => {
+                if (soundOn) return;
+                if (!pendingSoundPlay && !hasUnreadOrders()) return;
+                unlockOrderSound();
+            }, { capture: true, passive: true });
+        }
+
+        async function testOrderSound() {
+            try {
+                await tryPlayOrderSound({ quiet: false });
+                showToast('Звук слышен');
+            } catch (_) {
+                if (advanceOrderSoundUrl()) {
+                    return testOrderSound();
+                }
+                showToast('Файл neworder.mp3 не загружается. Проверьте интернет.');
             }
         }
 
@@ -1117,52 +1586,82 @@
         }
 
         function startSoundRemindLoop() {
-            if (soundRemindTimer || !hasUnreadOrders()) return;
+            if (soundRemindTimer) return;
             soundRemindTimer = setInterval(() => {
-                if (!hasUnreadOrders() || !soundOn) {
+                if (!hasUnreadOrders()) {
                     stopSoundRemindLoop();
+                    pendingSoundPlay = false;
                     return;
                 }
-                const audio = getOrderSound();
-                if (!soundPlaying || audio.paused) startUnreadAlertSound();
+                if (!soundOn) {
+                    updateSoundBanner();
+                    return;
+                }
+                playOrderAlert('remind');
             }, REMIND_SOUND_MS);
         }
 
-        function startUnreadAlertSound() {
-            if (!soundOn) {
-                updateSoundBanner();
+        /** @param {'new'|'remind'|'catchup'} reason */
+        function playOrderAlert(reason) {
+            if (!hasUnreadOrders()) {
+                pendingSoundPlay = false;
                 return;
             }
-            if (!hasUnreadOrders()) return;
-
-            const audio = getOrderSound();
-            if (soundPlaying && audio.loop && !audio.paused) return;
-
-            if (soundStopTimer) {
-                clearTimeout(soundStopTimer);
-                soundStopTimer = null;
+            if (!soundOn) {
+                updateSoundBanner();
+                pendingSoundPlay = true;
+                return;
             }
 
-            audio.loop = true;
-            audio.volume = 1;
-            audio.currentTime = 0;
-            soundPlaying = true;
-            lastSoundAt = Date.now();
+            const now = Date.now();
 
-            if ('mediaSession' in navigator) {
+            if (reason === 'catchup') {
+                if (!pendingSoundPlay) return;
+                pendingSoundPlay = false;
+            } else if (reason === 'remind') {
+                if (now - lastRemindAt < REMIND_SOUND_MS - 5000) return;
+                lastRemindAt = now;
+            } else if (reason === 'new') {
+                lastRemindAt = now;
+                pendingSoundPlay = true;
+            }
+
+            if (soundPlaying) return;
+            if (reason !== 'new' && now - lastSoundAt < SOUND_MIN_GAP_MS) return;
+
+            void (async () => {
                 try {
-                    navigator.mediaSession.metadata = new MediaMetadata({
-                        title: 'Новый заказ — Emika\'s',
-                        artist: 'CRM'
-                    });
-                    navigator.mediaSession.playbackState = 'playing';
-                } catch (_) {}
-            }
-
-            audio.play().catch(() => {
-                soundPlaying = false;
-                audio.loop = false;
-            });
+                    const audio = await getOrderSound();
+                    if (soundStopTimer) {
+                        clearTimeout(soundStopTimer);
+                        soundStopTimer = null;
+                    }
+                    audio.loop = false;
+                    audio.volume = 1;
+                    audio.currentTime = 0;
+                    await audio.play();
+                    soundPlaying = true;
+                    lastSoundAt = Date.now();
+                    pendingSoundPlay = false;
+                    soundStopTimer = setTimeout(() => {
+                        soundPlaying = false;
+                        try {
+                            audio.pause();
+                            audio.currentTime = 0;
+                        } catch (_) {}
+                    }, SOUND_MAX_MS);
+                } catch (_) {
+                    soundPlaying = false;
+                    pendingSoundPlay = true;
+                    if (advanceOrderSoundUrl()) {
+                        playOrderAlert(reason);
+                        return;
+                    }
+                    soundOn = false;
+                    persistSoundEnabled(false);
+                    updateSoundBanner();
+                }
+            })();
         }
 
         function notifyNewOrders(newOrders) {
@@ -1193,7 +1692,7 @@
         function onUnreadOrdersAdded(newOrders) {
             updateFaviconAlert();
             startSoundRemindLoop();
-            startUnreadAlertSound();
+            playOrderAlert('new');
             notifyNewOrders(newOrders);
         }
 
@@ -1261,27 +1760,7 @@
         }
 
         function playNewOrderSoundOnce() {
-            if (hasUnreadOrders()) {
-                startUnreadAlertSound();
-                return;
-            }
-            if (!soundOn) {
-                updateSoundBanner();
-                return;
-            }
-            const now = Date.now();
-            if (soundPlaying || now - lastSoundAt < SOUND_MIN_GAP_MS) return;
-
-            const audio = getOrderSound();
-            audio.loop = false;
-            audio.volume = 1;
-            audio.currentTime = 0;
-            soundPlaying = true;
-            lastSoundAt = now;
-            soundStopTimer = setTimeout(() => stopOrderSound(), SOUND_MAX_MS);
-            audio.play().catch(() => {
-                stopOrderSound();
-            });
+            playOrderAlert(hasUnreadOrders() ? 'remind' : 'new');
         }
 
         let cancelTargetId = null;
@@ -1302,9 +1781,27 @@
             return localStorage.getItem(TOKEN_KEY) || '';
         }
 
-        function setToken(token) {
-            if (token) localStorage.setItem(TOKEN_KEY, token);
-            else localStorage.removeItem(TOKEN_KEY);
+        function setToken(token, meta = {}) {
+            if (token) {
+                localStorage.setItem(TOKEN_KEY, token);
+                if (meta.account) localStorage.setItem(ACCOUNT_KEY, meta.account);
+                if (meta.location) localStorage.setItem(LOCATION_SCOPE_KEY, meta.location);
+                if (meta.accountLabel) localStorage.setItem(ACCOUNT_LABEL_KEY, meta.accountLabel);
+            } else {
+                localStorage.removeItem(TOKEN_KEY);
+                localStorage.removeItem(ACCOUNT_KEY);
+                localStorage.removeItem(LOCATION_SCOPE_KEY);
+                localStorage.removeItem(ACCOUNT_LABEL_KEY);
+            }
+        }
+
+        function loadSessionMeta() {
+            crmLocationScope = localStorage.getItem(LOCATION_SCOPE_KEY) || 'all';
+            crmAccountLabel = localStorage.getItem(ACCOUNT_LABEL_KEY) || '';
+            if (crmLocationScope !== 'all') {
+                currentLocation = crmLocationScope;
+            }
+            loadOpenedOrderIds();
         }
 
         function showToast(msg) {
@@ -1375,6 +1872,10 @@
 
         function orderLocation(order) {
             return order.location === 'poselok' ? 'poselok' : 'eat-arena';
+        }
+
+        function locationLabel(order) {
+            return LOCATION_LABELS[orderLocation(order)] || 'Eat Arena';
         }
 
         function cancelReasonText(order) {
@@ -1473,11 +1974,7 @@
             orders.forEach((order) => {
                 const row = document.createElement('button');
                 row.type = 'button';
-                let rowClass = 'order-row';
-                if (order.id === selectedId) rowClass += ' is-active';
-                if (unreadOrderIds.has(order.id)) rowClass += ' order-row--unread';
-                if (selectedIds.has(order.id)) rowClass += ' order-row--picked';
-                row.className = rowClass;
+                row.className = orderRowClasses(order);
                 row.dataset.id = order.id;
 
                 const cb = document.createElement('input');
@@ -1499,10 +1996,14 @@
 
                 const main = document.createElement('div');
                 main.className = 'order-row__main';
+                const urg = urgencyLevel(order);
+                const urgDot = urg && openedOrderIds.has(order.id) && !unreadOrderIds.has(order.id)
+                    ? `<span class="urgency-dot urgency-dot--${urg}" title="Срочность"></span>`
+                    : '';
                 main.innerHTML = `
-                    <div class="order-row__num">${esc(order.orderNumber)}</div>
+                    <div class="order-row__num">${urgDot}${esc(order.orderNumber)}</div>
                     <div class="order-row__sub">${esc(order.customer?.name || '—')} · ${order.total} ₽</div>
-                    <div class="order-row__sub">Eat Arena · ${deliveryLabel(order.deliveryType)}${order.status === 'cancelled' && cancelReasonText(order) ? ` · ${esc(cancelReasonText(order))}` : ''}</div>
+                    <div class="order-row__sub">${esc(locationLabel(order))} · ${deliveryLabel(order.deliveryType)}${order.status === 'cancelled' && cancelReasonText(order) ? ` · ${esc(cancelReasonText(order))}` : ''}</div>
                     <div class="order-row__sub">${order.deletedAt ? `Удалён: ${formatDate(order.deletedAt)}` : (order.status === 'done' && order.archivedAt ? `Архив: ${formatDate(order.archivedAt)}` : formatDate(order.createdAt))}</div>
                 `;
 
@@ -1609,10 +2110,13 @@
             `).join('');
 
             const isDeletedView = Boolean(order.deletedAt);
-            const showDone = !isDeletedView && order.status !== 'done' && order.status !== 'cancelled';
-            const showCooking = !isDeletedView && !['cooking', 'done', 'cancelled'].includes(order.status);
-            const showCancel = !isDeletedView && !['done', 'cancelled'].includes(order.status);
+            const showStatusBtns = !isDeletedView && !['done', 'cancelled'].includes(order.status);
             const showDeleteBtn = !isDeletedView;
+            const isPreparing = order.status === 'confirmed' || order.status === 'cooking' || order.status === 'new';
+            const urg = urgencyLevel(order);
+            const urgBadge = urg && openedOrderIds.has(order.id)
+                ? `<span class="badge" style="background:rgba(255,255,255,0.08);color:var(--text);margin-left:6px;">● ${urg === 'blue' ? 'спокойно' : urg === 'green' ? '1–2 ч' : urg === 'yellow' ? '< 1 ч' : '< 30 мин'}</span>`
+                : '';
             const timeMeta = order.deletedAt
                 ? `<div style="color:var(--danger);font-size:0.82rem;margin-top:4px;">Удалён: ${esc(formatDate(order.deletedAt))} (хранится 7 дней)</div>`
                 : (order.status === 'done' && order.archivedAt
@@ -1630,30 +2134,28 @@
                         <div style="color:var(--muted);font-size:0.82rem;">Создан: ${esc(formatDate(order.createdAt))}</div>
                         ${timeMeta}
                     </div>
-                    <span class="badge badge-${order.status}">${STATUS_LABELS[order.status]}</span>
+                    <span class="badge badge-${order.status}">${STATUS_LABELS[order.status]}</span>${urgBadge}
                 </div>
                 <div class="detail-actions-top">
-                    ${showCooking ? '<button type="button" class="btn-cooking" id="cookingBtn">Готовим</button>' : ''}
-                    ${showDone ? '<button type="button" class="btn-ok" id="doneOneBtn">Выполнено → в архив</button>' : ''}
-                    ${showCancel ? '<button type="button" class="btn-cancel-sm" id="cancelOneBtn">Отмена</button>' : ''}
-                    ${showDeleteBtn ? '<button type="button" class="btn-danger" id="deleteOneBtn">Удалить</button>' : ''}
+                    ${showDeleteBtn ? '<button type="button" class="btn-danger btn-cancel-sm" id="deleteOneBtn">Удалить</button>' : ''}
                 </div>
                 <div class="detail-hero">
                     <div class="detail-customer-name">${esc(order.customer?.name || '—')}</div>
                     <a class="detail-customer-phone" href="tel:${esc((order.customer?.phone || '').replace(/\s/g, ''))}">${esc(order.customer?.phone || '—')}</a>
+                    ${contactLinksHtml(order)}
                     <div class="detail-comment-block">
                         <h3>Комментарий гостя</h3>
-                        <p class="detail-comment${order.comment ? '' : ' is-empty'}">${order.comment ? esc(order.comment) : 'Без комментария'}</p>
+                        <p class="detail-comment${order.comment ? '' : ' is-empty'}">${order.comment ? formatGuestComment(order.comment) : 'Без комментария'}</p>
                     </div>
                 </div>
                 <div class="detail-grid">
                     <div class="info-block">
                         <h3>Контакты</h3>
-                        ${order.customer?.email ? `<p>${esc(order.customer.email)}</p>` : '<p style="color:var(--muted);">Email не указан</p>'}
+                        ${order.customer?.email ? `<p>${formatContactField(order.customer.email)}</p>` : '<p style="color:var(--muted);">Email / TG не указан</p>'}
                     </div>
                     <div class="info-block">
                         <h3>Точка</h3>
-                        <p><strong>Eat Arena</strong></p>
+                        <p><strong>${esc(locationLabel(order))}</strong></p>
                         <p>${esc(deliveryLabel(order.deliveryType))}</p>
                         <p>${esc(order.address || '—')}</p>
                         ${order.addressExtra ? `<p>${esc(order.addressExtra)}</p>` : ''}
@@ -1671,61 +2173,51 @@
                 ${isDeletedView ? '' : `
                 <div class="detail-note-section">
                     <label for="managerNote">Заметка менеджера</label>
-                    <textarea id="managerNote" rows="4" placeholder="Внутренняя заметка по заказу…">${esc(order.managerNote || '')}</textarea>
-                    <div class="detail-note-actions">
-                        <select id="statusSelect" aria-label="Статус">
-                            ${Object.entries(STATUS_LABELS).map(([k, v]) => `<option value="${k}" ${order.status === k ? 'selected' : ''}>${v}</option>`).join('')}
-                        </select>
-                        <button type="button" class="btn-primary" id="saveOrderBtn">Сохранить</button>
-                    </div>
+                    <textarea id="managerNote" rows="4" placeholder="Внутренняя заметка… Enter — сохранить">${esc(order.managerNote || '')}</textarea>
+                    ${showStatusBtns ? `
+                    <div class="status-buttons" id="statusButtons">
+                        <button type="button" class="status-btn status-btn--prep ${isPreparing ? 'is-current' : ''}" data-status="cooking">Подтверждён / Готовим</button>
+                        <button type="button" class="status-btn status-btn--delivery ${order.status === 'delivery' ? 'is-current' : ''}" data-status="delivery">Отдали курьеру</button>
+                        <button type="button" class="status-btn status-btn--done" data-status="done">Выполнен</button>
+                        <button type="button" class="status-btn status-btn--cancel" id="cancelOneBtn">Отменён</button>
+                    </div>` : ''}
                 </div>`}
             `;
 
             detailRenderKey = getDetailRenderKey(order);
 
             if (!isDeletedView) {
-                document.getElementById('saveOrderBtn').addEventListener('click', () => saveOrder(order.id));
                 const noteEl = document.getElementById('managerNote');
                 if (noteEl) {
-                    let noteSaveTimer = null;
                     noteEl.addEventListener('blur', () => saveManagerNoteOnly(order.id));
-                    noteEl.addEventListener('input', () => {
-                        clearTimeout(noteSaveTimer);
-                        noteSaveTimer = setTimeout(() => saveManagerNoteOnly(order.id), 1200);
+                    noteEl.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            saveManagerNoteOnly(order.id);
+                            noteEl.blur();
+                        }
                     });
                 }
+                document.querySelectorAll('#statusButtons [data-status]').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        const st = btn.dataset.status;
+                        if (st === 'done') bulkAction('done', [order.id]);
+                        else setOrderStatus(order.id, st);
+                    });
+                });
             }
-            if (showCooking) {
-                document.getElementById('cookingBtn').addEventListener('click', () => setOrderStatus(order.id, 'cooking'));
-            }
-            if (showDone) {
-                document.getElementById('doneOneBtn').addEventListener('click', () => bulkAction('done', [order.id]));
-            }
-            if (showCancel) {
-                document.getElementById('cancelOneBtn').addEventListener('click', () => openCancelModal(order.id));
+            if (showStatusBtns) {
+                document.getElementById('cancelOneBtn')?.addEventListener('click', () => openCancelModal(order.id));
             }
             if (showDeleteBtn) {
                 document.getElementById('deleteOneBtn').addEventListener('click', () => openDeleteModal([order.id]));
             }
         }
 
-        async function markOrderSeen(id) {
-            const order = orders.find((o) => o.id === id);
-            if (!order || order.status !== 'new') return;
-            try {
-                const data = await api(`/api/orders/${id}`, {
-                    method: 'PATCH',
-                    body: JSON.stringify({ status: 'confirmed' })
-                });
-                const idx = orders.findIndex((o) => o.id === id);
-                if (idx !== -1) orders[idx] = data.order;
-            } catch (_) {}
-        }
-
         async function selectOrder(id) {
             selectedId = id;
             acknowledgeOrder(id);
-            await markOrderSeen(id);
+            markOrderOpened(id);
             renderOrdersList();
             renderDetail(orders.find((o) => o.id === id));
             showDetailOnMobile();
@@ -1759,12 +2251,14 @@
                 if (hasUnreadOrders()) {
                     updateFaviconAlert();
                     startSoundRemindLoop();
+                    pendingSoundPlay = true;
+                    playOrderAlert('catchup');
                 }
             } else {
                 const brandNew = nextOrders.filter((o) =>
                     o.status === 'new' && !knownOrderIds.has(o.id)
                 );
-                if (knownOrderIds.size && brandNew.length && currentView === 'active') {
+                if (brandNew.length && currentView === 'active') {
                     brandNew.forEach((o) => unreadOrderIds.add(o.id));
                     onUnreadOrdersAdded(brandNew);
                 }
@@ -1820,7 +2314,9 @@
                 renderOrdersList();
                 renderDetail(data.order);
                 if (status === 'cooking') {
-                    showToast(`На кухне · ${formatDate(data.order.cookingAt)}`);
+                    showToast('Подтверждён · готовим');
+                } else if (status === 'delivery') {
+                    showToast('Отдан курьеру');
                 } else if (status === 'done') {
                     showToast(`В архиве · ${formatDate(data.order.archivedAt)}`);
                 } else {
@@ -1849,27 +2345,6 @@
             } catch (e) {
                 showToast(e.message || 'Не удалось сохранить заметку');
             }
-        }
-
-        async function saveOrder(id) {
-            const status = document.getElementById('statusSelect').value;
-            const managerNote = document.getElementById('managerNote').value;
-            const data = await api(`/api/orders/${id}`, {
-                method: 'PATCH',
-                body: JSON.stringify({ status, managerNote })
-            });
-            if (status === 'done' && currentView === 'active') {
-                selectedId = null;
-                await loadOrders();
-                showToast(`В архиве · ${formatDate(data.order.archivedAt)}`);
-                showListOnMobile();
-                return;
-            }
-            const idx = orders.findIndex((o) => o.id === id);
-            if (idx !== -1) orders[idx] = data.order;
-            renderOrdersList();
-            renderDetail(data.order);
-            showToast('Сохранено');
         }
 
         async function bulkAction(action, ids, skipDeleteConfirm) {
@@ -1924,12 +2399,15 @@
             return Array.from(selectedIds).filter((id) => orders.some((o) => o.id === id));
         }
 
-        function showApp() {
+        async function showApp() {
             loginScreen.style.display = 'none';
             app.classList.add('is-ready');
             if (isMobileLayout()) showListOnMobile();
-            updateSoundBanner();
-            getOrderSound();
+            updateLocationTabsUi();
+            updateAccountLabelUi();
+            installSoundGestureFallback();
+            await restoreSoundState();
+            startUrgencyTick();
         }
 
         function showLogin() {
@@ -1939,17 +2417,27 @@
             stopOrderSound();
             stopFaviconAlert();
             stopSoundRemindLoop();
+            stopUrgencyTick();
             unreadOrderIds.clear();
             ordersInitialized = false;
         }
 
         async function tryBoot() {
             if (!getToken()) return showLogin();
+            loadSessionMeta();
             try {
+                try {
+                    const me = await api('/api/auth/me');
+                    crmLocationScope = me.location || crmLocationScope;
+                    crmAccountLabel = me.accountLabel || crmAccountLabel;
+                } catch (meErr) {
+                    if (meErr.status !== 404) throw meErr;
+                }
+                if (crmLocationScope !== 'all') currentLocation = crmLocationScope;
                 orders = [];
                 knownOrderIds = new Set();
                 await loadOrders();
-                showApp();
+                await showApp();
                 syncBulkBar();
                 registerCrmServiceWorker();
                 await requestAlertsPermission();
@@ -1969,7 +2457,16 @@
                     method: 'POST',
                     body: JSON.stringify({ password })
                 });
-                setToken(data.token);
+                crmLocationScope = data.location || 'all';
+                crmAccountLabel = data.accountLabel || '';
+                if (crmLocationScope !== 'all') currentLocation = crmLocationScope;
+                else currentLocation = 'all';
+                setToken(data.token, {
+                    account: data.account,
+                    location: data.location,
+                    accountLabel: data.accountLabel
+                });
+                loadOpenedOrderIds();
                 await tryBoot();
             } catch (err) {
                 loginError.style.display = 'block';
@@ -2067,22 +2564,16 @@
         });
 
         soundUnlockBtn?.addEventListener('click', () => unlockOrderSound());
+        soundTestBtn?.addEventListener('click', () => testOrderSound());
 
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                if (hasUnreadOrders() && soundOn) {
-                    getOrderSound().play().catch(() => {});
-                }
-            } else {
+            if (!document.hidden) {
                 schedulePoll(0);
-                if (hasUnreadOrders() && soundOn) startUnreadAlertSound();
+                if (pendingSoundPlay && soundOn) playOrderAlert('catchup');
             }
         });
 
-        window.addEventListener('focus', () => {
-            schedulePoll(0);
-            if (hasUnreadOrders() && soundOn) startUnreadAlertSound();
-        });
+        window.addEventListener('focus', () => schedulePoll(0));
         window.addEventListener('pageshow', () => {
             if (getToken()) schedulePoll(0);
         });
@@ -2100,6 +2591,19 @@
             }
         });
 
+        document.querySelectorAll('#locationTabs button[data-location]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                if (crmLocationScope !== 'all') return;
+                currentLocation = btn.dataset.location;
+                document.querySelectorAll('#locationTabs button[data-location]').forEach((b) => {
+                    b.classList.toggle('is-active', b === btn);
+                });
+                updateAccountLabelUi();
+                loadOrders();
+            });
+        });
+
+        installSoundGestureFallback();
         tryBoot();
     </script>
 </body>

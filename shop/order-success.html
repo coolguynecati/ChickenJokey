@@ -1,186 +1,202 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Заказ принят — Emika's</title>
-  <link rel="shortcut icon" href="../images/favicon.ico">
+  <link rel="shortcut icon" href="/images/favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      const saved = localStorage.getItem('emika-theme');
+      document.documentElement.setAttribute('data-theme', saved === 'light' || saved === 'dark' ? saved : 'dark');
+    })();
+  </script>
   <style>
-    :root { --orange:#ff6a1a; --bg:#0d0d0f; --card:rgba(20,20,24,.92); --text:#f5f5f5; --muted:#c9c9ce; }
-    * { box-sizing:border-box; }
+    :root {
+      --orange: #ff6a1a;
+      --bg: #0d0d0f;
+      --card: rgba(20, 20, 24, 0.92);
+      --text: #f5f5f5;
+      --muted: #c9c9ce;
+      --line: rgba(255, 255, 255, 0.1);
+      --surface-2: rgba(255, 255, 255, 0.08);
+    }
+
+    html[data-theme="light"] {
+      --bg: #f6f6f7;
+      --card: rgba(255, 255, 255, 0.96);
+      --text: #121316;
+      --muted: #545863;
+      --line: rgba(0, 0, 0, 0.1);
+      --surface-2: rgba(10, 10, 12, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      margin:0; min-height:100vh; padding:20px 14px 32px;
-      background:var(--bg); color:var(--text);
-      font-family:'Montserrat',Arial,sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px 14px 28px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Montserrat', Arial, sans-serif;
     }
-    .wrap { max-width:520px; margin:0 auto; }
+
+    html[data-theme="dark"] body {
+      background: #0d0d0f url('/images/background.jpg') center top / cover no-repeat fixed;
+    }
+
+    .wrap { max-width: 920px; margin: 0 auto; }
+    h1 { margin: 0 0 6px; font-size: 1.35rem; color: var(--text); }
+    .sub { margin: 0 0 18px; color: var(--muted); font-size: 0.88rem; }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 720px) {
+      .row { grid-template-columns: 1fr 1fr; max-width: 640px; }
+    }
     .card {
-      background:var(--card); border:1px solid rgba(255,255,255,.1);
-      border-radius:16px; padding:22px 18px; margin-bottom:12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 14px;
+      color: var(--text);
     }
-    h1 { margin:0 0 8px; font-size:1.35rem; }
-    .lead { color:var(--muted); margin:0 0 14px; line-height:1.55; font-size:0.92rem; }
-    .num { color:var(--orange); font-weight:700; font-size:1rem; margin:0 0 4px; }
-    .sum {
-      font-size:1.75rem; font-weight:700; color:var(--orange);
-      margin:14px 0 6px;
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
-    .sum-label { font-size:0.82rem; color:var(--muted); margin:0 0 16px; }
-    .pay-block {
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:12px; padding:14px; margin-bottom:12px;
-      background:rgba(255,255,255,.03);
-    }
-    .pay-block h2 {
-      margin:0 0 8px; font-size:0.95rem;
-      display:flex; align-items:center; gap:8px;
-    }
-    .pay-block p { margin:0 0 10px; color:var(--muted); font-size:0.88rem; line-height:1.5; }
-    .pay-block--online { border-color:rgba(255,106,26,.35); }
-    .pay-block--online h2 { color:var(--orange); }
+    .num { color: var(--orange); font-weight: 700; font-size: 1.05rem; margin: 0 0 4px; }
+    .sum { font-size: 1.5rem; font-weight: 700; color: var(--orange); margin: 0; }
+    .line { margin: 0; font-size: 0.9rem; line-height: 1.45; color: var(--text); }
     .btn {
-      display:inline-block; width:100%; text-align:center;
-      padding:12px 16px; border-radius:999px; border:none;
-      font-family:inherit; font-weight:700; font-size:0.9rem;
-      cursor:pointer; text-decoration:none; margin-top:6px;
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      padding: 11px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      text-decoration: none;
+      margin-top: 8px;
+      background: var(--surface-2);
+      color: var(--text);
     }
-    .btn-primary { background:var(--orange); color:#fff; }
-    .btn-ghost {
-      background:transparent; color:var(--text);
-      border:1px solid rgba(255,255,255,.2);
+    .btn:hover { border-color: rgba(255, 106, 26, 0.45); }
+    .back {
+      display: inline-block;
+      margin-top: 16px;
+      color: var(--orange);
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 0.9rem;
     }
-    .btn-copy { background:rgba(255,255,255,.08); color:var(--text); }
-    .phone { font-size:1.05rem; font-weight:700; color:var(--text); }
-    .hint { font-size:0.78rem; color:var(--muted); margin-top:8px; }
-    .back { display:inline-block; margin-top:8px; color:var(--orange); font-weight:700; text-decoration:none; font-size:0.92rem; }
-    .toast-copy {
-      position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
-      background:#1a1b22; border:1px solid rgba(255,106,26,.4);
-      padding:10px 16px; border-radius:10px; font-size:0.85rem;
-      display:none; z-index:10;
+    .toast {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--card);
+      border: 1px solid rgba(255, 106, 26, 0.4);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      display: none;
     }
-    .toast-copy.show { display:block; }
+    .toast.show { display: block; }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="card">
-      <h1>Заявка принята</h1>
-      <p class="lead">Менеджер получил ваш заказ. Мы свяжемся с вами для подтверждения. Оплатить можно <strong>онлайн</strong> (переводом) или <strong>на кассе</strong> при самовывозе.</p>
-      <p class="num" id="orderNum"></p>
-      <p class="sum-label">К оплате</p>
-      <p class="sum" id="orderSum">—</p>
+    <h1>Заказ принят</h1>
+    <p class="sub">Перезвоним для подтверждения.</p>
+
+    <div class="row" id="cardsRow">
+      <div class="card">
+        <h2>Заказ</h2>
+        <p class="num" id="orderNum">—</p>
+        <p class="sum" id="orderSum">—</p>
+        <p class="line muted" id="pickupLine" style="color:var(--muted);font-size:0.85rem;margin-top:8px;"></p>
+      </div>
+
+      <div class="card" id="transferCard" hidden>
+        <h2>Перевод</h2>
+        <p class="line" id="phoneDisplay"></p>
+        <button type="button" class="btn" id="copyPayBtn">Скопировать для перевода</button>
+      </div>
+
+      <div class="card" id="counterCard" hidden>
+        <h2>Касса</h2>
+        <p class="line"><strong id="venueName">Eat Arena</strong></p>
+        <p class="line" style="color:var(--muted);font-size:0.85rem;" id="venueAddress"></p>
+      </div>
     </div>
 
-    <div class="pay-block pay-block--online">
-      <h2>Оплатить онлайн</h2>
-      <p id="onlineHint">Переведите указанную сумму и в комментарии укажите номер заказа — так мы быстрее его найдём.</p>
-      <p class="phone" id="phoneDisplay"></p>
-      <a class="btn btn-primary" id="payLinkBtn" href="#" target="_blank" rel="noopener" hidden>Оплатить по ссылке</a>
-      <button type="button" class="btn btn-copy" id="copyPayBtn">Скопировать реквизиты для перевода</button>
-      <p class="hint" id="linkHint"></p>
-    </div>
-
-    <div class="pay-block">
-      <h2>Оплатить на кассе</h2>
-      <p>Приходите в <strong id="venueName">Eat Arena</strong> — оплата на месте перед выдачей заказа.</p>
-      <p class="hint" id="venueAddress"></p>
-    </div>
-
-    <a class="back" href="./">← Вернуться в меню</a>
+    <a class="back" href="./">← В меню</a>
   </div>
 
-  <div class="toast-copy" id="copyToast">Скопировано</div>
+  <p class="toast" id="toast">Скопировано</p>
 
   <script>
     const params = new URLSearchParams(location.search);
-    let order = { orderNumber: params.get('order') || '', total: 0 };
+    const orderFromUrl = params.get('order');
+    let order = null;
 
     try {
-      const last = JSON.parse(localStorage.getItem('emika-last-order') || '{}');
-      if (last.orderNumber) order.orderNumber = last.orderNumber;
-      if (last.total) order.total = Number(last.total) || 0;
+      const raw = localStorage.getItem('emika-last-order');
+      if (raw) order = JSON.parse(raw);
     } catch (_) {}
 
-    const DEFAULT_PAYMENT = {
-      phone: '+79778389898',
-      phoneDisplay: '+7 977 838 98 98',
-      payOnlineUrl: '',
-      venueName: 'Eat Arena',
-      venueAddress: 'Мичуринский проспект, 13А, стр. 1, 2 этаж'
-    };
+    const orderNum = orderFromUrl || order?.orderNumber || '—';
+    document.getElementById('orderNum').textContent = orderNum;
 
-    function formatSum(n) {
-      return `${Number(n).toLocaleString('ru-RU')} ₽`;
+    if (order?.total) {
+      document.getElementById('orderSum').textContent = `${order.total} ₽`;
     }
 
-    function buildPaymentComment(cfg) {
-      const parts = [];
-      if (order.orderNumber) parts.push(`Заказ ${order.orderNumber}`);
-      if (order.total) parts.push(`${order.total} руб`);
-      parts.push('Emika\'s Hot Chicken');
-      return parts.join(', ');
+    function pickupLabel(o) {
+      if (!o) return '';
+      if (o.pickupTimeMode === 'hour') return 'В течение часа';
+      if (o.pickupTimeMode === 'at' && o.pickupTimeAt) return `К ${o.pickupTimeAt}`;
+      return 'Как можно скорее';
     }
 
-    function buildCopyText(cfg) {
-      const lines = [
-        `Сумма: ${order.total ? formatSum(order.total) : '—'}`,
-        order.orderNumber ? `Номер заказа: ${order.orderNumber}` : '',
-        `Телефон для перевода: ${cfg.phoneDisplay || cfg.phone}`,
-        `Комментарий к переводу: ${buildPaymentComment(cfg)}`
-      ].filter(Boolean);
-      return lines.join('\n');
+    const pickupLine = document.getElementById('pickupLine');
+    if (order) pickupLine.textContent = `Самовывоз: ${pickupLabel(order)}`;
+
+    const payPhone = '+7 977 838 98 98';
+    const isTransfer = order?.paymentMethod === 'transfer';
+
+    if (isTransfer) {
+      document.getElementById('transferCard').hidden = false;
+      document.getElementById('phoneDisplay').textContent = payPhone;
+    } else {
+      document.getElementById('counterCard').hidden = false;
+      document.getElementById('venueAddress').textContent =
+        'Eat Arena, Мичуринский пр., 13А, стр. 1 — 2 этаж';
     }
 
-    function showCopyToast() {
-      const el = document.getElementById('copyToast');
-      el.classList.add('show');
-      setTimeout(() => el.classList.remove('show'), 2200);
-    }
-
-    async function init() {
-      document.getElementById('orderNum').textContent = order.orderNumber
-        ? `Номер заказа: ${order.orderNumber}`
-        : '';
-      document.getElementById('orderSum').textContent = order.total
-        ? formatSum(order.total)
-        : 'уточнит менеджер';
-
-      let cfg = { ...DEFAULT_PAYMENT };
+    const toast = document.getElementById('toast');
+    document.getElementById('copyPayBtn')?.addEventListener('click', async () => {
+      const text = `${payPhone}\nЗаказ ${orderNum}\n${order?.total || ''} ₽`.trim();
       try {
-        const res = await fetch('payment.json');
-        if (res.ok) cfg = { ...cfg, ...await res.json() };
+        await navigator.clipboard.writeText(text);
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
       } catch (_) {}
-
-      document.getElementById('phoneDisplay').textContent = cfg.phoneDisplay || cfg.phone;
-      document.getElementById('venueName').textContent = cfg.venueName || 'Eat Arena';
-      document.getElementById('venueAddress').textContent = cfg.venueAddress || '';
-
-      const payLinkBtn = document.getElementById('payLinkBtn');
-      const linkHint = document.getElementById('linkHint');
-      const url = String(cfg.payOnlineUrl || '').trim();
-
-      if (url) {
-        payLinkBtn.href = url;
-        payLinkBtn.hidden = false;
-        linkHint.textContent = 'Ссылка ведёт в приложение банка или на страницу оплаты. Укажите в комментарии номер заказа.';
-      } else {
-        linkHint.textContent = 'Ссылку банка можно добавить в файл shop/payment.json (поле payOnlineUrl). Пока — перевод по номеру телефона.';
-      }
-
-      document.getElementById('copyPayBtn').addEventListener('click', async () => {
-        const text = buildCopyText(cfg);
-        try {
-          await navigator.clipboard.writeText(text);
-          showCopyToast();
-        } catch {
-          prompt('Скопируйте текст:', text);
-        }
-      });
-    }
-
-    init();
+    });
   </script>
 </body>
 </html>

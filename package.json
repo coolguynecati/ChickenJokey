@@ -2,7 +2,8 @@
   "name": "emikashotchicken-repo",
   "private": true,
   "scripts": {
-    "start": "npm --prefix shop start",
-    "install:all": "npm --prefix shop install"
+    "postinstall": "npm install --omit=dev --prefix shop",
+    "start": "npm start --prefix shop",
+    "install:all": "npm install --prefix shop"
   }
 }

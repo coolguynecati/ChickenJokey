@@ -9,29 +9,66 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const SHOP_ROOT = path.join(__dirname, '..');
 
-function loadCrmPassword() {
-    const fileNames = ['crm-password.txt', 'password-crm.txt'];
+function readPasswordFile(fileNames) {
     for (const name of fileNames) {
         const filePath = path.join(SHOP_ROOT, name);
         try {
             if (!fs.existsSync(filePath)) continue;
             const fromFile = fs.readFileSync(filePath, 'utf8').trim();
-            if (fromFile) {
-                return { password: fromFile, source: name };
-            }
+            if (fromFile) return { password: fromFile, source: name };
         } catch {
             /* ignore */
         }
     }
-    const fromEnv = String(process.env.CRM_PASSWORD || '').trim();
-    if (fromEnv) {
-        return { password: fromEnv, source: 'CRM_PASSWORD env' };
-    }
-    return { password: 'emika2025', source: 'default' };
+    return null;
 }
 
-const CRM_AUTH = loadCrmPassword();
-const CRM_PASSWORD = CRM_AUTH.password;
+function loadCrmAccounts() {
+    const accounts = [];
+
+    const adminAuth = readPasswordFile(['crm-password.txt', 'password-crm.txt']);
+    const adminPassword = adminAuth?.password
+        || String(process.env.CRM_PASSWORD || '').trim()
+        || 'emika2025';
+    const adminSource = adminAuth?.source
+        || (process.env.CRM_PASSWORD ? 'CRM_PASSWORD env' : 'default');
+
+    accounts.push({
+        id: 'admin',
+        password: adminPassword,
+        location: 'all',
+        label: 'Все точки',
+        source: adminSource
+    });
+
+    const eatAuth = readPasswordFile(['crm-password-eat-arena.txt']);
+    const eatPassword = eatAuth?.password || String(process.env.CRM_PASSWORD_EAT_ARENA || '').trim();
+    if (eatPassword) {
+        accounts.push({
+            id: 'eat-arena',
+            password: eatPassword,
+            location: 'eat-arena',
+            label: 'Eat Arena',
+            source: eatAuth?.source || 'CRM_PASSWORD_EAT_ARENA env'
+        });
+    }
+
+    const poselokAuth = readPasswordFile(['crm-password-poselok.txt']);
+    const poselokPassword = poselokAuth?.password || String(process.env.CRM_PASSWORD_POSELOK || '').trim();
+    if (poselokPassword) {
+        accounts.push({
+            id: 'poselok',
+            password: poselokPassword,
+            location: 'poselok',
+            label: 'Посёлок',
+            source: poselokAuth?.source || 'CRM_PASSWORD_POSELOK env'
+        });
+    }
+
+    return accounts;
+}
+
+const CRM_ACCOUNTS = loadCrmAccounts();
 const REPO_ROOT = path.join(SHOP_ROOT, '..');
 const CLOUD_ROOT = path.join(REPO_ROOT, 'cloud');
 
@@ -39,32 +76,53 @@ cloud.ensureCloudRoot(CLOUD_ROOT);
 
 const SESSION_TTL_MS = 3 * 24 * 60 * 60 * 1000;
 
-/** @type {Map<string, number>} token -> expiry timestamp */
+/** @type {Map<string, { exp: number, location: string, accountId: string, label: string }>} */
 const sessions = new Map();
 
-function createToken() {
+function readBearerToken(req) {
+    const header = req.headers.authorization || '';
+    return header.startsWith('Bearer ') ? header.slice(7) : '';
+}
+
+function getSession(req) {
+    const token = readBearerToken(req);
+    if (!token) return null;
+    const sess = sessions.get(token);
+    if (!sess) return null;
+    if (Date.now() > sess.exp) {
+        sessions.delete(token);
+        return null;
+    }
+    return sess;
+}
+
+function createToken(account) {
     const token = crypto.randomBytes(24).toString('hex');
-    sessions.set(token, Date.now() + SESSION_TTL_MS);
+    sessions.set(token, {
+        exp: Date.now() + SESSION_TTL_MS,
+        location: account.location,
+        accountId: account.id,
+        label: account.label
+    });
     return token;
 }
 
-function isAuthed(req) {
-    const header = req.headers.authorization || '';
-    const token = header.startsWith('Bearer ') ? header.slice(7) : '';
-    const exp = sessions.get(token);
-    if (!exp) return false;
-    if (Date.now() > exp) {
-        sessions.delete(token);
-        return false;
-    }
-    return true;
-}
-
 function requireAuth(req, res, next) {
-    if (!isAuthed(req)) {
+    const sess = getSession(req);
+    if (!sess) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
+    req.crmSession = sess;
     next();
+}
+
+function sessionLocationScope(sess) {
+    return sess?.location === 'all' ? null : sess.location;
+}
+
+function orderInScope(order, scopeLocation) {
+    if (!scopeLocation) return true;
+    return store.resolveLocation(order) === scopeLocation;
 }
 
 app.use(express.json({ limit: '1mb' }));
@@ -82,21 +140,47 @@ app.use((req, res, next) => {
 app.get('/api/auth/check', (_req, res) => {
     res.json({
         ok: true,
-        source: CRM_AUTH.source,
-        passwordLength: CRM_PASSWORD.length
+        accounts: CRM_ACCOUNTS.map((a) => ({
+            id: a.id,
+            label: a.label,
+            location: a.location
+        }))
     });
 });
 
 app.post('/api/auth/login', (req, res) => {
     const password = String(req.body?.password || '').trim();
-    if (password !== CRM_PASSWORD) {
+    if (!password) {
+        return res.status(401).json({ error: 'Неверный пароль' });
+    }
+
+    const matches = CRM_ACCOUNTS.filter((a) => a.password === password);
+    if (matches.length === 0) {
+        return res.status(401).json({ error: 'Неверный пароль' });
+    }
+    if (matches.length > 1) {
         return res.status(401).json({
-            error: 'Неверный пароль',
-            hint: `Длина введённого: ${password.length}, ожидается: ${CRM_PASSWORD.length} (источник: ${CRM_AUTH.source})`
+            error: 'Этот пароль подходит к нескольким точкам — задайте разный пароль для каждой'
         });
     }
-    const token = createToken();
-    res.json({ token, expiresInHours: SESSION_TTL_MS / (60 * 60 * 1000) });
+
+    const account = matches[0];
+    const token = createToken(account);
+    res.json({
+        token,
+        account: account.id,
+        location: account.location,
+        accountLabel: account.label,
+        expiresInHours: SESSION_TTL_MS / (60 * 60 * 1000)
+    });
+});
+
+app.get('/api/auth/me', requireAuth, (req, res) => {
+    res.json({
+        account: req.crmSession.accountId,
+        location: req.crmSession.location,
+        accountLabel: req.crmSession.label
+    });
 });
 
 app.post('/api/orders', (req, res) => {
@@ -150,9 +234,20 @@ app.post('/api/orders', (req, res) => {
 app.post('/api/orders/bulk', requireAuth, (req, res) => {
     const ids = Array.isArray(req.body?.ids) ? req.body.ids : [];
     const action = String(req.body?.action || '').trim();
+    const scope = sessionLocationScope(req.crmSession);
 
     if (!ids.length) {
         return res.status(400).json({ error: 'Выберите заказы' });
+    }
+
+    if (scope) {
+        const allowed = ids.filter((id) => {
+            const o = store.getOrder(id);
+            return o && orderInScope(o, scope);
+        });
+        if (allowed.length !== ids.length) {
+            return res.status(403).json({ error: 'Нет доступа к одному из заказов' });
+        }
     }
 
     if (action === 'delete') {
@@ -176,9 +271,12 @@ app.post('/api/orders/bulk', requireAuth, (req, res) => {
 app.get('/api/orders', requireAuth, (req, res) => {
     let orders = store.readOrders();
     const view = String(req.query.view || 'active').trim();
-    const location = String(req.query.location || 'all').trim();
+    let location = String(req.query.location || 'all').trim();
     const status = String(req.query.status || '').trim();
     const q = String(req.query.q || '').trim().toLowerCase();
+    const scope = sessionLocationScope(req.crmSession);
+
+    if (scope) location = scope;
 
     if (view === 'active') {
         orders = orders.filter((o) => !o.deletedAt && o.status !== 'done');
@@ -188,12 +286,18 @@ app.get('/api/orders', requireAuth, (req, res) => {
         orders = orders.filter((o) => o.deletedAt);
     }
 
-    if (location && location !== 'all') {
+    if (scope) {
+        orders = orders.filter((o) => orderInScope(o, scope));
+    } else if (location && location !== 'all') {
         orders = orders.filter((o) => store.resolveLocation(o) === location);
     }
 
     if (status && status !== 'all') {
-        orders = orders.filter((o) => o.status === status);
+        if (status === 'preparing') {
+            orders = orders.filter((o) => o.status === 'confirmed' || o.status === 'cooking');
+        } else {
+            orders = orders.filter((o) => o.status === status);
+        }
     }
 
     if (q) {
@@ -220,12 +324,22 @@ app.get('/api/orders/:id', requireAuth, (req, res) => {
     }
     const order = store.getOrder(req.params.id);
     if (!order) return res.status(404).json({ error: 'Заказ не найден' });
+    const scope = sessionLocationScope(req.crmSession);
+    if (!orderInScope(order, scope)) {
+        return res.status(403).json({ error: 'Нет доступа к этому заказу' });
+    }
     res.json({ order });
 });
 
 app.patch('/api/orders/:id', requireAuth, (req, res) => {
     if (req.params.id === 'bulk') {
         return res.status(404).json({ error: 'Заказ не найден' });
+    }
+    const existing = store.getOrder(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Заказ не найден' });
+    const scope = sessionLocationScope(req.crmSession);
+    if (!orderInScope(existing, scope)) {
+        return res.status(403).json({ error: 'Нет доступа к этому заказу' });
     }
     const order = store.updateOrder(req.params.id, {
         status: req.body?.status,
@@ -240,6 +354,12 @@ app.patch('/api/orders/:id', requireAuth, (req, res) => {
 app.delete('/api/orders/:id', requireAuth, (req, res) => {
     if (req.params.id === 'bulk') {
         return res.status(404).json({ error: 'Заказ не найден' });
+    }
+    const existing = store.getOrder(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Заказ не найден' });
+    const scope = sessionLocationScope(req.crmSession);
+    if (!orderInScope(existing, scope)) {
+        return res.status(403).json({ error: 'Нет доступа к этому заказу' });
     }
     const ok = store.softDeleteOrder(req.params.id);
     if (!ok) return res.status(404).json({ error: 'Заказ не найден' });
@@ -279,6 +399,10 @@ app.get('/shop/media.html', (_req, res) => {
     res.redirect(302, '/media');
 });
 
+app.get('/franchise', (_req, res) => {
+    res.redirect(302, '/franchise/');
+});
+
 function resolveImagesDir() {
     const shopImages = path.join(SHOP_ROOT, 'images');
     const repoImages = path.join(REPO_ROOT, 'images');
@@ -296,6 +420,7 @@ app.get('/neworder.mp3', (_req, res) => {
 
 app.use('/images', express.static(resolveImagesDir()));
 app.use('/media-files', express.static(path.join(REPO_ROOT, 'media'), { index: false }));
+app.use('/franchise', express.static(path.join(REPO_ROOT, 'franchise')));
 app.use('/cloud', express.static(CLOUD_ROOT, { index: false, dotfiles: 'deny' }));
 app.use('/shop', express.static(SHOP_ROOT));
 
@@ -305,5 +430,5 @@ app.listen(PORT, () => {
     console.log(`Emika shop listening on port ${PORT}`);
     if (publicUrl) console.log(`Public URL: ${publicUrl}`);
     console.log('CRM path: /crm.html');
-    console.log(`CRM password: ${CRM_AUTH.source}, length ${CRM_PASSWORD.length}`);
+    console.log(`CRM accounts: ${CRM_ACCOUNTS.map((a) => a.id).join(', ')}`);
 });

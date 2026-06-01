@@ -4,6 +4,8 @@
   "private": true,
   "description": "Emika's Hot Chicken — site + order CRM",
   "scripts": {
+    "prestart": "npm install --omit=dev",
+    "postinstall": "node scripts/copy-images.js",
     "start": "node server/index.js",
     "dev": "node server/index.js",
     "tunnel": "npx cloudflared tunnel --url http://127.0.0.1:3000"

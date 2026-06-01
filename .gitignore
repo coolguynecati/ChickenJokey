@@ -3,5 +3,6 @@ shop/node_modules/
 .env
 shop/.env
 shop/data/
+shop/images/
 *.log
 .DS_Store

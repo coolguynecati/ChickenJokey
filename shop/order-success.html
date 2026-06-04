@@ -166,6 +166,17 @@
       document.getElementById('orderSum').textContent = `${order.total} ₽`;
     }
 
+    const VENUES = {
+      'eat-arena': {
+        name: 'Eat Arena',
+        address: 'Мичуринский пр-кт 13А, стр. 1 — самовывоз, 2 этаж'
+      },
+      poselok: {
+        name: 'пос. Развилка',
+        address: 'Проект. пр-зд 5539, 10В'
+      }
+    };
+
     function pickupLabel(o) {
       if (!o) return '';
       if (o.pickupTimeMode === 'hour') return 'В течение часа';
@@ -173,8 +184,12 @@
       return 'Как можно скорее';
     }
 
+    const venue = VENUES[order?.location === 'poselok' ? 'poselok' : 'eat-arena'];
+
     const pickupLine = document.getElementById('pickupLine');
-    if (order) pickupLine.textContent = `Самовывоз: ${pickupLabel(order)}`;
+    if (order) {
+      pickupLine.textContent = `Самовывоз (${venue.name}): ${pickupLabel(order)}`;
+    }
 
     const payPhone = '+7 977 838 98 98';
     const isTransfer = order?.paymentMethod === 'transfer';
@@ -184,8 +199,8 @@
       document.getElementById('phoneDisplay').textContent = payPhone;
     } else {
       document.getElementById('counterCard').hidden = false;
-      document.getElementById('venueAddress').textContent =
-        'Eat Arena, Мичуринский пр., 13А, стр. 1 — 2 этаж';
+      document.getElementById('venueName').textContent = venue.name;
+      document.getElementById('venueAddress').textContent = venue.address;
     }
 
     const toast = document.getElementById('toast');

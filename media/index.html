@@ -28,76 +28,52 @@
     <h1>Медиа материалы</h1>
 
     <!--
-      ═══ КАК РЕДАКТИРОВАТЬ САМОМУ ═══
-      Этот файл открывается на сайте по адресу /media
-
-      1) Положите видео в папку media/
-      2) Положите картинку-превью в media/previews/
-      3) Скопируйте любой блок <article class="card">…</article>
-      4) Замените только:
-         — src у картинки (превью)
-         — href у двух ссылок (видео)
-         — текст в <h2> и <p>
-      5) Вертикальное видео: добавьте class="card card--vertical"
-         Горизонтальное: просто class="card"
-      6) Пробел в имени файла → в ссылке пишите %20
-
-      Пример: vertical screen 1080.mp4 → vertical%20screen%201080.mp4
+      На сайте используется файл media.html в корне проекта (/media).
+      Здесь те же карточки, но ссылки ./ — для просмотра папки media локально.
+      Меняйте оба файла одинаково: media.html и media/index.html
     -->
 
     <div class="cards">
 
       <article class="card">
-        <img src="/media-files/previews/videomenu2_44min.jpg" alt="">
+        <img src="./previews/videomenu2_44min.jpg" alt="">
         <h2>videomenu2_44min.mp4</h2>
         <p>Горизонтальное меню (тестовый вариант). Повтор 44 мин — несколько копий на флешку на весь день.</p>
         <p class="card__links">
-          <a href="/media-files/videomenu2_44min.mp4" target="_blank" rel="noopener">Открыть</a>
-          <a class="download" href="/media-files/videomenu2_44min.mp4" download>Скачать</a>
+          <a href="./videomenu2_44min.mp4" target="_blank" rel="noopener">Открыть</a>
+          <a class="download" href="./videomenu2_44min.mp4" download>Скачать</a>
         </p>
       </article>
 
       <article class="card card--vertical">
-        <img src="/media-files/previews/vertical_screen_1080.jpg" alt="">
+        <img src="./previews/vertical_screen_1080.jpg" alt="">
         <h2>vertical screen 1080.mp4</h2>
         <p>Вертикальный экран Eat Arena, первый этаж.</p>
         <p class="card__links">
-          <a href="/media-files/vertical%20screen%201080.mp4" target="_blank" rel="noopener">Открыть</a>
-          <a class="download" href="/media-files/vertical%20screen%201080.mp4" download>Скачать</a>
+          <a href="./vertical%20screen%201080.mp4" target="_blank" rel="noopener">Открыть</a>
+          <a class="download" href="./vertical%20screen%201080.mp4" download>Скачать</a>
         </p>
       </article>
 
       <article class="card card--vertical">
-        <img src="/media-files/previews/vtoroe_menu_dinamika.jpg" alt="">
+        <img src="./previews/vtoroe_menu_dinamika.jpg" alt="">
         <h2>Второе меню Динамика</h2>
         <p>Вертикальное второе меню с динамикой.</p>
         <p class="card__links">
-          <a href="/media-files/vtoroe_menu_dinamika.mp4" target="_blank" rel="noopener">Открыть</a>
-          <a class="download" href="/media-files/vtoroe_menu_dinamika.mp4" download>Скачать</a>
+          <a href="./vtoroe_menu_dinamika.mp4" target="_blank" rel="noopener">Открыть</a>
+          <a class="download" href="./vtoroe_menu_dinamika.mp4" download>Скачать</a>
         </p>
       </article>
 
       <article class="card card--vertical">
-        <img src="/media-files/previews/vertical_screen_1080.jpg" alt="">
+        <img src="./previews/vertical_screen_1080.jpg" alt="">
         <h2>vertical screen 1080.mp4 (копия)</h2>
         <p>Вертикальное меню — вторая копия для второго экрана.</p>
         <p class="card__links">
-          <a href="/media-files/vertical%20screen%201080.mp4" target="_blank" rel="noopener">Открыть</a>
-          <a class="download" href="/media-files/vertical%20screen%201080.mp4" download>Скачать</a>
+          <a href="./vertical%20screen%201080.mp4" target="_blank" rel="noopener">Открыть</a>
+          <a class="download" href="./vertical%20screen%201080.mp4" download>Скачать</a>
         </p>
       </article>
-
-      <!-- ШАБЛОН — скопируйте блок ниже, раскомментируйте и заполните
-      <article class="card card--vertical">
-        <img src="/media-files/previews/ИМЯ_ФАЙЛА.jpg" alt="">
-        <h2>Название на странице</h2>
-        <p>Короткое описание.</p>
-        <p class="card__links">
-          <a href="/media-files/ИМЯ_ФАЙЛА.mp4" target="_blank" rel="noopener">Открыть</a>
-          <a class="download" href="/media-files/ИМЯ_ФАЙЛА.mp4" download>Скачать</a>
-        </p>
-      </article>
-      -->
 
     </div>
   </main>

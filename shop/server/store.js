@@ -128,7 +128,7 @@ function resolveLocation(order) {
 }
 
 function locationLabel(location) {
-    return location === 'poselok' ? 'Посёлок' : 'Eat Arena';
+    return location === 'poselok' ? 'пос. Развилка' : 'Eat Arena';
 }
 
 function nextOrderNumber(orders) {
@@ -220,6 +220,16 @@ function updateOrder(id, patch) {
     return orders[idx];
 }
 
+function markCookingEmailSent(id) {
+    const orders = readOrders();
+    const idx = orders.findIndex((o) => o.id === id);
+    if (idx === -1) return null;
+    orders[idx].cookingEmailSentAt = new Date().toISOString();
+    orders[idx].updatedAt = orders[idx].cookingEmailSentAt;
+    writeOrders(orders);
+    return orders[idx];
+}
+
 function getOrder(id) {
     return readOrders().find((o) => o.id === id) || null;
 }
@@ -263,11 +273,12 @@ function bulkUpdateStatus(ids, status) {
 
     orders.forEach((order, idx) => {
         if (!set.has(order.id)) return;
+        const wasCooking = orders[idx].status === 'cooking';
         orders[idx].status = status;
         orders[idx].updatedAt = now;
         if (status === 'cooking' && !orders[idx].cookingAt) orders[idx].cookingAt = now;
         if (status === 'done') orders[idx].archivedAt = now;
-        updated.push(orders[idx]);
+        if (status !== 'cooking' || !wasCooking) updated.push(orders[idx]);
     });
 
     if (updated.length) writeOrders(orders);
@@ -279,6 +290,7 @@ module.exports = {
     readEmails,
     createOrder,
     updateOrder,
+    markCookingEmailSent,
     getOrder,
     softDeleteOrder,
     softDeleteOrders,

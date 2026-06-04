@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -574,12 +574,6 @@
             border-color: rgba(62, 207, 142, 0.45);
         }
 
-        .status-btn--cancel {
-            background: rgba(255, 107, 107, 0.12);
-            color: var(--danger);
-            border-color: rgba(255, 107, 107, 0.4);
-        }
-
         .status-btn.is-current {
             box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
             transform: scale(0.98);
@@ -652,12 +646,18 @@
 
         .badge {
             display: inline-block;
-            padding: 2px 6px;
+            padding: 4px 10px;
             border-radius: 999px;
-            font-size: 0.6rem;
+            font-size: 0.72rem;
             font-weight: 700;
             text-transform: uppercase;
             white-space: nowrap;
+        }
+
+        .badge-lg {
+            font-size: 0.95rem;
+            padding: 10px 16px;
+            letter-spacing: 0.03em;
         }
 
         .badge-new { background: rgba(255, 106, 26, 0.2); color: #ffb07a; }
@@ -689,14 +689,107 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .detail-actions-top {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+        .detail-meta-card {
             margin-bottom: 12px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
         }
 
-        .detail-actions-top button { min-height: 50px; padding: 12px 18px; font-size: 1rem; }
+        .order-meta-strip {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .fulfillment-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            border: 2px solid transparent;
+        }
+
+        .fulfillment-chip__icon { font-size: 1.35rem; line-height: 1; }
+
+        .fulfillment-chip--pickup {
+            background: rgba(62, 207, 142, 0.15);
+            color: #7dffb8;
+            border-color: rgba(62, 207, 142, 0.4);
+        }
+
+        .fulfillment-chip--delivery {
+            background: rgba(100, 149, 237, 0.18);
+            color: #b8d4ff;
+            border-color: rgba(100, 149, 237, 0.45);
+        }
+
+        .venue-name-lg {
+            font-size: 1.35rem;
+            font-weight: 700;
+            line-height: 1.25;
+            color: var(--text);
+        }
+
+        .order-meta-time {
+            margin: 0 0 6px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--warn);
+        }
+
+        .order-meta-pay {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .order-meta-extra {
+            margin: 8px 0 0;
+            font-size: 0.95rem;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        .danger-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 24px;
+            justify-content: center;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .danger-action {
+            background: none;
+            border: none;
+            padding: 4px 2px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--muted);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .danger-action:hover { color: var(--text); }
+
+        .danger-action--delete { color: rgba(255, 107, 107, 0.55); }
+        .danger-action--delete:hover { color: var(--danger); }
+
+        .danger-action.is-confirm {
+            color: var(--danger);
+            font-weight: 600;
+            text-decoration: none;
+        }
 
         .detail-grid {
             display: grid;
@@ -721,7 +814,8 @@
             letter-spacing: 0.04em;
         }
 
-        .info-block p { margin: 0; line-height: 1.45; font-size: 0.88rem; }
+        .info-block p { margin: 0 0 6px; line-height: 1.45; font-size: 0.95rem; }
+        .info-block p:last-child { margin-bottom: 0; }
 
         .items-list { display: grid; gap: 6px; }
 
@@ -867,6 +961,15 @@
 
         .detail-actions > div { flex: 1; min-width: 140px; }
 
+        .guest-email-hint {
+            margin: 8px 0 0;
+            font-size: 0.8rem;
+            line-height: 1.45;
+        }
+        .guest-email-hint--warn { color: var(--warn); }
+        .guest-email-hint--ok { color: #8fd9a8; }
+        .guest-email-hint--muted { color: var(--muted); }
+
         .toast {
             position: fixed;
             left: 50%;
@@ -926,7 +1029,7 @@
                 <h1><span class="live-dot" id="liveDot"></span>Заказы</h1>
                 <small id="ordersCount">—</small>
                 <small id="crmAccountLabel" style="display:block;color:var(--orange);font-size:0.8rem;margin-top:2px;"></small>
-                <small id="crmVersion" style="display:block;color:var(--muted);font-size:0.75rem;margin-top:2px;">CRM v4.1</small>
+                <small id="crmVersion" style="display:block;color:var(--muted);font-size:0.75rem;margin-top:2px;">CRM v4.2</small>
                 <small id="pollStatus" style="display:block;color:var(--muted);font-size:0.7rem;margin-top:2px;"></small>
             </div>
             <div class="topbar-actions">
@@ -956,7 +1059,7 @@
                 <div class="location-tabs" id="locationTabs" hidden>
                     <button type="button" data-location="all" class="is-active">Все</button>
                     <button type="button" data-location="eat-arena">Eat Arena</button>
-                    <button type="button" data-location="poselok">Посёлок</button>
+                    <button type="button" data-location="poselok">пос. Развилка</button>
                 </div>
                 <div class="sidebar-frame sidebar-frame--toolbar">
                     <div class="toolbar-row">
@@ -1070,7 +1173,7 @@
             cancelled: 'Отменён'
         };
 
-        const LOCATION_LABELS = { 'eat-arena': 'Eat Arena', poselok: 'Посёлок' };
+        const LOCATION_LABELS = { 'eat-arena': 'Eat Arena', poselok: 'пос. Развилка' };
 
         const CANCEL_REASON_LABELS = {
             guest_cancelled: 'Гость отменил',
@@ -1171,16 +1274,13 @@
                     } catch (_) {}
                 };
                 add(new URL('neworder.mp3', location.href).href);
-                add(new URL('/shop/neworder.mp3', location.origin).href);
                 add(new URL('/neworder.mp3', location.origin).href);
                 try {
                     await emikaApiReady;
                     add(new URL('neworder.mp3', emikaApiOrigin).href);
-                    add(new URL('/shop/neworder.mp3', emikaApiOrigin).href);
                     add(new URL('/neworder.mp3', emikaApiOrigin).href);
                 } catch (_) {}
-                add('https://emikashotchicken.ru/shop/neworder.mp3');
-                add('https://chickenjokey.onrender.com/shop/neworder.mp3');
+                add('https://emikashotchicken.ru/neworder.mp3');
                 add('https://chickenjokey.onrender.com/neworder.mp3');
                 orderSoundUrls = [...new Set(urls)];
                 orderSoundUrlsReady = null;
@@ -1323,6 +1423,61 @@
                 return `<a href="mailto:${encodeURIComponent(raw)}">${esc(raw)}</a>`;
             }
             return esc(raw);
+        }
+
+        function isGuestEmailValid(value) {
+            const raw = String(value || '').trim();
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw);
+        }
+
+        function cookingEmailNoticeFromResult(result) {
+            if (!result) return '';
+            if (result.ok) return 'Письмо гостю отправлено';
+            if (result.skipped && result.reason === 'no_valid_email') {
+                return 'Письмо гостю не отправлено: нет email';
+            }
+            if (result.skipped && result.reason === 'already_sent') return '';
+            if (result.skipped && result.reason === 'smtp_not_configured') {
+                return 'Письмо гостю не отправлено: SMTP не настроен';
+            }
+            if (result.skipped && result.reason === 'disabled') return 'Письмо гостю отключено';
+            if (result.error) return 'Письмо гостю не отправлено: ошибка почты';
+            return '';
+        }
+
+        function summarizeCookingEmailResults(results) {
+            if (!Array.isArray(results) || !results.length) return '';
+            const sent = results.filter((r) => r.ok).length;
+            const noEmail = results.filter((r) => r.skipped && r.reason === 'no_valid_email').length;
+            const smtp = results.filter((r) => r.skipped && r.reason === 'smtp_not_configured').length;
+            const errors = results.filter((r) => r.error).length;
+            const parts = [];
+            if (sent) parts.push(`письмо гостю: ${sent}`);
+            if (noEmail) parts.push(`без email: ${noEmail}`);
+            if (smtp) parts.push(`SMTP не настроен: ${smtp}`);
+            if (errors) parts.push(`ошибка почты: ${errors}`);
+            return parts.join(' · ');
+        }
+
+        function guestEmailStatusHtml(order) {
+            if (!order || order.status === 'done' || order.status === 'cancelled' || order.deletedAt) {
+                return '';
+            }
+            if (order.cookingEmailSentAt) {
+                return '<p class="guest-email-hint guest-email-hint--ok">✉ Письмо «уже готовим» отправлено гостю</p>';
+            }
+            if (!isGuestEmailValid(order.customer?.email)) {
+                return '<p class="guest-email-hint guest-email-hint--warn">✉ Письмо гостю не отправится: нет email (только TG или поле пустое)</p>';
+            }
+            if (order.status === 'cooking') {
+                return '<p class="guest-email-hint guest-email-hint--warn">✉ Письмо не ушло — проверьте SMTP или повторите позже</p>';
+            }
+            return '<p class="guest-email-hint guest-email-hint--muted">✉ При «Готовим» письмо уйдёт на указанный email</p>';
+        }
+
+        function showCookingStatusToast(baseMsg, guestEmail) {
+            const extra = cookingEmailNoticeFromResult(guestEmail);
+            showToast(extra ? `${baseMsg} · ${extra}` : baseMsg);
         }
 
         function contactLinksHtml(order) {
@@ -1858,6 +2013,79 @@
             return type === 'pickup' ? 'Самовывоз' : 'Доставка';
         }
 
+        function deliveryModeMeta(order) {
+            const isPickup = order.deliveryType === 'pickup';
+            return {
+                isPickup,
+                icon: isPickup ? '🚶' : '🛵',
+                label: deliveryLabel(order.deliveryType),
+                className: isPickup ? 'fulfillment-chip--pickup' : 'fulfillment-chip--delivery'
+            };
+        }
+
+        function isKnownPickupVenue(order) {
+            if (order.deliveryType !== 'pickup') return false;
+            const loc = orderLocation(order);
+            return loc === 'eat-arena' || loc === 'poselok';
+        }
+
+        function orderMetaCardHtml(order) {
+            const mode = deliveryModeMeta(order);
+            const chip = `<span class="fulfillment-chip ${mode.className}"><span class="fulfillment-chip__icon" aria-hidden="true">${mode.icon}</span>${mode.label}</span>`;
+
+            if (order.deliveryType === 'delivery') {
+                const addr = [order.address, order.addressExtra].filter(Boolean).join(', ') || '—';
+                return `
+                    <div class="detail-meta-card">
+                        <div class="order-meta-strip">${chip}<div class="venue-name-lg">${esc(addr)}</div></div>
+                        <p class="order-meta-time">${esc(pickupTimeLabel(order))}</p>
+                        <p class="order-meta-pay">${esc(paymentLabel(order.paymentMethod))}${order.promoCode ? ` · ${esc(order.promoCode)}` : ''}</p>
+                    </div>`;
+            }
+
+            const venue = esc(locationLabel(order));
+            const extraAddr = !isKnownPickupVenue(order) && order.address
+                ? `<p class="order-meta-extra">${esc(order.address)}</p>`
+                : '';
+            return `
+                <div class="detail-meta-card">
+                    <div class="order-meta-strip">${chip}<div class="venue-name-lg">${venue}</div></div>
+                    ${extraAddr}
+                    <p class="order-meta-time">${esc(pickupTimeLabel(order))}</p>
+                    <p class="order-meta-pay">${esc(paymentLabel(order.paymentMethod))}${order.promoCode ? ` · ${esc(order.promoCode)}` : ''}</p>
+                </div>`;
+        }
+
+        function bindDoubleConfirmAction(btn, confirmMessage, onConfirm) {
+            if (!btn) return;
+            const defaultLabel = btn.textContent.trim();
+            btn.dataset.defaultLabel = defaultLabel;
+            let resetTimer = null;
+
+            const reset = () => {
+                btn.dataset.awaiting = '0';
+                btn.classList.remove('is-confirm');
+                btn.textContent = btn.dataset.defaultLabel;
+                if (resetTimer) {
+                    clearTimeout(resetTimer);
+                    resetTimer = null;
+                }
+            };
+
+            btn.addEventListener('click', () => {
+                if (btn.dataset.awaiting === '1') {
+                    reset();
+                    onConfirm();
+                    return;
+                }
+                btn.dataset.awaiting = '1';
+                btn.classList.add('is-confirm');
+                btn.textContent = confirmMessage;
+                if (resetTimer) clearTimeout(resetTimer);
+                resetTimer = setTimeout(reset, 5000);
+            });
+        }
+
         function paymentLabel(method) {
             return method === 'transfer' ? 'Оплата: перевод' : 'Оплата: на кассе';
         }
@@ -2003,7 +2231,7 @@
                 main.innerHTML = `
                     <div class="order-row__num">${urgDot}${esc(order.orderNumber)}</div>
                     <div class="order-row__sub">${esc(order.customer?.name || '—')} · ${order.total} ₽</div>
-                    <div class="order-row__sub">${esc(locationLabel(order))} · ${deliveryLabel(order.deliveryType)}${order.status === 'cancelled' && cancelReasonText(order) ? ` · ${esc(cancelReasonText(order))}` : ''}</div>
+                    <div class="order-row__sub">${deliveryModeMeta(order).icon} ${esc(locationLabel(order))}${order.status === 'cancelled' && cancelReasonText(order) ? ` · ${esc(cancelReasonText(order))}` : ''}</div>
                     <div class="order-row__sub">${order.deletedAt ? `Удалён: ${formatDate(order.deletedAt)}` : (order.status === 'done' && order.archivedAt ? `Архив: ${formatDate(order.archivedAt)}` : formatDate(order.createdAt))}</div>
                 `;
 
@@ -2134,10 +2362,7 @@
                         <div style="color:var(--muted);font-size:0.82rem;">Создан: ${esc(formatDate(order.createdAt))}</div>
                         ${timeMeta}
                     </div>
-                    <span class="badge badge-${order.status}">${STATUS_LABELS[order.status]}</span>${urgBadge}
-                </div>
-                <div class="detail-actions-top">
-                    ${showDeleteBtn ? '<button type="button" class="btn-danger btn-cancel-sm" id="deleteOneBtn">Удалить</button>' : ''}
+                    <span class="badge badge-lg badge-${order.status}">${STATUS_LABELS[order.status]}</span>${urgBadge}
                 </div>
                 <div class="detail-hero">
                     <div class="detail-customer-name">${esc(order.customer?.name || '—')}</div>
@@ -2148,20 +2373,12 @@
                         <p class="detail-comment${order.comment ? '' : ' is-empty'}">${order.comment ? formatGuestComment(order.comment) : 'Без комментария'}</p>
                     </div>
                 </div>
+                ${orderMetaCardHtml(order)}
                 <div class="detail-grid">
-                    <div class="info-block">
+                    <div class="info-block" style="grid-column:1/-1;">
                         <h3>Контакты</h3>
                         ${order.customer?.email ? `<p>${formatContactField(order.customer.email)}</p>` : '<p style="color:var(--muted);">Email / TG не указан</p>'}
-                    </div>
-                    <div class="info-block">
-                        <h3>Точка</h3>
-                        <p><strong>${esc(locationLabel(order))}</strong></p>
-                        <p>${esc(deliveryLabel(order.deliveryType))}</p>
-                        <p>${esc(order.address || '—')}</p>
-                        ${order.addressExtra ? `<p>${esc(order.addressExtra)}</p>` : ''}
-                        <p style="color:var(--muted);font-size:0.82rem;">${esc(paymentLabel(order.paymentMethod))}</p>
-                        <p style="color:var(--muted);font-size:0.82rem;">${esc(pickupTimeLabel(order))}</p>
-                        ${order.promoCode ? `<p>Промокод: ${esc(order.promoCode)}</p>` : ''}
+                        ${guestEmailStatusHtml(order)}
                     </div>
                 </div>
                 ${order.status === 'cancelled' && cancelReasonText(order) ? `<div class="info-block" style="margin-bottom:10px;"><h3>Причина отмены</h3><p>${esc(cancelReasonText(order))}</p></div>` : ''}
@@ -2179,7 +2396,11 @@
                         <button type="button" class="status-btn status-btn--prep ${isPreparing ? 'is-current' : ''}" data-status="cooking">Подтверждён / Готовим</button>
                         <button type="button" class="status-btn status-btn--delivery ${order.status === 'delivery' ? 'is-current' : ''}" data-status="delivery">Отдали курьеру</button>
                         <button type="button" class="status-btn status-btn--done" data-status="done">Выполнен</button>
-                        <button type="button" class="status-btn status-btn--cancel" id="cancelOneBtn">Отменён</button>
+                    </div>` : ''}
+                    ${showDeleteBtn ? `
+                    <div class="danger-actions">
+                        ${showStatusBtns ? '<button type="button" class="danger-action" id="cancelOneBtn">Отменить</button>' : ''}
+                        <button type="button" class="danger-action danger-action--delete" id="deleteOneBtn">Удалить</button>
                     </div>` : ''}
                 </div>`}
             `;
@@ -2207,10 +2428,18 @@
                 });
             }
             if (showStatusBtns) {
-                document.getElementById('cancelOneBtn')?.addEventListener('click', () => openCancelModal(order.id));
+                bindDoubleConfirmAction(
+                    document.getElementById('cancelOneBtn'),
+                    'Подтвердите отмену дополнительным нажатием',
+                    () => openCancelModal(order.id)
+                );
             }
             if (showDeleteBtn) {
-                document.getElementById('deleteOneBtn').addEventListener('click', () => openDeleteModal([order.id]));
+                bindDoubleConfirmAction(
+                    document.getElementById('deleteOneBtn'),
+                    'Подтвердите удаление дополнительным нажатием',
+                    () => openDeleteModal([order.id])
+                );
             }
         }
 
@@ -2314,7 +2543,7 @@
                 renderOrdersList();
                 renderDetail(data.order);
                 if (status === 'cooking') {
-                    showToast('Подтверждён · готовим');
+                    showCookingStatusToast('Подтверждён · готовим', data.guestEmail);
                 } else if (status === 'delivery') {
                     showToast('Отдан курьеру');
                 } else if (status === 'done') {
@@ -2357,21 +2586,24 @@
                 return;
             }
 
+            let bulkGuestEmails = [];
             try {
-                await api('/api/orders/bulk', {
+                const bulkData = await api('/api/orders/bulk', {
                     method: 'POST',
                     body: JSON.stringify({ ids, action })
                 });
+                if (Array.isArray(bulkData?.guestEmails)) bulkGuestEmails = bulkData.guestEmails;
             } catch (err) {
                 if (err.status === 404) {
                     for (const id of ids) {
                         if (action === 'delete') {
                             await api(`/api/orders/${id}`, { method: 'DELETE' });
                         } else if (action === 'cooking') {
-                            await api(`/api/orders/${id}`, {
+                            const patchData = await api(`/api/orders/${id}`, {
                                 method: 'PATCH',
                                 body: JSON.stringify({ status: 'cooking' })
                             });
+                            if (patchData?.guestEmail) bulkGuestEmails.push(patchData.guestEmail);
                         } else {
                             await api(`/api/orders/${id}`, {
                                 method: 'PATCH',
@@ -2391,7 +2623,12 @@
             });
             if (selectedId && ids.includes(selectedId)) selectedId = null;
             await loadOrders();
-            showToast(action === 'done' ? 'Перенесено в архив' : action === 'cooking' ? 'Отдано на кухню' : 'В архиве удалённых');
+            if (action === 'cooking') {
+                const summary = summarizeCookingEmailResults(bulkGuestEmails);
+                showToast(summary ? `Отдано на кухню · ${summary}` : 'Отдано на кухню');
+            } else {
+                showToast(action === 'done' ? 'Перенесено в архив' : 'В архиве удалённых');
+            }
             showListOnMobile();
         }
 

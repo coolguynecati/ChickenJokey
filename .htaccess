@@ -1,0 +1,17 @@
+# Магазин в корне домена: emikashotchicken.ru/ (без /shop/)
+# Apache + mod_rewrite
+
+RewriteEngine On
+
+# /shop/... → без /shop/
+RewriteRule ^shop/?$ / [R=301,L]
+RewriteRule ^shop/(.+)$ /$1 [R=301,L]
+
+# Не трогаем общие папки
+RewriteRule ^images/ - [L]
+RewriteRule ^franchise/ - [L]
+RewriteRule ^cloud/ - [L]
+
+# checkout.html, crm.html, …
+RewriteCond %{DOCUMENT_ROOT}/shop/$1 -f
+RewriteRule ^(.+)$ shop/$1 [L]

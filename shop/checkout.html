@@ -404,15 +404,51 @@
     }
     .error { color: #e85c5c; font-size: 0.85rem; display: none; margin-top: 6px; }
     html[data-theme="light"] .error { color: #c62828; }
-    .pickup-point {
-      margin: 0 0 8px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: rgba(255, 106, 26, 0.08);
-      border: 1px solid rgba(255, 106, 26, 0.22);
-      font-size: 0.85rem;
+    .location-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-    .pickup-point strong { color: var(--orange); }
+    .location-choice {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .location-choice:hover { border-color: rgba(255, 106, 26, 0.45); }
+    .location-choice:has(input:checked) {
+      border-color: rgba(255, 106, 26, 0.65);
+      background: rgba(255, 106, 26, 0.08);
+      box-shadow: 0 0 0 2px rgba(255, 106, 26, 0.12);
+    }
+    .location-choice input {
+      width: auto;
+      margin: 3px 0 0;
+      accent-color: var(--orange);
+      flex-shrink: 0;
+    }
+    .location-choice__body {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .location-choice__body strong {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .location-choice__addr {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
 
     /* Custom time dropdown */
     .pickup-select { position: relative; }
@@ -525,9 +561,26 @@
         <h3>Контакты</h3>
         <form id="checkoutForm" novalidate>
           <input type="hidden" name="deliveryType" value="pickup">
-          <input type="hidden" name="pickupLocation" value="eat-arena">
 
-          <p class="pickup-point muted"><strong>Eat Arena</strong> · самовывоз, 2 этаж</p>
+          <div class="field">
+            <label>Откуда забрать *</label>
+            <div class="location-choices">
+              <label class="location-choice">
+                <input type="radio" name="pickupLocation" value="eat-arena" checked>
+                <span class="location-choice__body">
+                  <strong>Eat Arena</strong>
+                  <span class="location-choice__addr">Мичуринский пр-кт 13А · самовывоз, 2 этаж</span>
+                </span>
+              </label>
+              <label class="location-choice">
+                <input type="radio" name="pickupLocation" value="poselok">
+                <span class="location-choice__body">
+                  <strong>пос. Развилка</strong>
+                  <span class="location-choice__addr">Проект. пр-зд 5539, 10В</span>
+                </span>
+              </label>
+            </div>
+          </div>
 
           <div class="row">
             <div class="field">
@@ -1139,7 +1192,32 @@
 
     renderCart();
 
-    const PICKUP_ADDRESS = 'Eat Arena, Мичуринский пр., 13А, стр. 1 — самовывоз';
+    const PICKUP_LOCATIONS = {
+      'eat-arena': {
+        location: 'eat-arena',
+        address: 'Eat Arena, Мичуринский пр-кт 13А, стр. 1 — самовывоз, 2 этаж'
+      },
+      poselok: {
+        location: 'poselok',
+        address: 'пос. Развилка, Проект. пр-зд 5539, 10В — самовывоз'
+      }
+    };
+
+    function getSelectedPickupLocation() {
+      const value = document.querySelector('input[name="pickupLocation"]:checked')?.value || 'eat-arena';
+      return PICKUP_LOCATIONS[value] ? value : 'eat-arena';
+    }
+
+    function applyPickupLocationPreset() {
+      const fromUrl = new URLSearchParams(location.search).get('location');
+      const preset = fromUrl || meta.pickupLocation || '';
+      const normalized = preset === 'poselok' ? 'poselok' : preset === 'eat-arena' ? 'eat-arena' : '';
+      if (!normalized) return;
+      const radio = document.querySelector(`input[name="pickupLocation"][value="${normalized}"]`);
+      if (radio) radio.checked = true;
+    }
+
+    applyPickupLocationPreset();
 
     function orderServerErrorMessage() {
       return 'Не удалось отправить заказ. Обновите страницу или позвоните +7 977 838 98 98.';
@@ -1201,6 +1279,8 @@
       }
 
       const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'counter';
+      const pickupKey = getSelectedPickupLocation();
+      const pickupVenue = PICKUP_LOCATIONS[pickupKey];
 
       submitBtn.disabled = true;
       submitBtn.textContent = 'Отправляем…';
@@ -1208,8 +1288,8 @@
       const payload = {
         customer: { name, phone, email },
         deliveryType,
-        location: 'eat-arena',
-        address: PICKUP_ADDRESS,
+        location: pickupVenue.location,
+        address: pickupVenue.address,
         addressExtra: '',
         comment: document.getElementById('comment').value.trim(),
         paymentMethod,
@@ -1243,6 +1323,7 @@
           id: data.id,
           total: getCartTotal(),
           paymentMethod,
+          location: pickupVenue.location,
           pickupTimeMode,
           pickupTimeAt
         }));

@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const express = require('express');
 const store = require('./store');
 const cloud = require('./cloud');
+const notify = require('./notify');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -60,7 +61,7 @@ function loadCrmAccounts() {
             id: 'poselok',
             password: poselokPassword,
             location: 'poselok',
-            label: 'Посёлок',
+            label: 'пос. Развилка',
             source: poselokAuth?.source || 'CRM_PASSWORD_POSELOK env'
         });
     }
@@ -225,13 +226,17 @@ app.post('/api/orders', (req, res) => {
         total: Number(body.total) || 0
     });
 
+    notify.sendOrderNotification(order).catch((err) => {
+        console.error('[order-notify]', err?.message || err);
+    });
+
     res.status(201).json({
         id: order.id,
         orderNumber: order.orderNumber
     });
 });
 
-app.post('/api/orders/bulk', requireAuth, (req, res) => {
+app.post('/api/orders/bulk', requireAuth, async (req, res) => {
     const ids = Array.isArray(req.body?.ids) ? req.body.ids : [];
     const action = String(req.body?.action || '').trim();
     const scope = sessionLocationScope(req.crmSession);
@@ -262,7 +267,16 @@ app.post('/api/orders/bulk', requireAuth, (req, res) => {
 
     if (action === 'cooking') {
         const orders = store.bulkUpdateStatus(ids, 'cooking');
-        return res.json({ ok: true, orders });
+        const guestEmails = [];
+        for (const order of orders) {
+            try {
+                const result = await notify.handleOrderCookingStarted(order);
+                if (result) guestEmails.push(result);
+            } catch (err) {
+                guestEmails.push({ ok: false, error: err?.message || String(err) });
+            }
+        }
+        return res.json({ ok: true, orders, guestEmails });
     }
 
     return res.status(400).json({ error: 'Неизвестное действие' });
@@ -331,7 +345,7 @@ app.get('/api/orders/:id', requireAuth, (req, res) => {
     res.json({ order });
 });
 
-app.patch('/api/orders/:id', requireAuth, (req, res) => {
+app.patch('/api/orders/:id', requireAuth, async (req, res) => {
     if (req.params.id === 'bulk') {
         return res.status(404).json({ error: 'Заказ не найден' });
     }
@@ -341,6 +355,7 @@ app.patch('/api/orders/:id', requireAuth, (req, res) => {
     if (!orderInScope(existing, scope)) {
         return res.status(403).json({ error: 'Нет доступа к этому заказу' });
     }
+    const previousStatus = existing.status;
     const order = store.updateOrder(req.params.id, {
         status: req.body?.status,
         managerNote: req.body?.managerNote,
@@ -348,7 +363,15 @@ app.patch('/api/orders/:id', requireAuth, (req, res) => {
         cancelReason: req.body?.cancelReason
     });
     if (!order) return res.status(404).json({ error: 'Заказ не найден' });
-    res.json({ order });
+
+    let guestEmail = null;
+    try {
+        guestEmail = await notify.handleOrderCookingStarted(order, previousStatus);
+    } catch (err) {
+        guestEmail = { ok: false, error: err?.message || String(err) };
+    }
+
+    res.json({ order, guestEmail });
 });
 
 app.delete('/api/orders/:id', requireAuth, (req, res) => {
@@ -367,7 +390,11 @@ app.delete('/api/orders/:id', requireAuth, (req, res) => {
 });
 
 app.get('/api/health', (_req, res) => {
-    res.json({ ok: true, orders: store.readOrders().length });
+    res.json({
+        ok: true,
+        orders: store.readOrders().length,
+        orderNotify: notify.isSmtpConfigured()
+    });
 });
 
 app.get('/api/cloud', (req, res) => {
@@ -380,7 +407,18 @@ app.get('/api/cloud', (req, res) => {
 });
 
 app.get('/', (_req, res) => {
-    res.redirect(302, '/shop/');
+    res.sendFile(path.join(REPO_ROOT, 'index.html'));
+});
+
+app.use((req, res, next) => {
+    const p = req.path;
+    if (p === '/shop' || p === '/shop/') {
+        return res.redirect(301, '/');
+    }
+    if (p.startsWith('/shop/')) {
+        return res.redirect(301, p.slice(5) || '/');
+    }
+    next();
 });
 
 app.get('/media', (_req, res) => {
@@ -392,10 +430,6 @@ app.get('/media/', (_req, res) => {
 });
 
 app.get('/media.html', (_req, res) => {
-    res.redirect(302, '/media');
-});
-
-app.get('/shop/media.html', (_req, res) => {
     res.redirect(302, '/media');
 });
 
@@ -422,7 +456,7 @@ app.use('/images', express.static(resolveImagesDir()));
 app.use('/media-files', express.static(path.join(REPO_ROOT, 'media'), { index: false }));
 app.use('/franchise', express.static(path.join(REPO_ROOT, 'franchise')));
 app.use('/cloud', express.static(CLOUD_ROOT, { index: false, dotfiles: 'deny' }));
-app.use('/shop', express.static(SHOP_ROOT));
+app.use(express.static(SHOP_ROOT, { index: false }));
 
 app.listen(PORT, () => {
     store.readOrders();

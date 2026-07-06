@@ -7,10 +7,10 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>CRM — заказы | Emika's</title>
+    <title>CRM — заказы</title>
     <link rel="manifest" href="crm-manifest.webmanifest">
     <meta name="theme-color" content="#ff6a1a">
-    <meta name="apple-mobile-web-app-title" content="Emika CRM">
+    <meta name="apple-mobile-web-app-title" content="CRM заказов">
     <link rel="shortcut icon" href="/images/crm_ico.png" type="image/png">
     <link rel="icon" href="/images/crm_ico.png" type="image/png">
     <link rel="apple-touch-icon" href="/images/crm_ico.png">
@@ -1054,10 +1054,10 @@
 <body>
     <div class="login-wrap" id="loginScreen">
         <div class="login-layout">
-            <img class="login-logo" src="/images/crm_logo.png" alt="Emika's CRM">
+            <img class="login-logo" src="/images/crm_logo.png" alt="CRM заказов">
             <form class="login-card" id="loginForm">
                 <h1>CRM заказов</h1>
-                <p>Emika's Hot Chicken — планшет / телефон</p>
+                <p>Планшет / телефон</p>
                 <label for="crmPassword">Пароль</label>
                 <input id="crmPassword" type="password" autocomplete="current-password" required>
                 <p class="login-error" id="loginError">Неверный пароль</p>
@@ -1233,10 +1233,10 @@
 
         function assertCabinetAccount(accountId) {
             if (CRM_BRAND_LOCK === 'dymny-dvor' && accountId !== 'dymny-dvor') {
-                throw new Error('Этот пароль для CRM Emika. Откройте crm-dymny.html');
+                throw new Error('Пароль другого кабинета. Откройте crm-dymny.html');
             }
             if (CRM_BRAND_LOCK === 'emika' && accountId === 'dymny-dvor') {
-                throw new Error('Пароль Дымного Двора — войдите через crm-dymny.html');
+                throw new Error('Пароль другого кабинета. Откройте crm-dymny.html');
             }
         }
 
@@ -1245,9 +1245,7 @@
             if (resolved !== CRM_BRAND_LOCK) {
                 setToken('');
                 showLogin();
-                throw new Error(CRM_BRAND_LOCK === 'dymny-dvor'
-                    ? 'Сессия Emika. Войдите паролем Дымного Двора.'
-                    : 'Сессия Дымного Двора. Войдите через crm-dymny.html');
+                throw new Error('Сессия другого кабинета. Войдите своим паролем.');
             }
         }
 

@@ -1,7 +1,7 @@
 {
-  "name": "Emika's — заказы CRM",
-  "short_name": "Emika CRM",
-  "description": "CRM заказов Emika's Hot Chicken",
+  "name": "CRM — заказы",
+  "short_name": "CRM заказов",
+  "description": "CRM заказов для ресторанов и точек",
   "start_url": "./crm.html",
   "scope": "./",
   "display": "standalone",

@@ -5,6 +5,7 @@ const express = require('express');
 const store = require('./store');
 const cloud = require('./cloud');
 const notify = require('./notify');
+const push = require('./push');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -38,6 +39,7 @@ function loadCrmAccounts() {
         id: 'admin',
         password: adminPassword,
         location: 'all',
+        brand: 'emika',
         label: 'Все точки',
         source: adminSource
     });
@@ -49,6 +51,7 @@ function loadCrmAccounts() {
             id: 'eat-arena',
             password: eatPassword,
             location: 'eat-arena',
+            brand: 'emika',
             label: 'Eat Arena',
             source: eatAuth?.source || 'CRM_PASSWORD_EAT_ARENA env'
         });
@@ -61,8 +64,22 @@ function loadCrmAccounts() {
             id: 'poselok',
             password: poselokPassword,
             location: 'poselok',
-            label: 'пос. Развилка',
+            brand: 'emika',
+            label: 'Набережные Челны',
             source: poselokAuth?.source || 'CRM_PASSWORD_POSELOK env'
+        });
+    }
+
+    const dymnyAuth = readPasswordFile(['crm-password-dymny-dvor.txt', 'crm-password-dymny.txt']);
+    const dymnyPassword = dymnyAuth?.password || String(process.env.CRM_PASSWORD_DYMNY_DVOR || '').trim();
+    if (dymnyPassword) {
+        accounts.push({
+            id: 'dymny-dvor',
+            password: dymnyPassword,
+            location: 'rumyantsevo',
+            brand: 'dymny-dvor',
+            label: 'Дымный Двор',
+            source: dymnyAuth?.source || 'CRM_PASSWORD_DYMNY_DVOR env'
         });
     }
 
@@ -77,7 +94,7 @@ cloud.ensureCloudRoot(CLOUD_ROOT);
 
 const SESSION_TTL_MS = 3 * 24 * 60 * 60 * 1000;
 
-/** @type {Map<string, { exp: number, location: string, accountId: string, label: string }>} */
+/** @type {Map<string, { exp: number, location: string, accountId: string, label: string, brand: string }>} */
 const sessions = new Map();
 
 function readBearerToken(req) {
@@ -103,7 +120,8 @@ function createToken(account) {
         exp: Date.now() + SESSION_TTL_MS,
         location: account.location,
         accountId: account.id,
-        label: account.label
+        label: account.label,
+        brand: account.brand || 'emika'
     });
     return token;
 }
@@ -117,11 +135,17 @@ function requireAuth(req, res, next) {
     next();
 }
 
+function sessionBrandScope(sess) {
+    return sess?.brand === 'dymny-dvor' ? 'dymny-dvor' : 'emika';
+}
+
 function sessionLocationScope(sess) {
     return sess?.location === 'all' ? null : sess.location;
 }
 
-function orderInScope(order, scopeLocation) {
+function orderInScope(order, sess) {
+    if (store.resolveBrand(order) !== sessionBrandScope(sess)) return false;
+    const scopeLocation = sessionLocationScope(sess);
     if (!scopeLocation) return true;
     return store.resolveLocation(order) === scopeLocation;
 }
@@ -171,6 +195,7 @@ app.post('/api/auth/login', (req, res) => {
         token,
         account: account.id,
         location: account.location,
+        brand: account.brand || 'emika',
         accountLabel: account.label,
         expiresInHours: SESSION_TTL_MS / (60 * 60 * 1000)
     });
@@ -180,21 +205,108 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
     res.json({
         account: req.crmSession.accountId,
         location: req.crmSession.location,
+        brand: req.crmSession.brand || 'emika',
         accountLabel: req.crmSession.label
     });
+});
+
+app.get('/api/push/vapid-public-key', (_req, res) => {
+    const publicKey = push.getPublicKey();
+    res.json({ publicKey: publicKey || null, configured: push.isPushConfigured() });
+});
+
+app.post('/api/push/subscribe', requireAuth, (req, res) => {
+    const result = push.upsertSubscription(req.body || {}, req.crmSession);
+    if (!result.ok) return res.status(400).json({ error: 'Не удалось сохранить подписку' });
+    res.json({ ok: true });
+});
+
+app.delete('/api/push/subscribe', requireAuth, (req, res) => {
+    push.removeSubscription(req.body?.endpoint);
+    res.json({ ok: true });
+});
+
+app.post('/api/promo/first-order/check', (req, res) => {
+    const phone = String(req.body?.phone || '').trim();
+    const email = String(req.body?.email || '').trim();
+
+    if (!store.isValidPhone(phone)) {
+        return res.json({
+            eligible: false,
+            reason: 'invalid_phone',
+            message: 'Укажите корректный номер телефона'
+        });
+    }
+    if (!store.isValidContact(email)) {
+        return res.json({
+            eligible: false,
+            reason: 'invalid_email',
+            message: 'Укажите e-mail или Telegram (@username)'
+        });
+    }
+
+    const usage = store.hasUsedFirstOrderPromo({ phone, email });
+    if (usage.used) {
+        return res.json({
+            eligible: false,
+            reason: 'already_used',
+            message: 'Акция «Первый заказ» уже была использована с этим телефоном или e-mail/TG.',
+            orderNumber: usage.orderNumber || ''
+        });
+    }
+
+    res.json({ eligible: true });
 });
 
 app.post('/api/orders', (req, res) => {
     const body = req.body || {};
     const name = String(body.customer?.name || '').trim();
     const phone = String(body.customer?.phone || '').trim();
+    const email = String(body.customer?.email || '').trim();
 
     if (!name || !phone) {
         return res.status(400).json({ error: 'Укажите имя и телефон' });
     }
 
+    if (!store.isValidPhone(phone)) {
+        return res.status(400).json({ error: 'Укажите корректный номер телефона (например +7 999 000 00 00)' });
+    }
+
     if (!Array.isArray(body.items) || !body.items.length) {
         return res.status(400).json({ error: 'Корзина пуста' });
+    }
+
+    const items = body.items.map((item) => ({
+        id: item.id,
+        titleRu: item.titleRu,
+        titleEn: item.titleEn,
+        price: Number(item.price) || 0,
+        qty: Number(item.qty) || 1,
+        image: item.image || ''
+    }));
+
+    const brand = store.normalizeBrand(body.brand);
+    const hasFirstOrderPromo = store.orderHasPromoFirstItems(items);
+
+    if (hasFirstOrderPromo) {
+        if (brand !== 'emika') {
+            return res.status(400).json({ error: 'Акция «Первый заказ» доступна только в меню Emika' });
+        }
+        if (!store.isValidContact(email)) {
+            return res.status(400).json({
+                error: 'Для акции «Первый заказ» укажите e-mail или Telegram (@username)'
+            });
+        }
+        const usage = store.hasUsedFirstOrderPromo({ phone, email });
+        if (usage.used) {
+            return res.status(400).json({
+                error: 'Акция «Первый заказ» уже была использована с этим телефоном или e-mail/TG.'
+            });
+        }
+    } else if (email && brand !== 'dymny-dvor' && !store.isValidContact(email)) {
+        return res.status(400).json({ error: 'Укажите корректный e-mail или Telegram (@username)' });
+    } else if (email && brand === 'dymny-dvor' && !store.isValidContact(email) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: 'Укажите корректный e-mail' });
     }
 
     const deliveryType = body.deliveryType === 'pickup' ? 'pickup' : 'delivery';
@@ -205,7 +317,8 @@ app.post('/api/orders', (req, res) => {
     }
 
     const order = store.createOrder({
-        customer: { name, phone, email: body.customer?.email },
+        brand,
+        customer: { name, phone, email },
         deliveryType,
         location: body.location,
         address,
@@ -215,19 +328,25 @@ app.post('/api/orders', (req, res) => {
         pickupTimeMode: body.pickupTimeMode,
         pickupTimeAt: body.pickupTimeAt,
         promoCode: body.promoCode,
-        items: body.items.map((item) => ({
-            id: item.id,
-            titleRu: item.titleRu,
-            titleEn: item.titleEn,
-            price: Number(item.price) || 0,
-            qty: Number(item.qty) || 1,
-            image: item.image || ''
-        })),
+        items,
         total: Number(body.total) || 0
     });
 
+    if (hasFirstOrderPromo) {
+        store.markFirstOrderPromoUsed({
+            phone,
+            email,
+            orderId: order.id,
+            orderNumber: order.orderNumber
+        });
+    }
+
     notify.sendOrderNotification(order).catch((err) => {
         console.error('[order-notify]', err?.message || err);
+    });
+
+    push.notifyNewOrderPush(order).catch((err) => {
+        console.error('[order-push]', err?.message || err);
     });
 
     res.status(201).json({
@@ -239,20 +358,18 @@ app.post('/api/orders', (req, res) => {
 app.post('/api/orders/bulk', requireAuth, async (req, res) => {
     const ids = Array.isArray(req.body?.ids) ? req.body.ids : [];
     const action = String(req.body?.action || '').trim();
-    const scope = sessionLocationScope(req.crmSession);
+    const sess = req.crmSession;
 
     if (!ids.length) {
         return res.status(400).json({ error: 'Выберите заказы' });
     }
 
-    if (scope) {
-        const allowed = ids.filter((id) => {
-            const o = store.getOrder(id);
-            return o && orderInScope(o, scope);
-        });
-        if (allowed.length !== ids.length) {
-            return res.status(403).json({ error: 'Нет доступа к одному из заказов' });
-        }
+    const allowed = ids.filter((id) => {
+        const o = store.getOrder(id);
+        return o && orderInScope(o, sess);
+    });
+    if (allowed.length !== ids.length) {
+        return res.status(403).json({ error: 'Нет доступа к одному из заказов' });
     }
 
     if (action === 'delete') {
@@ -289,6 +406,7 @@ app.get('/api/orders', requireAuth, (req, res) => {
     const status = String(req.query.status || '').trim();
     const q = String(req.query.q || '').trim().toLowerCase();
     const scope = sessionLocationScope(req.crmSession);
+    const brandScope = sessionBrandScope(req.crmSession);
 
     if (scope) location = scope;
 
@@ -300,8 +418,10 @@ app.get('/api/orders', requireAuth, (req, res) => {
         orders = orders.filter((o) => o.deletedAt);
     }
 
+    orders = orders.filter((o) => store.resolveBrand(o) === brandScope);
+
     if (scope) {
-        orders = orders.filter((o) => orderInScope(o, scope));
+        orders = orders.filter((o) => orderInScope(o, req.crmSession));
     } else if (location && location !== 'all') {
         orders = orders.filter((o) => store.resolveLocation(o) === location);
     }
@@ -339,7 +459,7 @@ app.get('/api/orders/:id', requireAuth, (req, res) => {
     const order = store.getOrder(req.params.id);
     if (!order) return res.status(404).json({ error: 'Заказ не найден' });
     const scope = sessionLocationScope(req.crmSession);
-    if (!orderInScope(order, scope)) {
+    if (!orderInScope(order, req.crmSession)) {
         return res.status(403).json({ error: 'Нет доступа к этому заказу' });
     }
     res.json({ order });
@@ -351,8 +471,7 @@ app.patch('/api/orders/:id', requireAuth, async (req, res) => {
     }
     const existing = store.getOrder(req.params.id);
     if (!existing) return res.status(404).json({ error: 'Заказ не найден' });
-    const scope = sessionLocationScope(req.crmSession);
-    if (!orderInScope(existing, scope)) {
+    if (!orderInScope(existing, req.crmSession)) {
         return res.status(403).json({ error: 'Нет доступа к этому заказу' });
     }
     const previousStatus = existing.status;
@@ -380,8 +499,7 @@ app.delete('/api/orders/:id', requireAuth, (req, res) => {
     }
     const existing = store.getOrder(req.params.id);
     if (!existing) return res.status(404).json({ error: 'Заказ не найден' });
-    const scope = sessionLocationScope(req.crmSession);
-    if (!orderInScope(existing, scope)) {
+    if (!orderInScope(existing, req.crmSession)) {
         return res.status(403).json({ error: 'Нет доступа к этому заказу' });
     }
     const ok = store.softDeleteOrder(req.params.id);
@@ -393,7 +511,8 @@ app.get('/api/health', (_req, res) => {
     res.json({
         ok: true,
         orders: store.readOrders().length,
-        orderNotify: notify.isSmtpConfigured()
+        orderNotify: notify.isSmtpConfigured(),
+        pushNotify: push.isPushConfigured()
     });
 });
 
@@ -419,6 +538,28 @@ app.use((req, res, next) => {
         return res.redirect(301, p.slice(5) || '/');
     }
     next();
+});
+
+app.get('/crm-dymny.html', (_req, res) => {
+    const filePath = path.join(SHOP_ROOT, 'crm-dymny.html');
+    if (fs.existsSync(filePath)) return res.sendFile(filePath);
+    res.redirect(302, '/crm.html?cabinet=dymny-dvor');
+});
+
+app.get('/crm-dymny', (_req, res) => {
+    res.redirect(301, '/crm-dymny.html');
+});
+
+app.get('/contacts.html', (_req, res) => {
+    const rootFile = path.join(REPO_ROOT, 'contacts.html');
+    const shopFile = path.join(SHOP_ROOT, 'contacts.html');
+    if (fs.existsSync(rootFile)) return res.sendFile(rootFile);
+    if (fs.existsSync(shopFile)) return res.sendFile(shopFile);
+    res.status(404).send('Not found');
+});
+
+app.get('/contacts', (_req, res) => {
+    res.redirect(301, '/contacts.html');
 });
 
 app.get('/media', (_req, res) => {
@@ -453,7 +594,11 @@ app.get('/neworder.mp3', (_req, res) => {
 });
 
 app.use('/images', express.static(resolveImagesDir()));
-app.use('/media-files', express.static(path.join(REPO_ROOT, 'media'), { index: false }));
+// Локально: index.html иногда ссылается на shop/… при открытии как файл
+app.use('/shop', express.static(SHOP_ROOT));
+const mediaDir = path.join(REPO_ROOT, 'media');
+app.use('/media', express.static(mediaDir, { index: false }));
+app.use('/media-files', express.static(mediaDir, { index: false }));
 app.use('/franchise', express.static(path.join(REPO_ROOT, 'franchise')));
 app.use('/cloud', express.static(CLOUD_ROOT, { index: false, dotfiles: 'deny' }));
 app.use(express.static(SHOP_ROOT, { index: false }));
@@ -464,5 +609,6 @@ app.listen(PORT, () => {
     console.log(`Emika shop listening on port ${PORT}`);
     if (publicUrl) console.log(`Public URL: ${publicUrl}`);
     console.log('CRM path: /crm.html');
+    console.log('CRM Dymny: /crm-dymny.html');
     console.log(`CRM accounts: ${CRM_ACCOUNTS.map((a) => a.id).join(', ')}`);
 });

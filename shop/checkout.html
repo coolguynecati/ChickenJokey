@@ -138,6 +138,26 @@
       border-radius: 6px;
       background: var(--input-bg);
     }
+    .item-thumb-stack {
+      display: flex;
+      width: 52px;
+      height: 52px;
+      gap: 2px;
+      align-items: center;
+    }
+    .item-thumb-stack img {
+      flex: 1;
+      width: auto;
+      min-width: 0;
+      height: 100%;
+      padding: 2px;
+    }
+    .item-thumb-empty {
+      display: grid;
+      place-items: center;
+      font-size: 1.4rem;
+      line-height: 1;
+    }
     .item-main { min-width: 0; font-size: 0.9rem; line-height: 1.35; }
     .item-actions {
       display: flex;
@@ -542,7 +562,6 @@
   <div class="wrap">
     <a class="back-to-menu" href="./">&lt; назад в меню</a>
     <h1>Оформление заказа</h1>
-    <p id="apiStatus" class="muted" style="margin:0 0 8px;font-size:0.85rem;" hidden></p>
     <div class="grid">
       <section class="card">
         <div class="cart-card-head">
@@ -575,8 +594,8 @@
               <label class="location-choice">
                 <input type="radio" name="pickupLocation" value="poselok">
                 <span class="location-choice__body">
-                  <strong>пос. Развилка</strong>
-                  <span class="location-choice__addr">Проект. пр-зд 5539, 10В</span>
+                  <strong>Набережные Челны</strong>
+                  <span class="location-choice__addr">проспект Сююмбике, 2/19 · «Гурмэхолл», ТЦ «Омега»</span>
                 </span>
               </label>
             </div>
@@ -636,38 +655,18 @@
 
   <script>
     const EMIKA_API_FALLBACK = 'https://chickenjokey.onrender.com';
-    let emikaApiOrigin = location.origin;
+    const API_TIMEOUT_MS = 30000;
 
-    async function emikaPingApi(base) {
+    async function getApiBase() {
       try {
-        const res = await fetch(new URL('/api/health', base).href, { cache: 'no-store' });
-        if (!res.ok) return false;
-        const data = await res.json();
-        return Boolean(data?.ok);
-      } catch {
-        return false;
-      }
-    }
-
-    async function emikaResolveApiOrigin() {
-      const host = location.hostname;
-      if (host === 'localhost' || host === '127.0.0.1') return location.origin;
-      if (await emikaPingApi(location.origin)) return location.origin;
-      if (await emikaPingApi(EMIKA_API_FALLBACK)) return EMIKA_API_FALLBACK;
+        if (window.emikaApiReady) return await window.emikaApiReady;
+      } catch (_) {}
       return EMIKA_API_FALLBACK;
     }
 
-    const emikaApiReady = emikaResolveApiOrigin().then((origin) => {
-      emikaApiOrigin = origin;
-      return origin;
-    });
-
-    function emikaApiUrl(path) {
-      return new URL(path, emikaApiOrigin).href;
+    function buildEmikaApiUrl(path, base) {
+      return new URL(path, base || EMIKA_API_FALLBACK).href;
     }
-
-    window.emikaApiReady = emikaApiReady;
-    window.emikaApiUrl = emikaApiUrl;
 
     const MSK_TZ = 'Europe/Moscow';
     const MSK_OPEN_MIN = 11 * 60;
@@ -818,14 +817,62 @@
 
     fillPickupTimePicker();
 
+    const MENU_IMAGES = {
+      burger: '/images/burg1.png',
+      tenders: '/images/burg3.png',
+      bites: '/images/bites.png',
+      kinza1: '/images/kinza1.png',
+      kinza2: '/images/kinza2.png',
+      kinza3: '/images/kinza3.png',
+      kinza4: '/images/kinza4.png',
+      kinza5: '/images/kinza5.png',
+      kinza6: '/images/kinza6.png',
+      coke1: '/images/coke1.png',
+      coke2: '/images/coke2.png'
+    };
+
+    function parsePromoLineKey(lineKey) {
+      if (!String(lineKey || '').startsWith('promo-first::')) return null;
+      const parts = String(lineKey).split('::');
+      if (parts.length < 4) return null;
+      return { food: parts[1], drink: parts[2], spice: parts[3] };
+    }
+
+    function getCheckoutItemImages(item) {
+      const stored = Array.isArray(item?.images)
+        ? item.images.filter(Boolean)
+        : [item?.image, item?.imageSecondary].filter((src) => src && src !== '/images/logo.png');
+      if (stored.length) return stored;
+
+      const promo = parsePromoLineKey(item?.id);
+      if (promo) {
+        return [MENU_IMAGES[promo.food], MENU_IMAGES[promo.drink]].filter(Boolean);
+      }
+
+      return item?.image && item.image !== '/images/logo.png' ? [item.image] : [];
+    }
+
+    function renderCheckoutThumbHtml(images) {
+      if (!images.length) {
+        return '<div class="item-thumb-empty" aria-hidden="true">🎁</div>';
+      }
+      if (images.length === 1) {
+        return `<img src="${images[0]}" alt="">`;
+      }
+      return `<div class="item-thumb-stack">${images.map((src) => `<img src="${src}" alt="">`).join('')}</div>`;
+    }
+
     function normalizeCartItem(item) {
+      const images = getCheckoutItemImages(item);
       return {
         id: String(item?.id || ''),
         titleRu: item?.titleRu || '',
         titleEn: item?.titleEn || '',
         price: Number(item?.price) || 0,
         qty: Math.max(1, Math.min(99, Number(item?.qty) || 1)),
-        image: item?.image || '/images/logo.png'
+        image: images[0] || '/images/logo.png',
+        imageSecondary: images[1] || '',
+        images
       };
     }
 
@@ -852,6 +899,41 @@
 
     let cart = loadCheckoutCart();
 
+    function cartHasFirstOrderPromo() {
+      return cart.some((item) => String(item.id || '').startsWith('promo-first::'));
+    }
+
+    function normalizePhoneDigits(value) {
+      let digits = String(value || '').replace(/\D/g, '');
+      if (digits.length === 11 && digits.startsWith('8')) digits = `7${digits.slice(1)}`;
+      if (digits.length === 10) digits = `7${digits}`;
+      return digits.length >= 11 && digits.startsWith('7') ? digits : '';
+    }
+
+    function isValidPhone(value) {
+      return Boolean(normalizePhoneDigits(value));
+    }
+
+    function isValidContact(value) {
+      const raw = String(value || '').trim();
+      if (!raw) return false;
+      if (/^@[a-z0-9_]{4,32}$/i.test(raw)) return true;
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw);
+    }
+
+    function updateEmailFieldForPromo() {
+      const emailLabel = document.querySelector('label[for="email"]');
+      const emailInput = document.getElementById('email');
+      if (!emailLabel || !emailInput) return;
+      if (cartHasFirstOrderPromo()) {
+        emailLabel.textContent = 'e-mail/TG *';
+        emailInput.required = true;
+        emailInput.placeholder = 'Обязательно для акции «Первый заказ»';
+      }
+    }
+
+    updateEmailFieldForPromo();
+
     function getCartTotal() {
       return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
     }
@@ -877,9 +959,9 @@
     }
 
     const RECOMMENDED_PRODUCTS = {
-      'drink-choco': { id: 'drink-choco', titleRu: 'Милкшейк — Шоколад', titleEn: 'Chocolate milkshake', price: 290, image: '/images/drink3.png' },
-      'drink-straw': { id: 'drink-straw', titleRu: 'Милкшейк — Клубника', titleEn: 'Strawberry milkshake', price: 290, image: '/images/drink4.png' },
-      'drink-van': { id: 'drink-van', titleRu: 'Милкшейк — Ваниль', titleEn: 'Vanilla milkshake', price: 290, image: '/images/drink5.png' },
+      'drink-choco': { id: 'drink-choco', titleRu: 'Милкшейк — Шоколад', titleEn: 'Chocolate milkshake', price: 350, image: '/images/drink3.png' },
+      'drink-straw': { id: 'drink-straw', titleRu: 'Милкшейк — Клубника', titleEn: 'Strawberry milkshake', price: 350, image: '/images/drink4.png' },
+      'drink-van': { id: 'drink-van', titleRu: 'Милкшейк — Ваниль', titleEn: 'Vanilla milkshake', price: 350, image: '/images/drink5.png' },
       coleslaw: { id: 'coleslaw', titleRu: 'Салат Коул Слоу', titleEn: 'Coleslaw', price: 229, image: '/images/sal2.png' },
       mac: { id: 'mac', titleRu: "Мак'н'Чиз", titleEn: 'Mac & cheese', price: 249, image: '/images/sal4.png' },
       fries: { id: 'fries', titleRu: 'Картошка фри', titleEn: 'Fries', price: 229, image: '/images/burg2.png' },
@@ -1046,8 +1128,8 @@
     }
 
     function saveCart() {
-      localStorage.setItem(CHECKOUT_CART_KEY, JSON.stringify(cart));
       if (cart.length) {
+        localStorage.setItem(CHECKOUT_CART_KEY, JSON.stringify(cart));
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({
           savedAt: Date.now(),
           items: cart.map((item) => ({
@@ -1056,13 +1138,26 @@
             titleEn: item.titleEn,
             price: item.price,
             qty: item.qty,
-            image: item.image
+            image: item.image,
+            imageSecondary: item.imageSecondary || '',
+            images: item.images || getCheckoutItemImages(item)
           }))
         }));
       } else {
-        localStorage.removeItem(CART_STORAGE_KEY);
-        localStorage.removeItem(CHECKOUT_CART_KEY);
+        clearEmikaCartStorage();
       }
+    }
+
+    function clearEmikaCartStorage() {
+      localStorage.removeItem(CART_STORAGE_KEY);
+      localStorage.removeItem(CHECKOUT_CART_KEY);
+      localStorage.removeItem('emika-checkout-meta');
+    }
+
+    function resetCartAfterOrder() {
+      cart = [];
+      clearEmikaCartStorage();
+      renderCart();
     }
 
     function setItemQty(index, nextQty) {
@@ -1108,6 +1203,7 @@
       submitBtn.disabled = false;
       cart.forEach((item, index) => {
         const sum = item.price * item.qty;
+        const images = getCheckoutItemImages(item);
         const el = document.createElement('div');
         el.className = 'item';
         if (normalizeText(item.id) === normalizeText(recentlyAddedProductId)) {
@@ -1115,7 +1211,7 @@
         }
         el.dataset.index = String(index);
         el.innerHTML = `
-          <img src="${item.image}" alt="">
+          ${renderCheckoutThumbHtml(images)}
           <div class="item-main">
             <div>${item.titleRu || item.titleEn}</div>
             <div class="muted">${item.price} ₽ × ${item.qty} = ${sum} ₽</div>
@@ -1192,6 +1288,12 @@
 
     renderCart();
 
+    window.addEventListener('pageshow', (e) => {
+      if (!e.persisted) return;
+      cart = loadCheckoutCart();
+      renderCart();
+    });
+
     const PICKUP_LOCATIONS = {
       'eat-arena': {
         location: 'eat-arena',
@@ -1199,7 +1301,7 @@
       },
       poselok: {
         location: 'poselok',
-        address: 'пос. Развилка, Проект. пр-зд 5539, 10В — самовывоз'
+        address: 'Набережные Челны, проспект Сююмбике, 2/19, «Гурмэхолл», ТЦ «Омега» — самовывоз'
       }
     };
 
@@ -1220,7 +1322,27 @@
     applyPickupLocationPreset();
 
     function orderServerErrorMessage() {
-      return 'Не удалось отправить заказ. Обновите страницу или позвоните +7 977 838 98 98.';
+      return 'Не удалось отправить заказ. Позвоните +7 977 838 98 98.';
+    }
+
+    function sanitizeUserMessage(msg) {
+      return String(msg || '')
+        .replace(/https?:\/\/[^\s]+/gi, '')
+        .replace(/\b(chickenjokey|onrender\.com|render\.com)\b/gi, '')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+    }
+
+    function explainFetchError(error) {
+      if (!error) return orderServerErrorMessage();
+      if (error.name === 'AbortError') {
+        return 'Не удалось дождаться ответа. Нажмите «Отправить заказ» ещё раз.';
+      }
+      const msg = sanitizeUserMessage(error.message);
+      if (/failed to fetch|networkerror|blocked-localhost/i.test(msg)) {
+        return 'Не удалось отправить заказ. Проверьте интернет или попробуйте другой браузер.';
+      }
+      return msg || orderServerErrorMessage();
     }
 
     async function parseJsonResponse(res) {
@@ -1228,20 +1350,37 @@
       try {
         return JSON.parse(text);
       } catch {
-        throw new Error(orderServerErrorMessage());
+        throw new Error(`Сервер вернул неожиданный ответ (${res.status}). ${orderServerErrorMessage()}`);
       }
     }
 
-    async function checkApi() {
+    async function checkoutApi(path, options = {}) {
+      const base = await getApiBase();
+      const url = buildEmikaApiUrl(path, base);
+      const headers = { ...(options.headers || {}) };
+      if (options.body && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
       try {
-        await emikaApiReady;
-        const res = await fetch(emikaApiUrl('/api/health'), { cache: 'no-store' });
-        if (!res.ok) return false;
-        const data = await res.json();
-        return Boolean(data?.ok);
-      } catch {
-        return false;
+        return await fetch(url, { ...options, headers, signal: controller.signal });
+      } finally {
+        clearTimeout(timer);
       }
+    }
+
+    async function checkoutApiWithRetry(path, options = {}, attempts = 3) {
+      let lastError = null;
+      for (let attempt = 0; attempt < attempts; attempt += 1) {
+        try {
+          return await checkoutApi(path, options);
+        } catch (e) {
+          lastError = e;
+          if (attempt < attempts - 1) {
+            await new Promise((r) => setTimeout(r, 1200));
+          }
+        }
+      }
+      throw lastError || new Error(orderServerErrorMessage());
     }
 
     function readPickupTime() {
@@ -1269,7 +1408,26 @@
         err.style.display = 'block';
         return;
       }
-      if (!cart.length) return;
+      if (!isValidPhone(phone)) {
+        err.textContent = 'Укажите корректный номер телефона (например +7 999 000 00 00).';
+        err.style.display = 'block';
+        return;
+      }
+      if (cartHasFirstOrderPromo() && !isValidContact(email)) {
+        err.textContent = 'Для акции «Первый заказ» укажите e-mail или Telegram (@username).';
+        err.style.display = 'block';
+        return;
+      }
+      if (email && !isValidContact(email)) {
+        err.textContent = 'Укажите корректный e-mail или Telegram (@username).';
+        err.style.display = 'block';
+        return;
+      }
+      if (!cart.length) {
+        err.textContent = 'Корзина пуста. Вернитесь в меню и добавьте блюда.';
+        err.style.display = 'block';
+        return;
+      }
 
       const { mode: pickupTimeMode, at: pickupTimeAt } = readPickupTime();
       if (!pickupTimeMode) {
@@ -1301,23 +1459,14 @@
       };
 
       try {
-        await emikaApiReady;
-        if (!(await checkApi())) {
-          throw new Error(orderServerErrorMessage());
-        }
-
-        const res = await fetch(emikaApiUrl('/api/orders'), {
+        const res = await checkoutApiWithRetry('/api/orders', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         const data = await parseJsonResponse(res);
         if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
 
         localStorage.setItem('emika-checkout-contact', JSON.stringify({ name, phone, email }));
-        localStorage.removeItem('emika-checkout-cart');
-        localStorage.removeItem('emika-checkout-meta');
-        localStorage.removeItem('emika-cart');
         localStorage.setItem('emika-last-order', JSON.stringify({
           orderNumber: data.orderNumber,
           id: data.id,
@@ -1327,10 +1476,11 @@
           pickupTimeMode,
           pickupTimeAt
         }));
+        resetCartAfterOrder();
 
         window.location.href = `order-success.html?order=${encodeURIComponent(data.orderNumber)}`;
       } catch (error) {
-        err.textContent = error.message || orderServerErrorMessage();
+        err.textContent = explainFetchError(error);
         err.style.display = 'block';
         submitBtn.disabled = false;
         submitBtn.textContent = 'Отправить заказ';

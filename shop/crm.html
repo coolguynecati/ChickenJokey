@@ -11,7 +11,9 @@
     <link rel="manifest" href="crm-manifest.webmanifest">
     <meta name="theme-color" content="#ff6a1a">
     <meta name="apple-mobile-web-app-title" content="Emika CRM">
-    <link rel="shortcut icon" href="/images/favicon.ico">
+    <link rel="shortcut icon" href="/images/crm_ico.png" type="image/png">
+    <link rel="icon" href="/images/crm_ico.png" type="image/png">
+    <link rel="apple-touch-icon" href="/images/crm_ico.png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         (function () {
@@ -62,13 +64,28 @@
             padding: 20px;
         }
 
+        .login-layout {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(20px, 5vw, 36px);
+            width: min(540px, 100%);
+        }
+
+        .login-logo {
+            width: min(168px, 34vw);
+            height: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
         .login-card, .panel {
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 14px;
         }
 
-        .login-card { width: min(400px, 100%); padding: 24px; }
+        .login-card { flex: 1; min-width: min(280px, 100%); padding: 24px; }
         .login-card h1 { margin: 0 0 8px; font-size: 1.35rem; }
         .login-card p { margin: 0 0 18px; color: var(--muted); font-size: 0.9rem; }
 
@@ -215,6 +232,18 @@
         .topbar h1 { margin: 0; font-size: 1.2rem; }
         .topbar small { color: var(--muted); font-size: 0.88rem; }
         .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+        .crm-app-logo {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            width: 34px;
+            height: auto;
+            object-fit: contain;
+            opacity: 0.72;
+            pointer-events: none;
+            z-index: 20;
+        }
 
         .bulk-bar {
             display: flex;
@@ -998,6 +1027,17 @@
             width: 100%;
         }
 
+        @media (max-width: 520px) {
+            .login-layout {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .login-logo {
+                width: min(140px, 52vw);
+            }
+        }
+
         @media (max-width: 860px) {
             :root { --list-w: 1fr; }
 
@@ -1013,17 +1053,21 @@
 </head>
 <body>
     <div class="login-wrap" id="loginScreen">
-        <form class="login-card" id="loginForm">
-            <h1>CRM заказов</h1>
-            <p>Emika's Hot Chicken — планшет / телефон</p>
-            <label for="crmPassword">Пароль</label>
-            <input id="crmPassword" type="password" autocomplete="current-password" required>
-            <p class="login-error" id="loginError">Неверный пароль</p>
-            <button type="submit" class="btn-primary" style="width:100%;margin-top:12px;">Войти</button>
-        </form>
+        <div class="login-layout">
+            <img class="login-logo" src="/images/crm_logo.png" alt="Emika's CRM">
+            <form class="login-card" id="loginForm">
+                <h1>CRM заказов</h1>
+                <p>Emika's Hot Chicken — планшет / телефон</p>
+                <label for="crmPassword">Пароль</label>
+                <input id="crmPassword" type="password" autocomplete="current-password" required>
+                <p class="login-error" id="loginError">Неверный пароль</p>
+                <button type="submit" class="btn-primary" style="width:100%;margin-top:12px;">Войти</button>
+            </form>
+        </div>
     </div>
 
     <div class="app" id="app">
+        <img class="crm-app-logo" src="/images/crm_logo.png" alt="" aria-hidden="true">
         <header class="topbar">
             <div>
                 <h1><span class="live-dot" id="liveDot"></span>Заказы</h1>
@@ -1059,7 +1103,7 @@
                 <div class="location-tabs" id="locationTabs" hidden>
                     <button type="button" data-location="all" class="is-active">Все</button>
                     <button type="button" data-location="eat-arena">Eat Arena</button>
-                    <button type="button" data-location="poselok">пос. Развилка</button>
+                    <button type="button" data-location="poselok">Набережные Челны</button>
                 </div>
                 <div class="sidebar-frame sidebar-frame--toolbar">
                     <div class="toolbar-row">
@@ -1120,44 +1164,35 @@
 
     <script>
         const EMIKA_API_FALLBACK = 'https://chickenjokey.onrender.com';
-        let emikaApiOrigin = location.origin;
+        let emikaApiOriginResolved = EMIKA_API_FALLBACK;
 
-        async function emikaPingApi(base) {
-            try {
-                const res = await fetch(new URL('/api/health', base).href, { cache: 'no-store' });
-                if (!res.ok) return false;
-                const data = await res.json();
-                return Boolean(data?.ok);
-            } catch {
-                return false;
-            }
+        const emikaApiReady = (window.emikaApiReady || Promise.resolve(EMIKA_API_FALLBACK))
+            .then((origin) => {
+                emikaApiOriginResolved = origin || EMIKA_API_FALLBACK;
+                return emikaApiOriginResolved;
+            });
+
+        function buildEmikaApiUrl(path) {
+            return new URL(path, emikaApiOriginResolved).href;
         }
 
-        async function emikaResolveApiOrigin() {
-            const host = location.hostname;
-            if (host === 'localhost' || host === '127.0.0.1') return location.origin;
-            if (await emikaPingApi(location.origin)) return location.origin;
-            if (await emikaPingApi(EMIKA_API_FALLBACK)) return EMIKA_API_FALLBACK;
-            return EMIKA_API_FALLBACK;
+        function getEmikaApiOrigin() {
+            return emikaApiOriginResolved;
         }
 
-        const emikaApiReady = emikaResolveApiOrigin().then((origin) => {
-            emikaApiOrigin = origin;
-            return origin;
-        });
+        const CRM_PARAMS = new URLSearchParams(location.search);
+        const CRM_CABINET = document.documentElement.getAttribute('data-crm-cabinet')
+            || CRM_PARAMS.get('cabinet')
+            || 'emika';
+        const CRM_BRAND_LOCK = (CRM_CABINET === 'dymny' || CRM_CABINET === 'dymny-dvor')
+            ? 'dymny-dvor'
+            : 'emika';
 
-        function emikaApiUrl(path) {
-            return new URL(path, emikaApiOrigin).href;
-        }
-
-        window.emikaApiReady = emikaApiReady;
-        window.emikaApiUrl = emikaApiUrl;
-
-        const TOKEN_KEY = 'emika-crm-token';
-        const ACCOUNT_KEY = 'emika-crm-account';
-        const LOCATION_SCOPE_KEY = 'emika-crm-location-scope';
-        const ACCOUNT_LABEL_KEY = 'emika-crm-account-label';
-        const OPENED_ORDERS_KEY = 'emika-crm-opened-orders';
+        const TOKEN_KEY = CRM_BRAND_LOCK === 'dymny-dvor' ? 'dymny-crm-token' : 'emika-crm-token';
+        const ACCOUNT_KEY = CRM_BRAND_LOCK === 'dymny-dvor' ? 'dymny-crm-account' : 'emika-crm-account';
+        const LOCATION_SCOPE_KEY = CRM_BRAND_LOCK === 'dymny-dvor' ? 'dymny-crm-location-scope' : 'emika-crm-location-scope';
+        const ACCOUNT_LABEL_KEY = CRM_BRAND_LOCK === 'dymny-dvor' ? 'dymny-crm-account-label' : 'emika-crm-account-label';
+        const OPENED_ORDERS_KEY = CRM_BRAND_LOCK === 'dymny-dvor' ? 'dymny-crm-opened-orders' : 'emika-crm-opened-orders';
         const UNREAD_URGENT_MS = 5 * 60 * 1000;
         const MSK_TZ = 'Europe/Moscow';
         const POLL_VISIBLE_MS = 3000;
@@ -1173,12 +1208,48 @@
             cancelled: 'Отменён'
         };
 
-        const LOCATION_LABELS = { 'eat-arena': 'Eat Arena', poselok: 'пос. Развилка' };
+        const LOCATION_LABELS = {
+            'eat-arena': 'Eat Arena',
+            poselok: 'Набережные Челны',
+            rumyantsevo: 'Дымный Двор · Румянцево'
+        };
+
+        function applyCabinetBranding() {
+            const loginTitle = document.querySelector('#loginForm h1');
+            const loginSub = document.querySelector('#loginForm p');
+            if (CRM_BRAND_LOCK === 'dymny-dvor') {
+                document.title = 'CRM — заказы | Дымный Двор';
+                if (loginTitle) loginTitle.textContent = 'CRM Дымный Двор';
+                if (loginSub) loginSub.textContent = 'Шашлыки · Румянцево — планшет / телефон';
+            }
+        }
+
+        applyCabinetBranding();
 
         const CANCEL_REASON_LABELS = {
             guest_cancelled: 'Гость отменил',
             guest_no_pickup: 'Гость не забрал заказ'
         };
+
+        function assertCabinetAccount(accountId) {
+            if (CRM_BRAND_LOCK === 'dymny-dvor' && accountId !== 'dymny-dvor') {
+                throw new Error('Этот пароль для CRM Emika. Откройте crm-dymny.html');
+            }
+            if (CRM_BRAND_LOCK === 'emika' && accountId === 'dymny-dvor') {
+                throw new Error('Пароль Дымного Двора — войдите через crm-dymny.html');
+            }
+        }
+
+        function assertCabinetBrand(brand) {
+            const resolved = brand === 'dymny-dvor' ? 'dymny-dvor' : 'emika';
+            if (resolved !== CRM_BRAND_LOCK) {
+                setToken('');
+                showLogin();
+                throw new Error(CRM_BRAND_LOCK === 'dymny-dvor'
+                    ? 'Сессия Emika. Войдите паролем Дымного Двора.'
+                    : 'Сессия Дымного Двора. Войдите через crm-dymny.html');
+            }
+        }
 
         const loginScreen = document.getElementById('loginScreen');
         const loginForm = document.getElementById('loginForm');
@@ -1233,7 +1304,7 @@
         const unreadOrderIds = new Set();
         let faviconTimer = null;
         let faviconLinkEl = null;
-        const FAVICON_DEFAULT = '/images/favicon.ico';
+        const FAVICON_DEFAULT = '/images/crm_ico.png';
         const FAVICON_ALERT = "data:image/svg+xml," + encodeURIComponent(
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="82" font-size="72">🔥</text></svg>'
         );
@@ -1277,8 +1348,9 @@
                 add(new URL('/neworder.mp3', location.origin).href);
                 try {
                     await emikaApiReady;
-                    add(new URL('neworder.mp3', emikaApiOrigin).href);
-                    add(new URL('/neworder.mp3', emikaApiOrigin).href);
+                    const apiOrigin = getEmikaApiOrigin();
+                    add(new URL('neworder.mp3', apiOrigin).href);
+                    add(new URL('/neworder.mp3', apiOrigin).href);
                 } catch (_) {}
                 add('https://emikashotchicken.ru/neworder.mp3');
                 add('https://chickenjokey.onrender.com/neworder.mp3');
@@ -1909,9 +1981,51 @@
             } catch (_) {}
         }
 
-        function registerCrmServiceWorker() {
-            if (!('serviceWorker' in navigator)) return;
-            navigator.serviceWorker.register(new URL('crm-sw.js', location.href).href).catch(() => {});
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const raw = atob(base64);
+            const out = new Uint8Array(raw.length);
+            for (let i = 0; i < raw.length; i += 1) out[i] = raw.charCodeAt(i);
+            return out;
+        }
+
+        async function registerCrmServiceWorker() {
+            if (!('serviceWorker' in navigator)) return null;
+            try {
+                return await navigator.serviceWorker.register(new URL('crm-sw.js', location.href).href);
+            } catch (_) {
+                return null;
+            }
+        }
+
+        async function subscribeToPush() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+            try {
+                const keyRes = await fetch(buildEmikaApiUrl('/api/push/vapid-public-key'), { cache: 'no-store' });
+                const keyData = await keyRes.json();
+                if (!keyData?.publicKey) return;
+
+                if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+                    await Notification.requestPermission();
+                }
+                if (typeof Notification !== 'undefined' && Notification.permission !== 'granted') return;
+
+                const reg = await navigator.serviceWorker.ready;
+                let sub = await reg.pushManager.getSubscription();
+                if (!sub) {
+                    sub = await reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(keyData.publicKey)
+                    });
+                }
+                await api('/api/push/subscribe', {
+                    method: 'POST',
+                    body: JSON.stringify(sub.toJSON())
+                });
+            } catch (err) {
+                console.warn('[crm-push]', err?.message || err);
+            }
         }
 
         function playNewOrderSoundOnce() {
@@ -1972,7 +2086,7 @@
             if (token) headers.Authorization = `Bearer ${token}`;
 
             await emikaApiReady;
-            const url = path.startsWith('http') ? path : emikaApiUrl(path);
+            const url = path.startsWith('http') ? path : buildEmikaApiUrl(path);
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
             let res;
@@ -1980,7 +2094,7 @@
                 res = await fetch(url, { ...options, headers, signal: controller.signal });
             } catch (e) {
                 if (e.name === 'AbortError') {
-                    const err = new Error('Сервер не отвечает (таймаут). Render мог уснуть — подождите.');
+                    const err = new Error('Сервер не отвечает. Подождите и попробуйте снова.');
                     err.status = 0;
                     throw err;
                 }
@@ -2029,9 +2143,17 @@
             return loc === 'eat-arena' || loc === 'poselok';
         }
 
+        function orderHasFirstOrderPromo(order) {
+            if (order?.firstOrderPromo) return true;
+            return (order?.items || []).some((item) => String(item?.id || '').startsWith('promo-first::'));
+        }
+
         function orderMetaCardHtml(order) {
             const mode = deliveryModeMeta(order);
             const chip = `<span class="fulfillment-chip ${mode.className}"><span class="fulfillment-chip__icon" aria-hidden="true">${mode.icon}</span>${mode.label}</span>`;
+            const promoBadge = orderHasFirstOrderPromo(order)
+                ? '<span class="badge" style="margin-left:6px;background:rgba(255,106,26,0.18);color:var(--orange);">1-й заказ</span>'
+                : '';
 
             if (order.deliveryType === 'delivery') {
                 const addr = [order.address, order.addressExtra].filter(Boolean).join(', ') || '—';
@@ -2039,7 +2161,7 @@
                     <div class="detail-meta-card">
                         <div class="order-meta-strip">${chip}<div class="venue-name-lg">${esc(addr)}</div></div>
                         <p class="order-meta-time">${esc(pickupTimeLabel(order))}</p>
-                        <p class="order-meta-pay">${esc(paymentLabel(order.paymentMethod))}${order.promoCode ? ` · ${esc(order.promoCode)}` : ''}</p>
+                        <p class="order-meta-pay">${esc(paymentLabel(order.paymentMethod))}${order.promoCode ? ` · ${esc(order.promoCode)}` : ''}${promoBadge}</p>
                     </div>`;
             }
 
@@ -2052,7 +2174,7 @@
                     <div class="order-meta-strip">${chip}<div class="venue-name-lg">${venue}</div></div>
                     ${extraAddr}
                     <p class="order-meta-time">${esc(pickupTimeLabel(order))}</p>
-                    <p class="order-meta-pay">${esc(paymentLabel(order.paymentMethod))}${order.promoCode ? ` · ${esc(order.promoCode)}` : ''}</p>
+                    <p class="order-meta-pay">${esc(paymentLabel(order.paymentMethod))}${order.promoCode ? ` · ${esc(order.promoCode)}` : ''}${promoBadge}</p>
                 </div>`;
         }
 
@@ -2099,7 +2221,9 @@
         }
 
         function orderLocation(order) {
-            return order.location === 'poselok' ? 'poselok' : 'eat-arena';
+            if (order.location === 'rumyantsevo') return 'rumyantsevo';
+            if (order.location === 'poselok') return 'poselok';
+            return 'eat-arena';
         }
 
         function locationLabel(order) {
@@ -2229,7 +2353,7 @@
                     ? `<span class="urgency-dot urgency-dot--${urg}" title="Срочность"></span>`
                     : '';
                 main.innerHTML = `
-                    <div class="order-row__num">${urgDot}${esc(order.orderNumber)}</div>
+                    <div class="order-row__num">${urgDot}${esc(order.orderNumber)}${orderHasFirstOrderPromo(order) ? ' <span style="color:var(--orange);font-size:0.72rem;">1-й заказ</span>' : ''}</div>
                     <div class="order-row__sub">${esc(order.customer?.name || '—')} · ${order.total} ₽</div>
                     <div class="order-row__sub">${deliveryModeMeta(order).icon} ${esc(locationLabel(order))}${order.status === 'cancelled' && cancelReasonText(order) ? ` · ${esc(cancelReasonText(order))}` : ''}</div>
                     <div class="order-row__sub">${order.deletedAt ? `Удалён: ${formatDate(order.deletedAt)}` : (order.status === 'done' && order.archivedAt ? `Архив: ${formatDate(order.archivedAt)}` : formatDate(order.createdAt))}</div>
@@ -2665,6 +2789,7 @@
             try {
                 try {
                     const me = await api('/api/auth/me');
+                    assertCabinetBrand(me.brand);
                     crmLocationScope = me.location || crmLocationScope;
                     crmAccountLabel = me.accountLabel || crmAccountLabel;
                 } catch (meErr) {
@@ -2676,12 +2801,18 @@
                 await loadOrders();
                 await showApp();
                 syncBulkBar();
-                registerCrmServiceWorker();
+                await registerCrmServiceWorker();
                 await requestAlertsPermission();
+                await subscribeToPush();
                 startPolling();
             } catch (e) {
                 setToken('');
                 showLogin();
+                if (loginError) {
+                    loginError.style.display = 'block';
+                    loginError.textContent = e?.message
+                        || 'Не удалось загрузить заказы. Попробуйте войти снова.';
+                }
             }
         }
 
@@ -2694,6 +2825,7 @@
                     method: 'POST',
                     body: JSON.stringify({ password })
                 });
+                assertCabinetAccount(data.account);
                 crmLocationScope = data.location || 'all';
                 crmAccountLabel = data.accountLabel || '';
                 if (crmLocationScope !== 'all') currentLocation = crmLocationScope;
@@ -2707,10 +2839,12 @@
                 await tryBoot();
             } catch (err) {
                 loginError.style.display = 'block';
-                if (err.message && err.message !== 'Неверный пароль') {
+                if (err.status === 401 || err.message === 'Неверный пароль') {
+                    loginError.textContent = 'Неверный пароль';
+                } else if (err.message) {
                     loginError.textContent = err.message;
                 } else {
-                    loginError.textContent = 'Неверный пароль';
+                    loginError.textContent = 'Не удалось войти. Подождите и попробуйте снова.';
                 }
             }
         });

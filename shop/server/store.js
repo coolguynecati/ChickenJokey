@@ -5,8 +5,10 @@ const crypto = require('crypto');
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 const EMAILS_FILE = path.join(DATA_DIR, 'emails.json');
+const PROMO_FIRST_FILE = path.join(DATA_DIR, 'promo-first-customers.json');
 const DELETED_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const CANCEL_REASONS = new Set(['guest_cancelled', 'guest_no_pickup']);
+let promoLedgerSynced = false;
 
 function ensureStore() {
     if (!fs.existsSync(DATA_DIR)) {
@@ -17,6 +19,13 @@ function ensureStore() {
     }
     if (!fs.existsSync(EMAILS_FILE)) {
         fs.writeFileSync(EMAILS_FILE, '[]', 'utf8');
+    }
+    if (!fs.existsSync(PROMO_FIRST_FILE)) {
+        fs.writeFileSync(PROMO_FIRST_FILE, '[]', 'utf8');
+    }
+    if (!promoLedgerSynced) {
+        promoLedgerSynced = true;
+        syncPromoFirstLedgerFromOrders();
     }
 }
 
@@ -77,6 +86,139 @@ function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function normalizePhone(value) {
+    let digits = String(value || '').replace(/\D/g, '');
+    if (digits.length === 11 && digits.startsWith('8')) digits = `7${digits.slice(1)}`;
+    if (digits.length === 10) digits = `7${digits}`;
+    return digits.length >= 11 && digits.startsWith('7') ? digits : '';
+}
+
+function isValidPhone(value) {
+    return Boolean(normalizePhone(value));
+}
+
+/** Email or Telegram @handle for contact / promo tracking */
+function normalizeContact(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    if (raw.startsWith('@')) return raw.toLowerCase();
+    const lower = raw.toLowerCase();
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lower)) return lower;
+    return lower;
+}
+
+function isValidContact(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return false;
+    if (/^@[a-z0-9_]{4,32}$/i.test(raw)) return true;
+    return isValidEmail(normalizeEmail(raw));
+}
+
+function readPromoFirstCustomers() {
+    ensureStore();
+    try {
+        const raw = fs.readFileSync(PROMO_FIRST_FILE, 'utf8');
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : [];
+    } catch {
+        return [];
+    }
+}
+
+function writePromoFirstCustomers(rows) {
+    ensureStore();
+    fs.writeFileSync(PROMO_FIRST_FILE, JSON.stringify(rows, null, 2), 'utf8');
+}
+
+function orderHasPromoFirstItems(items) {
+    return (Array.isArray(items) ? items : []).some((item) => {
+        const id = String(item?.id || '');
+        return id.startsWith('promo-first::') || id === 'promo-first';
+    });
+}
+
+function hasUsedFirstOrderPromo({ phone, email }) {
+    const normalizedPhone = normalizePhone(phone);
+    const normalizedContact = normalizeContact(email);
+
+    for (const entry of readPromoFirstCustomers()) {
+        if (normalizedPhone && entry.phone && entry.phone === normalizedPhone) {
+            return { used: true, via: 'phone', orderNumber: entry.orderNumber || '' };
+        }
+        if (normalizedContact && entry.emailContact && entry.emailContact === normalizedContact) {
+            return { used: true, via: 'email', orderNumber: entry.orderNumber || '' };
+        }
+    }
+
+    for (const order of readOrders()) {
+        if (order.status === 'cancelled' || order.deletedAt) continue;
+        if (!orderHasPromoFirstItems(order.items)) continue;
+        const orderPhone = normalizePhone(order.customer?.phone);
+        const orderContact = normalizeContact(order.customer?.email);
+        if (normalizedPhone && orderPhone && normalizedPhone === orderPhone) {
+            return { used: true, via: 'phone', orderNumber: order.orderNumber || '' };
+        }
+        if (normalizedContact && orderContact && normalizedContact === orderContact) {
+            return { used: true, via: 'email', orderNumber: order.orderNumber || '' };
+        }
+    }
+
+    return { used: false };
+}
+
+function markFirstOrderPromoUsed({ phone, email, orderId, orderNumber }) {
+    const normalizedPhone = normalizePhone(phone);
+    const normalizedContact = normalizeContact(email);
+    if (!normalizedPhone && !normalizedContact) return null;
+
+    const rows = readPromoFirstCustomers();
+    const duplicate = rows.some((entry) => {
+        if (normalizedPhone && entry.phone === normalizedPhone) return true;
+        if (normalizedContact && entry.emailContact === normalizedContact) return true;
+        return false;
+    });
+    if (duplicate) return null;
+
+    const record = {
+        phone: normalizedPhone,
+        emailContact: normalizedContact,
+        usedAt: new Date().toISOString(),
+        orderId: orderId || '',
+        orderNumber: orderNumber || ''
+    };
+    rows.unshift(record);
+    writePromoFirstCustomers(rows);
+    return record;
+}
+
+function syncPromoFirstLedgerFromOrders() {
+    const rows = readPromoFirstCustomers();
+    const keys = new Set(rows.map((e) => `${e.phone || ''}|${e.emailContact || ''}`));
+
+    for (const order of readOrders()) {
+        if (order.status === 'cancelled' || order.deletedAt) continue;
+        if (!orderHasPromoFirstItems(order.items)) continue;
+
+        const phone = normalizePhone(order.customer?.phone);
+        const emailContact = normalizeContact(order.customer?.email);
+        const key = `${phone}|${emailContact}`;
+        if (!phone && !emailContact) continue;
+        if (keys.has(key)) continue;
+
+        rows.push({
+            phone,
+            emailContact,
+            usedAt: order.createdAt || new Date().toISOString(),
+            orderId: order.id || '',
+            orderNumber: order.orderNumber || '',
+            source: 'backfill'
+        });
+        keys.add(key);
+    }
+
+    if (rows.length) writePromoFirstCustomers(rows);
+}
+
 function saveCustomerEmail(email, meta = {}) {
     const normalized = normalizeEmail(email);
     if (!normalized || !isValidEmail(normalized)) return null;
@@ -110,30 +252,55 @@ function saveCustomerEmail(email, meta = {}) {
     return normalized;
 }
 
-const LOCATIONS = new Set(['eat-arena', 'poselok']);
+const BRANDS = new Set(['emika', 'dymny-dvor']);
+const LOCATIONS = new Set(['eat-arena', 'poselok', 'rumyantsevo']);
 
-function normalizeLocation(value) {
+function normalizeBrand(value) {
     const v = String(value || '').trim().toLowerCase();
-    if (v === 'poselok' || v === 'посёлок' || v === 'поселок') return 'poselok';
+    if (v === 'dymny-dvor' || v === 'dymny' || v === 'дымный' || v === 'дымный-двор') return 'dymny-dvor';
+    return 'emika';
+}
+
+function resolveBrand(order) {
+    if (order?.brand && BRANDS.has(order.brand)) return order.brand;
+    return 'emika';
+}
+
+function normalizeLocation(value, brand) {
+    const b = normalizeBrand(brand);
+    const v = String(value || '').trim().toLowerCase();
+    if (b === 'dymny-dvor') return 'rumyantsevo';
+    if (v === 'rumyantsevo' || v.includes('румянцево')) return 'rumyantsevo';
+    if (v === 'poselok' || v === 'chelny' || v === 'челны' || v === 'набережные челны') return 'poselok';
     return 'eat-arena';
 }
 
 function resolveLocation(order) {
+    const brand = resolveBrand(order);
+    if (brand === 'dymny-dvor') return 'rumyantsevo';
     if (order?.location && LOCATIONS.has(order.location)) return order.location;
     const hay = `${order?.address || ''} ${order?.comment || ''}`.toLowerCase();
-    if (hay.includes('развилка') || hay.includes('посёлок') || hay.includes('поселок') || hay.includes('5539')) {
+    if (hay.includes('румянцево')) return 'rumyantsevo';
+    if (hay.includes('челн') || hay.includes('chelny') || hay.includes('сююмбике') || hay.includes('syuyumbike') || hay.includes('гурмэхолл') || hay.includes('gurmehall') || hay.includes('омега') || hay.includes('omega')) {
         return 'poselok';
     }
     return 'eat-arena';
 }
 
 function locationLabel(location) {
-    return location === 'poselok' ? 'пос. Развилка' : 'Eat Arena';
+    if (location === 'rumyantsevo') return 'Дымный Двор · Румянцево';
+    if (location === 'poselok') return 'Набережные Челны';
+    return 'Eat Arena';
 }
 
-function nextOrderNumber(orders) {
+function brandLabel(brand) {
+    return resolveBrand({ brand }) === 'dymny-dvor' ? 'Дымный Двор' : "Emika's";
+}
+
+function nextOrderNumber(orders, brand) {
     const year = new Date().getFullYear();
-    const prefix = `E${year}-`;
+    const b = normalizeBrand(brand);
+    const prefix = b === 'dymny-dvor' ? `DD${year}-` : `E${year}-`;
     const nums = orders
         .map((o) => o.orderNumber)
         .filter((n) => typeof n === 'string' && n.startsWith(prefix))
@@ -145,9 +312,14 @@ function nextOrderNumber(orders) {
 function createOrder(payload) {
     const orders = readOrders();
     const now = new Date().toISOString();
+    const items = Array.isArray(payload.items) ? payload.items : [];
+    const brand = normalizeBrand(payload.brand);
+    const payment = String(payload.paymentMethod || '').trim();
+    const allowedPayments = new Set(['transfer', 'counter', 'card', 'cash', 'sbp']);
     const order = {
         id: crypto.randomUUID(),
-        orderNumber: nextOrderNumber(orders),
+        orderNumber: nextOrderNumber(orders, brand),
+        brand,
         status: 'new',
         createdAt: now,
         updatedAt: now,
@@ -157,18 +329,19 @@ function createOrder(payload) {
             email: String(payload.customer?.email || '').trim()
         },
         deliveryType: payload.deliveryType === 'pickup' ? 'pickup' : 'delivery',
-        location: normalizeLocation(payload.location),
+        location: normalizeLocation(payload.location, brand),
         address: String(payload.address || '').trim(),
         addressExtra: String(payload.addressExtra || '').trim(),
         comment: String(payload.comment || '').trim(),
-        paymentMethod: payload.paymentMethod === 'transfer' ? 'transfer' : 'counter',
+        paymentMethod: allowedPayments.has(payment) ? payment : 'counter',
         pickupTimeMode: ['asap', 'hour', 'at'].includes(payload.pickupTimeMode)
             ? payload.pickupTimeMode
             : 'asap',
         pickupTimeAt: String(payload.pickupTimeAt || '').trim(),
         promoCode: String(payload.promoCode || '').trim(),
-        items: Array.isArray(payload.items) ? payload.items : [],
+        items,
         total: Number(payload.total) || 0,
+        firstOrderPromo: orderHasPromoFirstItems(items),
         managerNote: ''
     };
 
@@ -212,7 +385,7 @@ function updateOrder(id, patch) {
         orders[idx].managerNote = patch.managerNote.trim();
     }
     if (patch.location) {
-        orders[idx].location = normalizeLocation(patch.location);
+        orders[idx].location = normalizeLocation(patch.location, orders[idx].brand);
     }
 
     orders[idx].updatedAt = new Date().toISOString();
@@ -295,8 +468,19 @@ module.exports = {
     softDeleteOrder,
     softDeleteOrders,
     bulkUpdateStatus,
+    resolveBrand,
+    normalizeBrand,
+    brandLabel,
     resolveLocation,
     locationLabel,
     normalizeLocation,
-    cancelReasonLabel
+    cancelReasonLabel,
+    normalizePhone,
+    isValidPhone,
+    normalizeContact,
+    isValidContact,
+    orderHasPromoFirstItems,
+    hasUsedFirstOrderPromo,
+    markFirstOrderPromoUsed,
+    readPromoFirstCustomers
 };

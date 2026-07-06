@@ -304,14 +304,13 @@
 <body data-page-id="contacts">
     <header>
         <nav>
-            <a class="brand" href="./">
+            <a class="brand" href="/">
                 <img src="/images/logo.png" alt="Emika's Hot Chicken">
             </a>
             <div class="header-actions">
                 <div class="top-links">
-                    <a class="top-link" href="./#menuTabs"><span class="lang-ru">Меню</span><span class="lang-en">Menu</span></a>
-                    <a class="top-link is-current" href="contacts.html"><span class="lang-ru">Контакты</span><span class="lang-en">Contacts</span></a>
-                    <a class="top-link" href="cloud.html"><span class="lang-ru">Облако</span><span class="lang-en">Cloud</span></a>
+                    <a class="top-link" href="/#menuTabs"><span class="lang-ru">Меню</span><span class="lang-en">Menu</span></a>
+                    <a class="top-link is-current" href="/contacts.html"><span class="lang-ru">Контакты</span><span class="lang-en">Contacts</span></a>
                 </div>
                 <a href="tel:+79778389898" class="phone-link">+7 977 838 98 98</a>
                 <button type="button" class="lang-toggle" id="langToggle" aria-label="Переключить язык">
@@ -327,7 +326,7 @@
     </header>
 
     <main>
-        <a class="back-home" href="./"><span class="lang-ru">← На главную</span><span class="lang-en">← Back to home</span></a>
+        <a class="back-home" href="/"><span class="lang-ru">← На главную</span><span class="lang-en">← Back to home</span></a>
 
         <h1><span class="lang-ru">Контакты</span><span class="lang-en">Contacts</span></h1>
 
@@ -351,18 +350,26 @@
             </section>
 
             <section class="contact-card">
-                <h2><span class="lang-ru">Скоро откроемся</span><span class="lang-en">Opening soon</span></h2>
-                <p class="lang-ru">Проектируемый пр. № 5539, 10В, посёлок Развилка</p>
-                <p class="lang-en">Planned address: 10V, Razvilka village</p>
+                <h2><span class="lang-ru">Набережные Челны</span><span class="lang-en">Naberezhnye Chelny</span></h2>
+                <p class="lang-ru">проспект Сююмбике, 2/19, «Гурмэхолл», ТЦ «Омега»</p>
+                <p class="lang-en">Syuyumbike Ave. 2/19, Gurmehall, Omega Mall</p>
                 <p>
-                    <a href="https://yandex.ru/navi/org/ageva/230515854150?si=3qht15cpg13frarn1n412z92zr" target="_blank" rel="noopener">
+                    <a href="https://yandex.ru/maps/?text=проспект+Сююмбике+2%2F19+ТЦ+Омега+Набережные+Челны" target="_blank" rel="noopener">
                         <span class="lang-ru">Открыть на карте</span><span class="lang-en">Open on map</span>
                     </a>
                 </p>
             </section>
 
-            <section class="map-wrap" aria-label="Карта">
-                <iframe src="https://yandex.ru/map-widget/v1/-/CLDpiAJ1" allowfullscreen="true" title="Emika's Hot Chicken на карте"></iframe>
+            <section class="map-wrap" aria-label="Карта — Москва">
+                <p class="lang-ru" style="margin:0 0 8px;color:var(--muted);font-size:0.9rem;">Москва · Мичуринский проспект, 13А, стр. 1, Eat Arena, 2 этаж</p>
+                <p class="lang-en" style="margin:0 0 8px;color:var(--muted);font-size:0.9rem;">Moscow · Michurinsky Ave. 13A, bld. 1, Eat Arena, 2nd floor</p>
+                <iframe src="https://yandex.ru/map-widget/v1/?oid=204325250851&ol=biz" allowfullscreen="true" title="Eat Arena, Москва"></iframe>
+            </section>
+
+            <section class="map-wrap" aria-label="Карта — Набережные Челны">
+                <p class="lang-ru" style="margin:0 0 8px;color:var(--muted);font-size:0.9rem;">Набережные Челны · проспект Сююмбике, 2/19, «Гурмэхолл», ТЦ «Омега»</p>
+                <p class="lang-en" style="margin:0 0 8px;color:var(--muted);font-size:0.9rem;">Naberezhnye Chelny · Syuyumbike Ave. 2/19, Gurmehall, Omega Mall</p>
+                <iframe src="https://yandex.ru/map-widget/v1/org/gurmekholl/4694021330/?ll=52.392352%2C55.730284&z=16" allowfullscreen="true" title="Гурмэхолл, Набережные Челны"></iframe>
             </section>
         </div>
     </main>
@@ -424,6 +431,6 @@
         const savedLang = localStorage.getItem('emika-lang');
         switchLanguage(savedLang === 'en' ? 'en' : 'ru');
     </script>
-    <script src="page-new.js"></script>
+    <script src="/shop/page-new.js"></script>
 </body>
 </html>

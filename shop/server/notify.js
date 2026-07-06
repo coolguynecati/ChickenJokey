@@ -20,9 +20,14 @@ const VENUE_DETAILS = {
         mapUrl: 'https://yandex.ru/maps/?text=Emika%27s+Hot+Chicken+Мичуринский+проспект+13А+стр+1+Eat+Arena'
     },
     poselok: {
-        name: 'пос. Развилка',
-        address: 'Проект. пр-зд 5539, 10В',
-        mapUrl: 'https://yandex.ru/navi/org/ageva/230515854150?si=3qht15cpg13frarn1n412z92zr'
+        name: 'Набережные Челны',
+        address: 'проспект Сююмбике, 2/19, «Гурмэхолл», ТЦ «Омега»',
+        mapUrl: 'https://yandex.ru/maps/?text=проспект+Сююмбике+2%2F19+ТЦ+Омега+Набережные+Челны'
+    },
+    rumyantsevo: {
+        name: 'Дымный Двор',
+        address: 'деревня Румянцево, улица Центральная, 120',
+        mapUrl: 'https://yandex.ru/maps/213/moscow/house/tsentralnaya_ulitsa_120/Z04YcgRgTEUAQFtvfXpzeHhrZQ==/?ll=37.430507%2C55.629481&z=16'
     }
 };
 
@@ -93,15 +98,23 @@ async function sendTransactionalMail({ to, subject, text, html }) {
     }
 }
 
-/** @returns {string[]} unique recipient emails for order location */
 function getOrderNotifyRecipients(order) {
+    const brand = store.resolveBrand(order);
+    if (brand === 'dymny-dvor') {
+        const dymnyEmail = String(process.env.DYMNY_ORDER_EMAIL || 'hello@dymnydvor.ru').trim();
+        return [dymnyEmail];
+    }
     const loc = store.resolveLocation(order);
     const venue = VENUE_EMAIL[loc] || VENUE_EMAIL['eat-arena'];
     return [...new Set([venue, INFO_EMAIL])];
 }
 
 function paymentLabel(method) {
-    return method === 'transfer' ? 'Перевод' : 'На кассе';
+    if (method === 'transfer') return 'Перевод';
+    if (method === 'card') return 'Картой онлайн';
+    if (method === 'cash') return 'Наличными';
+    if (method === 'sbp') return 'СБП';
+    return 'На кассе';
 }
 
 function pickupTimeText(order) {

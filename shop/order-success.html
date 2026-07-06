@@ -150,6 +150,10 @@
   <p class="toast" id="toast">Скопировано</p>
 
   <script>
+    ['emika-cart', 'emika-checkout-cart', 'emika-checkout-meta'].forEach((key) => {
+      try { localStorage.removeItem(key); } catch (_) {}
+    });
+
     const params = new URLSearchParams(location.search);
     const orderFromUrl = params.get('order');
     let order = null;
@@ -172,8 +176,8 @@
         address: 'Мичуринский пр-кт 13А, стр. 1 — самовывоз, 2 этаж'
       },
       poselok: {
-        name: 'пос. Развилка',
-        address: 'Проект. пр-зд 5539, 10В'
+        name: 'Набережные Челны',
+        address: 'проспект Сююмбике, 2/19, «Гурмэхолл», ТЦ «Омега» — самовывоз'
       }
     };
 

@@ -586,12 +586,22 @@ function resolveImagesDir() {
     return repoImages;
 }
 
-app.get('/neworder.mp3', (_req, res) => {
-    const filePath = path.join(SHOP_ROOT, 'neworder.mp3');
-    if (!fs.existsSync(filePath)) return res.sendStatus(404);
-    res.type('audio/mpeg');
-    res.sendFile(filePath);
-});
+function sendNewOrderSound(_req, res) {
+    const wavPath = path.join(SHOP_ROOT, 'neworder.wav');
+    if (fs.existsSync(wavPath)) {
+        res.type('audio/wav');
+        return res.sendFile(wavPath);
+    }
+    const mp3Path = path.join(SHOP_ROOT, 'neworder.mp3');
+    if (fs.existsSync(mp3Path)) {
+        res.type('audio/mpeg');
+        return res.sendFile(mp3Path);
+    }
+    return res.sendStatus(404);
+}
+
+app.get('/neworder.wav', sendNewOrderSound);
+app.get('/neworder.mp3', sendNewOrderSound);
 
 app.use('/images', express.static(resolveImagesDir()));
 // Локально: index.html иногда ссылается на shop/… при открытии как файл

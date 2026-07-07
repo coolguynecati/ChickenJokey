@@ -16,6 +16,7 @@ shop\cloud.html
 shop\contacts.html
 shop\crm.html
 shop\crm-dymny.html
+shop\neworder.wav
 shop\emika-api.js
 shop\emika-guard.js
 shop\order-success.html

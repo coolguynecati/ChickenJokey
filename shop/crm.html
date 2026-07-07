@@ -654,6 +654,19 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
+        .crm-no-item-images .order-row {
+            grid-template-columns: auto 1fr auto;
+        }
+
+        .crm-no-item-images .item-line {
+            grid-template-columns: 1fr auto;
+        }
+
+        .crm-no-item-images .item-line img,
+        .crm-no-item-images .order-thumb {
+            display: none;
+        }
+
         .order-row__main { min-width: 0; }
 
         .order-row__num {
@@ -1187,6 +1200,7 @@
         const CRM_BRAND_LOCK = (CRM_CABINET === 'dymny' || CRM_CABINET === 'dymny-dvor')
             ? 'dymny-dvor'
             : 'emika';
+        const CRM_SHOW_ITEM_IMAGES = CRM_BRAND_LOCK !== 'dymny-dvor';
 
         const TOKEN_KEY = CRM_BRAND_LOCK === 'dymny-dvor' ? 'dymny-crm-token' : 'emika-crm-token';
         const ACCOUNT_KEY = CRM_BRAND_LOCK === 'dymny-dvor' ? 'dymny-crm-account' : 'emika-crm-account';
@@ -1218,6 +1232,7 @@
             const loginTitle = document.querySelector('#loginForm h1');
             const loginSub = document.querySelector('#loginForm p');
             if (CRM_BRAND_LOCK === 'dymny-dvor') {
+                document.documentElement.classList.add('crm-no-item-images');
                 document.title = 'CRM — заказы | Дымный Двор';
                 if (loginTitle) loginTitle.textContent = 'CRM Дымный Двор';
                 if (loginSub) loginSub.textContent = 'Шашлыки · Румянцево — планшет / телефон';
@@ -1283,7 +1298,7 @@
         const SOUND_SESSION_KEY = 'emika-crm-sound-on';
         const SOUND_STORAGE_KEY = 'emika-crm-sound-on';
 
-        const SOUND_MAX_MS = 14000;
+        const SOUND_MAX_MS = 2500;
         const SOUND_MIN_GAP_MS = 2500;
         const REMIND_SOUND_MS = 2 * 60 * 1000;
 
@@ -1342,15 +1357,21 @@
                         if (u) urls.push(new URL(u).href);
                     } catch (_) {}
                 };
+                add(new URL('neworder.wav', location.href).href);
                 add(new URL('neworder.mp3', location.href).href);
+                add(new URL('/neworder.wav', location.origin).href);
                 add(new URL('/neworder.mp3', location.origin).href);
                 try {
                     await emikaApiReady;
                     const apiOrigin = getEmikaApiOrigin();
+                    add(new URL('neworder.wav', apiOrigin).href);
                     add(new URL('neworder.mp3', apiOrigin).href);
+                    add(new URL('/neworder.wav', apiOrigin).href);
                     add(new URL('/neworder.mp3', apiOrigin).href);
                 } catch (_) {}
+                add('https://emikashotchicken.ru/neworder.wav');
                 add('https://emikashotchicken.ru/neworder.mp3');
+                add('https://chickenjokey.onrender.com/neworder.wav');
                 add('https://chickenjokey.onrender.com/neworder.mp3');
                 orderSoundUrls = [...new Set(urls)];
                 orderSoundUrlsReady = null;
@@ -1737,7 +1758,7 @@
                 if (advanceOrderSoundUrl()) {
                     return testOrderSound();
                 }
-                showToast('Файл neworder.mp3 не загружается. Проверьте интернет.');
+                showToast('Звук заказа не загружается. Проверьте интернет.');
             }
         }
 
@@ -2339,10 +2360,12 @@
                     renderOrdersList();
                 });
 
-                const thumb = document.createElement('img');
-                thumb.className = 'order-thumb';
-                thumb.src = order.items?.[0]?.image || '/images/logo.png';
-                thumb.alt = '';
+                const thumb = CRM_SHOW_ITEM_IMAGES ? document.createElement('img') : null;
+                if (thumb) {
+                    thumb.className = 'order-thumb';
+                    thumb.src = order.items?.[0]?.image || '/images/logo.png';
+                    thumb.alt = '';
+                }
 
                 const main = document.createElement('div');
                 main.className = 'order-row__main';
@@ -2361,7 +2384,7 @@
                 badge.className = `badge badge-${order.status}`;
                 badge.textContent = STATUS_LABELS[order.status] || order.status;
 
-                row.append(cb, thumb, main, badge);
+                row.append(cb, ...(thumb ? [thumb] : []), main, badge);
 
                 let longPressFired = false;
                 let pressTimer = null;
@@ -2450,7 +2473,7 @@
 
             const itemsHtml = (order.items || []).map((item) => `
                 <div class="item-line">
-                    <img src="${esc(item.image || '/images/logo.png')}" alt="">
+                    ${CRM_SHOW_ITEM_IMAGES ? `<img src="${esc(item.image || '/images/logo.png')}" alt="">` : ''}
                     <div>
                         <div class="item-line__title">${esc(item.titleRu || item.titleEn || '—')}</div>
                         <div class="item-line__meta">${item.qty} × ${item.price} ₽</div>

@@ -852,6 +852,42 @@
             color: var(--text);
         }
 
+        .venue-name-lg a {
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .venue-name-lg a:hover {
+            border-bottom-color: var(--orange);
+            color: var(--orange);
+        }
+
+        .order-map-wrap {
+            margin-top: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: #0b0b0e;
+        }
+
+        .order-map-wrap iframe {
+            display: block;
+            width: 100%;
+            height: 220px;
+            border: 0;
+        }
+
+        .order-map-link {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 0.82rem;
+            color: var(--orange);
+            text-decoration: none;
+        }
+
+        .order-map-link:hover { text-decoration: underline; }
+
         .order-meta-time {
             margin: 0 0 6px;
             font-size: 1.1rem;
@@ -1159,7 +1195,7 @@
                 <h1><span class="live-dot" id="liveDot"></span>Заказы</h1>
                 <small id="ordersCount">—</small>
                 <small id="crmAccountLabel" style="display:block;color:var(--orange);font-size:0.8rem;margin-top:2px;"></small>
-                <small id="crmVersion" style="display:block;color:var(--muted);font-size:0.75rem;margin-top:2px;">CRM v4.4</small>
+                <small id="crmVersion" style="display:block;color:var(--muted);font-size:0.75rem;margin-top:2px;">CRM v4.5</small>
                 <small id="pollStatus" style="display:block;color:var(--muted);font-size:0.7rem;margin-top:2px;"></small>
             </div>
             <div class="topbar-actions">
@@ -2546,6 +2582,36 @@
             return (order?.items || []).some((item) => String(item?.id || '').startsWith('promo-first::'));
         }
 
+        function yandexMapsSearchUrl(address) {
+            const q = String(address || '').trim();
+            if (!q || q === '—') return '';
+            return `https://yandex.ru/maps/?text=${encodeURIComponent(q)}`;
+        }
+
+        function yandexMapsEmbedUrl(address) {
+            const q = String(address || '').trim();
+            if (!q || q === '—') return '';
+            return `https://yandex.ru/map-widget/v1/?z=16&text=${encodeURIComponent(q)}`;
+        }
+
+        function addressMapHtml(address) {
+            const mapsUrl = yandexMapsSearchUrl(address);
+            const embedUrl = yandexMapsEmbedUrl(address);
+            if (!mapsUrl || !embedUrl) return '';
+            return `
+                <div class="order-map-wrap">
+                    <iframe
+                        src="${esc(embedUrl)}"
+                        title="Яндекс Карта"
+                        loading="lazy"
+                        allow="fullscreen"
+                        referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                </div>
+                <a class="order-map-link" href="${esc(mapsUrl)}" target="_blank" rel="noopener noreferrer">Открыть в Яндекс Картах ↗</a>
+            `;
+        }
+
         function orderMetaCardHtml(order) {
             const mode = deliveryModeMeta(order);
             const chip = `<span class="fulfillment-chip ${mode.className}"><span class="fulfillment-chip__icon" aria-hidden="true">${mode.icon}</span>${mode.label}</span>`;
@@ -2555,9 +2621,19 @@
 
             if (order.deliveryType === 'delivery') {
                 const addr = [order.address, order.addressExtra].filter(Boolean).join(', ') || '—';
+                // Для Дымного двора подсказываем район, если гость написал короткий адрес
+                let mapQuery = addr;
+                if (CRM_BRAND_LOCK === 'dymny-dvor' && addr !== '—' && !/румянц|моск|одинцов|новомосков/i.test(addr)) {
+                    mapQuery = `деревня Румянцево, ${addr}`;
+                }
+                const mapsUrl = yandexMapsSearchUrl(mapQuery);
+                const addrHtml = mapsUrl
+                    ? `<div class="venue-name-lg"><a href="${esc(mapsUrl)}" target="_blank" rel="noopener noreferrer">${esc(addr)}</a></div>`
+                    : `<div class="venue-name-lg">${esc(addr)}</div>`;
                 return `
                     <div class="detail-meta-card">
-                        <div class="order-meta-strip">${chip}<div class="venue-name-lg">${esc(addr)}</div></div>
+                        <div class="order-meta-strip">${chip}${addrHtml}</div>
+                        ${addressMapHtml(mapQuery)}
                         <p class="order-meta-time">${esc(pickupTimeLabel(order))}</p>
                         <p class="order-meta-pay">${esc(paymentLabel(order.paymentMethod))}${order.promoCode ? ` · ${esc(order.promoCode)}` : ''}${promoBadge}</p>
                     </div>`;

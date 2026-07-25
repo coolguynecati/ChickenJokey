@@ -888,6 +888,22 @@
 
         .order-map-link:hover { text-decoration: underline; }
 
+        .order-map-warn {
+            margin: 10px 0 0;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 180, 60, 0.35);
+            background: rgba(255, 180, 60, 0.1);
+            color: #ffd59a;
+            font-size: 0.82rem;
+            line-height: 1.4;
+        }
+
+        .order-map-warn strong {
+            color: #ffe2b0;
+            font-weight: 700;
+        }
+
         .order-meta-time {
             margin: 0 0 6px;
             font-size: 1.1rem;
@@ -1195,7 +1211,7 @@
                 <h1><span class="live-dot" id="liveDot"></span>Заказы</h1>
                 <small id="ordersCount">—</small>
                 <small id="crmAccountLabel" style="display:block;color:var(--orange);font-size:0.8rem;margin-top:2px;"></small>
-                <small id="crmVersion" style="display:block;color:var(--muted);font-size:0.75rem;margin-top:2px;">CRM v4.5</small>
+                <small id="crmVersion" style="display:block;color:var(--muted);font-size:0.75rem;margin-top:2px;">CRM v4.5.1</small>
                 <small id="pollStatus" style="display:block;color:var(--muted);font-size:0.7rem;margin-top:2px;"></small>
             </div>
             <div class="topbar-actions">
@@ -2609,6 +2625,7 @@
                     ></iframe>
                 </div>
                 <a class="order-map-link" href="${esc(mapsUrl)}" target="_blank" rel="noopener noreferrer">Открыть в Яндекс Картах ↗</a>
+                <p class="order-map-warn"><strong>Внимание!</strong> Прежде чем отдать заказ курьеру — убедитесь, что адрес, указанный при заказе, верный. Яндекс Карта генерируется автоматически.</p>
             `;
         }
 

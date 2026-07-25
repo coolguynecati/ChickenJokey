@@ -6,8 +6,11 @@ const store = require('./store');
 const cloud = require('./cloud');
 const notify = require('./notify');
 const push = require('./push');
+const sheetsAudit = require('./sheets-audit');
+const weeklyExport = require('./weekly-export');
 
 const app = express();
+app.set('trust proxy', true);
 const PORT = Number(process.env.PORT) || 3000;
 const SHOP_ROOT = path.join(__dirname, '..');
 
@@ -349,6 +352,10 @@ app.post('/api/orders', (req, res) => {
         console.error('[order-push]', err?.message || err);
     });
 
+    sheetsAudit.logOrderCreated(order).catch((err) => {
+        console.error('[sheets-audit]', err?.message || err);
+    });
+
     res.status(201).json({
         id: order.id,
         orderNumber: order.orderNumber
@@ -359,6 +366,7 @@ app.post('/api/orders/bulk', requireAuth, async (req, res) => {
     const ids = Array.isArray(req.body?.ids) ? req.body.ids : [];
     const action = String(req.body?.action || '').trim();
     const sess = req.crmSession;
+    const actor = { accountId: sess.accountId, label: sess.label };
 
     if (!ids.length) {
         return res.status(400).json({ error: 'Выберите заказы' });
@@ -373,27 +381,40 @@ app.post('/api/orders/bulk', requireAuth, async (req, res) => {
     }
 
     if (action === 'delete') {
-        const deleted = store.softDeleteOrders(ids);
-        return res.json({ ok: true, deleted });
+        const deletedOrders = store.softDeleteOrders(ids, actor);
+        for (const order of deletedOrders) {
+            sheetsAudit.logOrderDeleted(order, actor).catch((err) => {
+                console.error('[sheets-audit]', err?.message || err);
+            });
+        }
+        return res.json({ ok: true, deleted: deletedOrders.length });
     }
 
     if (action === 'done') {
-        const orders = store.bulkUpdateStatus(ids, 'done');
-        return res.json({ ok: true, orders });
+        const updated = store.bulkUpdateStatus(ids, 'done', actor);
+        for (const row of updated) {
+            sheetsAudit.logStatusChange(row.order, row.previousStatus, actor).catch((err) => {
+                console.error('[sheets-audit]', err?.message || err);
+            });
+        }
+        return res.json({ ok: true, orders: updated.map((r) => r.order) });
     }
 
     if (action === 'cooking') {
-        const orders = store.bulkUpdateStatus(ids, 'cooking');
+        const updated = store.bulkUpdateStatus(ids, 'cooking', actor);
         const guestEmails = [];
-        for (const order of orders) {
+        for (const row of updated) {
+            sheetsAudit.logStatusChange(row.order, row.previousStatus, actor).catch((err) => {
+                console.error('[sheets-audit]', err?.message || err);
+            });
             try {
-                const result = await notify.handleOrderCookingStarted(order);
+                const result = await notify.handleOrderCookingStarted(row.order);
                 if (result) guestEmails.push(result);
             } catch (err) {
                 guestEmails.push({ ok: false, error: err?.message || String(err) });
             }
         }
-        return res.json({ ok: true, orders, guestEmails });
+        return res.json({ ok: true, orders: updated.map((r) => r.order), guestEmails });
     }
 
     return res.status(400).json({ error: 'Неизвестное действие' });
@@ -475,13 +496,20 @@ app.patch('/api/orders/:id', requireAuth, async (req, res) => {
         return res.status(403).json({ error: 'Нет доступа к этому заказу' });
     }
     const previousStatus = existing.status;
+    const actor = { accountId: req.crmSession.accountId, label: req.crmSession.label };
     const order = store.updateOrder(req.params.id, {
         status: req.body?.status,
         managerNote: req.body?.managerNote,
         location: req.body?.location,
         cancelReason: req.body?.cancelReason
-    });
+    }, actor);
     if (!order) return res.status(404).json({ error: 'Заказ не найден' });
+
+    if (req.body?.status && order.status !== previousStatus) {
+        sheetsAudit.logStatusChange(order, previousStatus, actor).catch((err) => {
+            console.error('[sheets-audit]', err?.message || err);
+        });
+    }
 
     let guestEmail = null;
     try {
@@ -502,8 +530,12 @@ app.delete('/api/orders/:id', requireAuth, (req, res) => {
     if (!orderInScope(existing, req.crmSession)) {
         return res.status(403).json({ error: 'Нет доступа к этому заказу' });
     }
-    const ok = store.softDeleteOrder(req.params.id);
-    if (!ok) return res.status(404).json({ error: 'Заказ не найден' });
+    const actor = { accountId: req.crmSession.accountId, label: req.crmSession.label };
+    const order = store.softDeleteOrder(req.params.id, actor);
+    if (!order) return res.status(404).json({ error: 'Заказ не найден' });
+    sheetsAudit.logOrderDeleted(order, actor).catch((err) => {
+        console.error('[sheets-audit]', err?.message || err);
+    });
     res.json({ ok: true });
 });
 
@@ -512,9 +544,64 @@ app.get('/api/health', (_req, res) => {
         ok: true,
         orders: store.readOrders().length,
         orderNotify: notify.isSmtpConfigured(),
-        pushNotify: push.isPushConfigured()
+        pushNotify: push.isPushConfigured(),
+        sheetsAudit: sheetsAudit.isSheetsConfigured(),
+        weeklyExport: weeklyExport.isWeeklyExportEnabled()
     });
 });
+
+/** Manual / cron trigger: POST /api/cron/weekly-export  Header x-cron-secret or ?secret= */
+app.post('/api/cron/weekly-export', async (req, res) => {
+    const expected = String(process.env.CRON_SECRET || process.env.WEEKLY_EXPORT_SECRET || '').trim();
+    const got = String(
+        req.get('x-cron-secret')
+        || req.query.secret
+        || req.body?.secret
+        || ''
+    ).trim();
+
+    if (expected) {
+        if (!got || got !== expected) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+    } else if (process.env.NODE_ENV === 'production' || process.env.RENDER) {
+        return res.status(503).json({
+            error: 'Задайте CRON_SECRET в окружении для ручного запуска выгрузки'
+        });
+    }
+
+    try {
+        const force = req.query.force === '1' || req.body?.force === true;
+        const result = await weeklyExport.sendWeeklyExport({ force });
+        if (!result.ok && result.skipped) {
+            return res.status(503).json(result);
+        }
+        if (!result.ok) {
+            return res.status(500).json(result);
+        }
+        return res.json(result);
+    } catch (err) {
+        console.error('[weekly-export]', err?.message || err);
+        return res.status(500).json({ ok: false, error: err?.message || String(err) });
+    }
+});
+
+function requestHost(req) {
+    const xf = String(req.headers['x-forwarded-host'] || '').split(',')[0].trim();
+    const raw = xf || String(req.headers.host || req.hostname || '');
+    return raw.toLowerCase().replace(/:\d+$/, '');
+}
+
+function isDymnyCrmHost(req) {
+    const host = requestHost(req);
+    const configured = String(process.env.CRM_DYMNY_HOST || 'crm.dimniy-dvor.ru')
+        .split(/[,;]+/)
+        .map((s) => s.trim().toLowerCase())
+        .filter(Boolean);
+    if (configured.includes(host)) return true;
+    // fallback: любой поддомен crm.*dimniy-dvor.ru
+    return host === 'crm.dimniy-dvor.ru' || host.endsWith('.crm.dimniy-dvor.ru');
+}
 
 app.get('/api/cloud', (req, res) => {
     const folderPath = String(req.query.path || '').trim();
@@ -525,7 +612,11 @@ app.get('/api/cloud', (req, res) => {
     res.json(data);
 });
 
-app.get('/', (_req, res) => {
+app.get('/', (req, res) => {
+    if (isDymnyCrmHost(req)) {
+        // Сразу кабинет Дымного двора, не лендинг Emika
+        return res.redirect(302, '/crm.html?cabinet=dymny-dvor');
+    }
     res.sendFile(path.join(REPO_ROOT, 'index.html'));
 });
 
@@ -621,4 +712,5 @@ app.listen(PORT, () => {
     console.log('CRM path: /crm.html');
     console.log('CRM Dymny: /crm-dymny.html');
     console.log(`CRM accounts: ${CRM_ACCOUNTS.map((a) => a.id).join(', ')}`);
+    weeklyExport.startWeeklyExportScheduler();
 });

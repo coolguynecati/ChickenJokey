@@ -309,6 +309,47 @@ function nextOrderNumber(orders, brand) {
     return `${prefix}${String(next).padStart(4, '0')}`;
 }
 
+function actorLabel(actor) {
+    if (!actor) return '';
+    if (typeof actor === 'string') return actor.trim();
+    return String(actor.label || actor.accountId || '').trim();
+}
+
+function pushHistory(order, entry) {
+    if (!Array.isArray(order.history)) order.history = [];
+    order.history.push(entry);
+}
+
+function applyStatusSideEffects(order, status, now, actor) {
+    const who = actorLabel(actor);
+    if (status === 'confirmed' && !order.confirmedAt) {
+        order.confirmedAt = now;
+        if (who) order.confirmedBy = who;
+    }
+    if (status === 'cooking' && !order.cookingAt) {
+        order.cookingAt = now;
+        if (who) order.cookingBy = who;
+    }
+    if (status === 'delivery' && !order.deliveryAt) {
+        order.deliveryAt = now;
+        if (who) order.deliveryBy = who;
+    }
+    if (status === 'done') {
+        order.archivedAt = now;
+        if (who) order.archivedBy = who;
+    }
+    if (status === 'cancelled') {
+        order.cancelledAt = now;
+        if (who) order.cancelledBy = who;
+    }
+    pushHistory(order, {
+        at: now,
+        event: 'status',
+        status,
+        by: who || 'CRM'
+    });
+}
+
 function createOrder(payload) {
     const orders = readOrders();
     const now = new Date().toISOString();
@@ -342,7 +383,8 @@ function createOrder(payload) {
         items,
         total: Number(payload.total) || 0,
         firstOrderPromo: orderHasPromoFirstItems(items),
-        managerNote: ''
+        managerNote: '',
+        history: [{ at: now, event: 'created', status: 'new', by: 'сайт' }]
     };
 
     orders.unshift(order);
@@ -356,7 +398,7 @@ function createOrder(payload) {
     return order;
 }
 
-function updateOrder(id, patch) {
+function updateOrder(id, patch, actor) {
     const orders = readOrders();
     const idx = orders.findIndex((o) => o.id === id);
     if (idx === -1) return null;
@@ -366,17 +408,12 @@ function updateOrder(id, patch) {
     ]);
 
     if (patch.status && allowedStatus.has(patch.status)) {
-        orders[idx].status = patch.status;
-        const now = new Date().toISOString();
-        if (patch.status === 'cooking' && !orders[idx].cookingAt) {
-            orders[idx].cookingAt = now;
-        }
-        if (patch.status === 'done') {
-            orders[idx].archivedAt = now;
-        }
-        if (patch.status === 'cancelled') {
-            orders[idx].cancelledAt = now;
-            if (patch.cancelReason && CANCEL_REASONS.has(patch.cancelReason)) {
+        const prev = orders[idx].status;
+        if (prev !== patch.status) {
+            orders[idx].status = patch.status;
+            const now = new Date().toISOString();
+            applyStatusSideEffects(orders[idx], patch.status, now, actor);
+            if (patch.status === 'cancelled' && patch.cancelReason && CANCEL_REASONS.has(patch.cancelReason)) {
                 orders[idx].cancelReason = patch.cancelReason;
             }
         }
@@ -407,33 +444,39 @@ function getOrder(id) {
     return readOrders().find((o) => o.id === id) || null;
 }
 
-function softDeleteOrder(id) {
+function softDeleteOrder(id, actor) {
     const orders = readOrders();
     const idx = orders.findIndex((o) => o.id === id);
-    if (idx === -1 || orders[idx].deletedAt) return false;
+    if (idx === -1 || orders[idx].deletedAt) return null;
     const now = new Date().toISOString();
+    const who = actorLabel(actor);
     orders[idx].deletedAt = now;
     orders[idx].updatedAt = now;
+    if (who) orders[idx].deletedBy = who;
+    pushHistory(orders[idx], { at: now, event: 'deleted', status: orders[idx].status, by: who || 'CRM' });
     writeOrders(orders);
-    return true;
+    return orders[idx];
 }
 
-function softDeleteOrders(ids) {
+function softDeleteOrders(ids, actor) {
     const set = new Set(Array.isArray(ids) ? ids : []);
     const orders = readOrders();
     const now = new Date().toISOString();
-    let count = 0;
+    const who = actorLabel(actor);
+    const deleted = [];
     orders.forEach((order, idx) => {
         if (!set.has(order.id) || order.deletedAt) return;
         orders[idx].deletedAt = now;
         orders[idx].updatedAt = now;
-        count += 1;
+        if (who) orders[idx].deletedBy = who;
+        pushHistory(orders[idx], { at: now, event: 'deleted', status: orders[idx].status, by: who || 'CRM' });
+        deleted.push(orders[idx]);
     });
-    if (count) writeOrders(orders);
-    return count;
+    if (deleted.length) writeOrders(orders);
+    return deleted;
 }
 
-function bulkUpdateStatus(ids, status) {
+function bulkUpdateStatus(ids, status, actor) {
     const set = new Set(Array.isArray(ids) ? ids : []);
     const allowedStatus = new Set([
         'new', 'confirmed', 'cooking', 'delivery', 'done', 'cancelled'
@@ -446,12 +489,12 @@ function bulkUpdateStatus(ids, status) {
 
     orders.forEach((order, idx) => {
         if (!set.has(order.id)) return;
-        const wasCooking = orders[idx].status === 'cooking';
+        const prev = orders[idx].status;
+        if (prev === status) return;
         orders[idx].status = status;
         orders[idx].updatedAt = now;
-        if (status === 'cooking' && !orders[idx].cookingAt) orders[idx].cookingAt = now;
-        if (status === 'done') orders[idx].archivedAt = now;
-        if (status !== 'cooking' || !wasCooking) updated.push(orders[idx]);
+        applyStatusSideEffects(orders[idx], status, now, actor);
+        updated.push({ order: orders[idx], previousStatus: prev });
     });
 
     if (updated.length) writeOrders(orders);

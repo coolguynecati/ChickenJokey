@@ -35,8 +35,40 @@ npm start
 
 - **Eat Arena** → `eatarena@emikashotchicken.ru` и `info@emikashotchicken.ru`
 - **Набережные Челны** → `razvilka@emikashotchicken.ru` и `info@emikashotchicken.ru`
+- **Дымный Двор** → `narek@dimniy-dvor.ru` и `info@dimniy-dvor.ru` (или `DYMNY_ORDER_EMAIL`)
 
 Нужны переменные SMTP в `.env` или на Render (`SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `PUBLIC_SITE_URL`). Проверка: `GET /api/health` → `"orderNotify": true`.
+
+### Google Таблица — неизменяемый журнал (Дымный Двор)
+
+Каждое событие (новый заказ, смена статуса, архив, удаление) **дописывается** в Google Sheets. Менеджеры CRM таблицу не редактируют.
+
+Пошагово: [`docs/GOOGLE_SHEETS.md`](docs/GOOGLE_SHEETS.md).  
+Проверка: `/api/health` → `"sheetsAudit": true`.
+
+### Еженедельный Excel на почту
+
+Каждый **понедельник в 09:00 (МСК)** на `narek@dimniy-dvor.ru` уходит письмо с Excel за последние 7 дней:
+
+- лист **Заказы** — состав, времена статусов, кто отправил в архив / удалил  
+- лист **События** — хронология  
+
+Нужен настроенный SMTP. Переменные: `WEEKLY_EXPORT_EMAIL`, `CRON_SECRET` (для ручного запуска).  
+Проверка: `/api/health` → `"weeklyExport": true`.  
+Ручной запуск: `POST /api/cron/weekly-export` с заголовком `x-cron-secret: <CRON_SECRET>`.
+
+Пока Google Таблица не подключена — этого отчёта достаточно для контроля.
+
+### Автопечать заказов на кухне (А4)
+
+В CRM Дымного двора (`/crm-dymny.html`):
+
+1. ПК у принтера, вкладка CRM открыта, USB-принтер — **по умолчанию**.
+2. Кнопки в шапке: **Звук → Вкл/Выкл** и **Печать → Вкл/Выкл** (печать для Дымного двора по умолчанию включена).
+3. Новый заказ → компактный бланк (белый / чёрный текст); большой заказ — на сколько страниц нужно.
+4. Кнопка **«Печать»** в карточке — повтор вручную.
+
+Без диалога каждый раз: ярлык Chrome с `--kiosk-printing`.
 
 ### Письмо гостю «уже готовим»
 

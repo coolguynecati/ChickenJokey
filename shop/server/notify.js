@@ -77,7 +77,7 @@ function absAssetUrl(baseUrl, assetPath) {
     return `${baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
-async function sendTransactionalMail({ to, subject, text, html }) {
+async function sendTransactionalMail({ to, subject, text, html, attachments }) {
     if (process.env.ORDER_NOTIFY_DISABLED === 'true') {
         return { ok: false, skipped: true, reason: 'disabled' };
     }
@@ -91,7 +91,14 @@ async function sendTransactionalMail({ to, subject, text, html }) {
 
     const transport = getSmtpTransport();
     try {
-        const result = await transport.sendMail({ from, to, subject, text, html });
+        const result = await transport.sendMail({
+            from,
+            to,
+            subject,
+            text,
+            html,
+            attachments: Array.isArray(attachments) ? attachments : undefined
+        });
         return { ok: true, messageId: result.messageId };
     } catch (err) {
         return { ok: false, error: err?.message || String(err) };
@@ -101,8 +108,11 @@ async function sendTransactionalMail({ to, subject, text, html }) {
 function getOrderNotifyRecipients(order) {
     const brand = store.resolveBrand(order);
     if (brand === 'dymny-dvor') {
-        const dymnyEmail = String(process.env.DYMNY_ORDER_EMAIL || 'hello@dymnydvor.ru').trim();
-        return [dymnyEmail];
+        const fromEnv = String(process.env.DYMNY_ORDER_EMAIL || '').trim();
+        if (fromEnv) {
+            return [...new Set(fromEnv.split(/[,;]+/).map((s) => s.trim()).filter(Boolean))];
+        }
+        return ['narek@dimniy-dvor.ru', 'info@dimniy-dvor.ru'];
     }
     const loc = store.resolveLocation(order);
     const venue = VENUE_EMAIL[loc] || VENUE_EMAIL['eat-arena'];
@@ -149,9 +159,20 @@ function getVenueDetails(order) {
     return VENUE_DETAILS[loc] || VENUE_DETAILS['eat-arena'];
 }
 
+function buildDymnyOrderSubject(order) {
+    let time = formatMoscowTime(order.createdAt ? new Date(order.createdAt) : new Date());
+    if (order.pickupTimeMode === 'at' && order.pickupTimeAt) {
+        time = String(order.pickupTimeAt).trim() || time;
+    }
+    const name = String(order.customer?.name || 'Гость').trim() || 'Гость';
+    const type = order.deliveryType === 'pickup' ? 'СВ' : 'ДС';
+    return `DD: ${time} - ${name} - ${type}`;
+}
+
 function buildOrderMail(order) {
     const loc = store.resolveLocation(order);
     const venueName = store.locationLabel(loc);
+    const brand = store.resolveBrand(order);
     const lines = [
         `Заказ: ${order.orderNumber}`,
         `Точка: ${venueName}`,
@@ -183,8 +204,12 @@ function buildOrderMail(order) {
         .replace(/>/g, '&gt;')
         .replace(/\n/g, '<br>\n');
 
+    const subject = brand === 'dymny-dvor'
+        ? buildDymnyOrderSubject(order)
+        : `Новый заказ ${order.orderNumber} — ${venueName}`;
+
     return {
-        subject: `Новый заказ ${order.orderNumber} — ${venueName}`,
+        subject,
         text,
         html: `<!DOCTYPE html><html><body style="font-family:sans-serif;line-height:1.5">${html}</body></html>`
     };
@@ -417,6 +442,7 @@ module.exports = {
     summarizeCookingEmailResults,
     isValidCustomerEmail,
     isSmtpConfigured,
+    sendTransactionalMail,
     VENUE_EMAIL,
     INFO_EMAIL
 };

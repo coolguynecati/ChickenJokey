@@ -350,6 +350,12 @@ function applyStatusSideEffects(order, status, now, actor) {
     });
 }
 
+function findByClientOrderKey(key) {
+    const k = String(key || '').trim();
+    if (!k) return null;
+    return readOrders().find((o) => String(o.clientOrderKey || '').trim() === k) || null;
+}
+
 function createOrder(payload) {
     const orders = readOrders();
     const now = new Date().toISOString();
@@ -357,10 +363,16 @@ function createOrder(payload) {
     const brand = normalizeBrand(payload.brand);
     const payment = String(payload.paymentMethod || '').trim();
     const allowedPayments = new Set(['transfer', 'counter', 'card', 'cash', 'sbp']);
+    const clientOrderKey = String(payload.clientOrderKey || payload.localOrderNumber || '').trim();
+    if (clientOrderKey) {
+        const existing = orders.find((o) => String(o.clientOrderKey || '').trim() === clientOrderKey);
+        if (existing) return existing;
+    }
     const order = {
         id: crypto.randomUUID(),
         orderNumber: nextOrderNumber(orders, brand),
         brand,
+        clientOrderKey: clientOrderKey || undefined,
         status: 'new',
         createdAt: now,
         updatedAt: now,
@@ -505,6 +517,7 @@ module.exports = {
     readOrders,
     readEmails,
     createOrder,
+    findByClientOrderKey,
     updateOrder,
     markCookingEmailSent,
     getOrder,

@@ -261,22 +261,41 @@ app.post('/api/promo/first-order/check', (req, res) => {
     res.json({ eligible: true });
 });
 
-app.post('/api/orders', (req, res) => {
-    const body = req.body || {};
+function getDymnyIngestToken() {
+    return String(process.env.DYMNY_INGEST_TOKEN || process.env.ORDER_MAIL_TOKEN || 'dymny-mail-2026-kuhnya').trim();
+}
+
+/** Shared create path for site POST and FormSubmit webhook (RU → email → CRM). */
+function ingestOrderBody(body, { source = 'api' } = {}) {
     const name = String(body.customer?.name || '').trim();
     const phone = String(body.customer?.phone || '').trim();
     const email = String(body.customer?.email || '').trim();
+    const clientOrderKey = String(body.clientOrderKey || body.localOrderNumber || '').trim();
 
     if (!name || !phone) {
-        return res.status(400).json({ error: 'Укажите имя и телефон' });
+        return { ok: false, status: 400, error: 'Укажите имя и телефон' };
     }
 
     if (!store.isValidPhone(phone)) {
-        return res.status(400).json({ error: 'Укажите корректный номер телефона (например +7 999 000 00 00)' });
+        return { ok: false, status: 400, error: 'Укажите корректный номер телефона (например +7 999 000 00 00)' };
     }
 
     if (!Array.isArray(body.items) || !body.items.length) {
-        return res.status(400).json({ error: 'Корзина пуста' });
+        return { ok: false, status: 400, error: 'Корзина пуста' };
+    }
+
+    if (clientOrderKey) {
+        const existing = store.findByClientOrderKey(clientOrderKey);
+        if (existing) {
+            return {
+                ok: true,
+                status: 200,
+                deduped: true,
+                id: existing.id,
+                orderNumber: existing.orderNumber,
+                order: existing
+            };
+        }
     }
 
     const items = body.items.map((item) => ({
@@ -293,34 +312,40 @@ app.post('/api/orders', (req, res) => {
 
     if (hasFirstOrderPromo) {
         if (brand !== 'emika') {
-            return res.status(400).json({ error: 'Акция «Первый заказ» доступна только в меню Emika' });
+            return { ok: false, status: 400, error: 'Акция «Первый заказ» доступна только в меню Emika' };
         }
         if (!store.isValidContact(email)) {
-            return res.status(400).json({
+            return {
+                ok: false,
+                status: 400,
                 error: 'Для акции «Первый заказ» укажите e-mail или Telegram (@username)'
-            });
+            };
         }
         const usage = store.hasUsedFirstOrderPromo({ phone, email });
         if (usage.used) {
-            return res.status(400).json({
+            return {
+                ok: false,
+                status: 400,
                 error: 'Акция «Первый заказ» уже была использована с этим телефоном или e-mail/TG.'
-            });
+            };
         }
     } else if (email && brand !== 'dymny-dvor' && !store.isValidContact(email)) {
-        return res.status(400).json({ error: 'Укажите корректный e-mail или Telegram (@username)' });
+        return { ok: false, status: 400, error: 'Укажите корректный e-mail или Telegram (@username)' };
     } else if (email && brand === 'dymny-dvor' && !store.isValidContact(email) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        return res.status(400).json({ error: 'Укажите корректный e-mail' });
+        return { ok: false, status: 400, error: 'Укажите корректный e-mail' };
     }
 
     const deliveryType = body.deliveryType === 'pickup' ? 'pickup' : 'delivery';
     const address = String(body.address || '').trim();
 
     if (deliveryType === 'delivery' && !address) {
-        return res.status(400).json({ error: 'Укажите адрес доставки' });
+        return { ok: false, status: 400, error: 'Укажите адрес доставки' };
     }
 
     const order = store.createOrder({
         brand,
+        clientOrderKey,
+        localOrderNumber: clientOrderKey,
         customer: { name, phone, email },
         deliveryType,
         location: body.location,
@@ -344,9 +369,12 @@ app.post('/api/orders', (req, res) => {
         });
     }
 
-    notify.sendOrderNotification(order).catch((err) => {
-        console.error('[order-notify]', err?.message || err);
-    });
+    // Не дублируем SMTP-письмо для Дымного: кухня уже получает FormSubmit
+    if (!(brand === 'dymny-dvor' && source === 'formsubmit-webhook')) {
+        notify.sendOrderNotification(order).catch((err) => {
+            console.error('[order-notify]', err?.message || err);
+        });
+    }
 
     push.notifyNewOrderPush(order).catch((err) => {
         console.error('[order-push]', err?.message || err);
@@ -356,9 +384,74 @@ app.post('/api/orders', (req, res) => {
         console.error('[sheets-audit]', err?.message || err);
     });
 
-    res.status(201).json({
+    return {
+        ok: true,
+        status: 201,
+        deduped: false,
         id: order.id,
-        orderNumber: order.orderNumber
+        orderNumber: order.orderNumber,
+        order
+    };
+}
+
+app.post('/api/orders', (req, res) => {
+    const result = ingestOrderBody(req.body || {}, { source: 'api' });
+    if (!result.ok) {
+        return res.status(result.status).json({ error: result.error });
+    }
+    res.status(result.status).json({
+        id: result.id,
+        orderNumber: result.orderNumber,
+        deduped: Boolean(result.deduped)
+    });
+});
+
+/** FormSubmit (доступен из РФ) → серверы FormSubmit → Render CRM */
+app.post('/api/webhooks/formsubmit-order', (req, res) => {
+    const raw = req.body || {};
+    const form = raw.form_data && typeof raw.form_data === 'object' ? raw.form_data : raw;
+    const token = String(form.ingestToken || form.mailToken || raw.ingestToken || '').trim();
+    const expected = getDymnyIngestToken();
+    if (!expected || !token || token !== expected) {
+        return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    let payload = null;
+    const crmRaw = form.crm_payload || form.crmPayload || raw.crm_payload;
+    if (typeof crmRaw === 'string' && crmRaw.trim()) {
+        try {
+            payload = JSON.parse(crmRaw);
+        } catch {
+            return res.status(400).json({ error: 'Invalid crm_payload JSON' });
+        }
+    } else if (crmRaw && typeof crmRaw === 'object') {
+        payload = crmRaw;
+    }
+
+    if (!payload || typeof payload !== 'object') {
+        return res.status(400).json({ error: 'crm_payload required' });
+    }
+
+    const localOrderNumber = String(
+        form.localOrderNumber || form['Номер заказа'] || payload.localOrderNumber || payload.clientOrderKey || ''
+    ).trim();
+    if (localOrderNumber) {
+        payload.clientOrderKey = localOrderNumber;
+        payload.localOrderNumber = localOrderNumber;
+    }
+    if (!payload.brand) payload.brand = 'dymny-dvor';
+    if (!payload.location) payload.location = 'rumyantsevo';
+
+    const result = ingestOrderBody(payload, { source: 'formsubmit-webhook' });
+    if (!result.ok) {
+        return res.status(result.status).json({ error: result.error });
+    }
+    console.log('[formsubmit-webhook]', result.deduped ? 'deduped' : 'created', result.orderNumber);
+    res.status(result.status).json({
+        ok: true,
+        id: result.id,
+        orderNumber: result.orderNumber,
+        deduped: Boolean(result.deduped)
     });
 });
 

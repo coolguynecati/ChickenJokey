@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Re:BRO — гриль-бар в Новосибирске. Шашлык, люля-кебаб, шаурма и гарниры на мангале. Самовывоз с Тюменской, 2А и доставка через Яндекс Еду.">
+  <title>Re:BRO — гриль-бар: шашлык, шаурма, люля-кебаб | Новосибирск</title>
+  <link rel="icon" href="images/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/icon_32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/icon_16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/icon_180.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Russo+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body data-page="home">
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <div class="masthead__body">
+      <video class="masthead__bg-video" autoplay muted loop playsinline poster="images/menu/sh4.jpg">
+        <source src="images/bbq.mp4" type="video/mp4">
+      </video>
+
+      <div class="masthead__content">
+        <div class="masthead__layout">
+          <div class="masthead__logo-col">
+            <div class="masthead__logo-wrap">
+              <a href="#">
+                <img src="images/logo_rebro.png" alt="Re:BRO — гриль-бар, Новосибирск" class="masthead__logo">
+              </a>
+            </div>
+          </div>
+
+          <div class="masthead__text-col">
+            <div class="masthead__headline-block">
+              <h1 class="masthead__title">Ежедневно 11:00–22:00</h1>
+              <p class="masthead__pill">Гриль-бар Re:BRO</p>
+            </div>
+            <p class="masthead__slogan">Мясо на мангале — для своих!</p>
+            <p class="masthead__desc">Шашлык, люля и шаурма — Новосибирск, Тюменская, 2А</p>
+            <div class="masthead__cta">
+              <a href="#menu" class="btn btn--outline-gold btn--lg">Самовывоз</a>
+              <a href="https://eda.yandex.ru/novosibirsk/r/re_bro_restaurant" class="btn btn--gold btn--lg" target="_blank" rel="noopener noreferrer">Доставка</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Шапка поверх видео -->
+      <div class="masthead__top">
+        <img class="masthead__top-shape" src="images/verh.png" alt="" aria-hidden="true">
+        <div class="container masthead__top-inner">
+          <nav class="masthead__nav">
+            <a href="#menu">Меню</a>
+            <a href="menu.html">Все меню</a>
+            <a href="#about">О нас</a>
+            <a href="#delivery">Доставка</a>
+          </nav>
+          <div class="masthead__actions">
+            <div class="header-phone-wrap">
+              <a href="tel:+79137574414" class="btn-phone">+7 913 757-44-14</a>
+              <button type="button" id="delivery-nudge" class="delivery-nudge" hidden aria-live="polite" onclick="openCart()"></button>
+            </div>
+            <button class="cart-btn" onclick="openCart()" aria-label="Корзина">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M6 6L5 3H2"/></svg>
+              <span class="cart-btn__count" data-count="0">0</span>
+            </button>
+            <button class="btn btn--ghost btn--icon" onclick="openAccount()" aria-label="Кабинет">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+            </button>
+            <button class="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="mobile-nav">
+    <p class="mobile-nav__hours">Ежедневно 11:00–22:00</p>
+    <a href="#menu">Меню</a>
+    <a href="menu.html">Все меню</a>
+    <a href="#about">О нас</a>
+    <a href="#delivery">Доставка</a>
+    <a href="tel:+79137574414" class="mobile-nav__phone">+7 913 757-44-14</a>
+    <button class="btn btn--gold" onclick="openAccount()">Личный кабинет</button>
+  </nav>
+
+  <!-- Menu -->
+  <section class="section section--cream" id="menu">
+    <div class="container">
+      <div class="section__header">
+        <h2 class="section__title">Меню</h2>
+      </div>
+
+      <nav class="menu-nav" id="menu-nav"></nav>
+      <p class="menu-hint" id="menu-hint" hidden>Нажмите на раздел — откроются блюда. Другой раздел закроет предыдущий.</p>
+      <div id="menu-content" class="menu-content-wrapper"></div>
+      <div class="menu-filters-row">
+        <div class="menu-filters" id="menu-filters"></div>
+        <p class="menu-all-wrap">
+          <a href="menu.html" class="btn btn--outline-gold">Все меню</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section section--dark" id="about">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__label">Почему мы</span>
+        <h2 class="section__title">Гриль без компромиссов</h2>
+        <p class="section__desc">Жарим мясо, овощи и грибы на мангале — забирайте с Тюменской, 2А или заказывайте доставку через Яндекс Еду.</p>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <img class="feature__icon" src="images/i1.png" alt="" width="200" height="200" loading="lazy">
+          <h3 class="feature__title">Всё на мангале</h3>
+          <p class="feature__text">Свиная шейка, рёбра, антрекот, куриные бёдра и крылышки, люля-кебаб — на живом огне</p>
+        </div>
+        <div class="feature">
+          <img class="feature__icon" src="images/i3.png" alt="" width="200" height="200" loading="lazy">
+          <h3 class="feature__title">Шаурма и гарниры</h3>
+          <p class="feature__text">Классическая и сырная шаурма, картошка, кукуруза, помидоры и шампиньоны с мангала</p>
+        </div>
+        <div class="feature">
+          <img class="feature__icon" src="images/i4.png" alt="" width="200" height="200" loading="lazy">
+          <h3 class="feature__title">Быстрая выдача</h3>
+          <p class="feature__text">Оформите заказ на сайте или по телефону и заберите горячим</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Delivery -->
+  <section class="section section--dark" id="delivery">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__label">Доставка и самовывоз</span>
+        <h2 class="section__title">Заберите или закажите домой</h2>
+        <p class="section__desc">Самовывоз — с Тюменской ул., 2А (Северо-Чемской жилмассив). Доставка — через <a href="https://eda.yandex.ru/novosibirsk/r/re_bro_restaurant" target="_blank" rel="noopener noreferrer">Яндекс Еду</a>.</p>
+      </div>
+      <div class="delivery-grid">
+        <div class="delivery-address">
+          <img
+            class="delivery-address__photo"
+            src="images/menu/sh4.jpg"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+          >
+          <div class="delivery-address__content">
+            <h3 class="delivery-address__title">Адрес</h3>
+            <p class="delivery-address__text">
+              <a href="https://yandex.ru/maps/org/rebro/144014513373/" target="_blank" rel="noopener noreferrer">
+                Новосибирск, Тюменская ул., 2А
+              </a>
+            </p>
+            <p class="delivery-address__meta">📍 Северо-Чемской жилмассив, Кировский район, 1 этаж</p>
+            <p class="delivery-address__meta">🕐 Ежедневно 11:00–22:00</p>
+            <p class="delivery-address__meta">📞 <a href="tel:+79137574414">+7 913 757-44-14</a></p>
+          </div>
+        </div>
+        <div class="delivery-map">
+          <iframe
+            src="https://yandex.ru/map-widget/v1/?ll=82.946651%2C54.960920&mode=search&oid=144014513373&ol=biz&z=16"
+            title="Re:BRO — Новосибирск, Тюменская ул., 2А"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+      </div>
+      <p class="menu-all-wrap">
+        <a href="https://eda.yandex.ru/novosibirsk/r/re_bro_restaurant" class="btn btn--gold btn--lg" target="_blank" rel="noopener noreferrer">Заказать доставку в Яндекс Еде</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <a href="#" class="footer__logo-link">
+            <img src="images/logo_rebro_small.png" alt="Re:BRO" class="footer__logo">
+          </a>
+          <p>Гриль-бар: шашлык, люля-кебаб, шаурма. Самовывоз и доставка. Новосибирск.</p>
+        </div>
+        <div class="footer__col">
+          <h4>Меню</h4>
+          <a href="#menu">Шашлык</a>
+          <a href="menu.html">Все меню</a>
+          <a href="#menu">Шаурма</a>
+          <a href="#menu">Люля-кебаб</a>
+          <a href="#menu">Гарниры</a>
+        </div>
+        <div class="footer__col">
+          <h4>Информация</h4>
+          <a href="#delivery">Доставка</a>
+          <a href="#about">О нас</a>
+          <a href="https://eda.yandex.ru/novosibirsk/r/re_bro_restaurant" target="_blank" rel="noopener noreferrer">Яндекс Еда</a>
+          <a href="#" onclick="openAccount();return false">Личный кабинет</a>
+        </div>
+        <div class="footer__col">
+          <h4>Контакты</h4>
+          <p><a href="tel:+79137574414">+7 913 757-44-14</a></p>
+          <p>📍 <a href="https://yandex.ru/maps/org/rebro/144014513373/" target="_blank" rel="noopener noreferrer">Новосибирск, Тюменская ул., 2А</a></p>
+          <p>🏘 Северо-Чемской жилмассив, Кировский район</p>
+          <p>🕐 Ежедневно 11:00–22:00</p>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>© 2026 Re:BRO. Все права защищены.</span>
+        <span>Сделано с 🔥 в Новосибирске</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cart Modal -->
+  <div class="modal-overlay" id="cart-modal">
+    <div class="modal">
+      <div class="modal__header">
+        <h2 class="modal__title">Корзина</h2>
+        <button class="modal__close" data-close="cart-modal">×</button>
+      </div>
+      <div class="modal__body" id="cart-body"></div>
+      <div class="modal__footer" id="cart-footer">
+        <div class="cart-total" style="flex:1;padding:0">
+          <span>Итого:</span>
+          <span class="cart-total__sum" id="cart-total-sum">0 ₽</span>
+        </div>
+        <button class="btn btn--primary" onclick="openCheckout()">Оформить заказ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal modal--wide">
+      <div class="modal__header">
+        <h2 class="modal__title">Оформление заказа</h2>
+        <button class="modal__close" data-close="checkout-modal">×</button>
+      </div>
+      <div class="modal__body">
+        <div class="delivery-toggle">
+          <button type="button" class="delivery-toggle__btn active" data-type="pickup" onclick="setCheckoutType('pickup')">📍 Самовывоз</button>
+          <a class="delivery-toggle__btn" href="https://eda.yandex.ru/novosibirsk/r/re_bro_restaurant" target="_blank" rel="noopener noreferrer">🛵 Доставка — Яндекс Еда</a>
+        </div>
+
+        <form id="checkout-form" onsubmit="placeOrder(event)" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Имя *</label>
+              <input type="text" name="name" required placeholder="Как к вам обращаться">
+            </div>
+            <div class="form-group">
+              <label>Телефон *</label>
+              <input type="tel" name="phone" required placeholder="+7 (___) ___-__-__">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email <span style="font-weight:400;opacity:.7">(необязательно)</span></label>
+            <input type="text" name="email" inputmode="email" autocomplete="email" placeholder="name@example.com" id="checkout-email">
+            <p class="form-hint" id="checkout-email-hint" hidden>Email неверный. Поле очищено — можно оставить пустым и нажать «Оплатить и заказать» снова</p>
+          </div>
+          <div class="form-group" id="address-group" style="display:none">
+            <label>Адрес доставки *</label>
+            <input type="text" name="address" placeholder="Улица, дом, квартира, подъезд">
+          </div>
+          <div class="form-group" id="pickup-info">
+            <label>Адрес самовывоза</label>
+            <input type="text" value="Новосибирск, Тюменская ул., 2А" disabled>
+          </div>
+          <div class="form-group" id="when-group">
+            <label>Когда приготовить</label>
+            <div class="delivery-toggle when-toggle" role="group" aria-label="Когда приготовить">
+              <button type="button" class="delivery-toggle__btn active" data-when="asap" onclick="setWhenMode('asap')">Как можно скорее</button>
+              <button type="button" class="delivery-toggle__btn" data-when="preorder" onclick="setWhenMode('preorder')">Предзаказ</button>
+            </div>
+            <div class="preorder-panel" id="preorder-fields" hidden>
+              <div class="preorder-days" id="preorder-days"></div>
+              <div class="form-row preorder-fields">
+                <div class="form-group">
+                  <label for="preorder-date">Дата</label>
+                  <input type="date" id="preorder-date" name="preorderDate" autocomplete="off">
+                </div>
+                <div class="form-group">
+                  <label for="preorder-time">Время</label>
+                  <select id="preorder-time" name="preorderTime">
+                    <option value="">Выберите время</option>
+                  </select>
+                </div>
+              </div>
+              <p class="preorder-hint">Ежедневно 11:00–22:00. Предзаказ минимум за 1 час, не дальше чем на 14 дней.</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Комментарий</label>
+            <textarea name="comment" rows="2" placeholder="Пожелания к заказу"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Способ оплаты</label>
+            <div class="payment-methods">
+              <div class="payment-method active" data-method="sbp" onclick="setPayment('sbp')">
+                <span class="payment-method__icon">📱</span>
+                СБП
+              </div>
+              <div class="payment-method" data-method="cash" onclick="setPayment('cash')">
+                <span class="payment-method__icon">💵</span>
+                Наличными
+              </div>
+            </div>
+          </div>
+
+          <div class="checkout-summary" id="checkout-summary">
+            <div class="checkout-summary__row">
+              <span>Сумма заказа</span>
+              <span id="checkout-subtotal">0 ₽</span>
+            </div>
+            <div class="checkout-summary__row" id="checkout-delivery-row" hidden>
+              <span>Доставка</span>
+              <span id="checkout-delivery-fee">0 ₽</span>
+            </div>
+            <p class="checkout-summary__hint" id="checkout-delivery-hint"></p>
+          </div>
+
+          <div class="cart-total">
+            <span>К оплате:</span>
+            <span class="cart-total__sum" id="checkout-total">0 ₽</span>
+          </div>
+
+          <button type="submit" id="checkout-submit-btn" class="btn btn--primary btn--lg" style="width:100%;margin-top:16px">
+            Оплатить и заказать
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal-overlay" id="success-modal">
+    <div class="modal">
+      <div class="modal__header">
+        <h2 class="modal__title">Заказ сформирован! 🎉</h2>
+        <button class="modal__close" data-close="success-modal">×</button>
+      </div>
+      <div class="modal__body" style="text-align:center">
+        <p style="font-size:3rem;margin-bottom:16px">✅</p>
+        <p style="margin-bottom:8px">Номер заказа:</p>
+        <p style="font-size:1.3rem;font-weight:700;margin-bottom:20px" id="success-order-id"></p>
+        <p style="color:var(--text-muted);margin-bottom:24px" id="success-order-note">Позвоните +7 913 757-44-14 и назовите номер заказа.</p>
+        <div class="success-actions">
+          <a class="btn btn--primary" href="tel:+79137574414">Позвонить +7 913 757-44-14</a>
+          <button type="button" class="btn btn--outline-gold" onclick="backToMenu()">Вернуться к меню</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Modal -->
+  <div class="modal-overlay" id="account-modal">
+    <div class="modal modal--wide">
+      <div class="modal__header">
+        <h2 class="modal__title">Личный кабинет</h2>
+        <button class="modal__close" data-close="account-modal">×</button>
+      </div>
+      <div class="modal__body">
+        <div class="account-tabs">
+          <button class="account-tab active" data-panel="panel-orders">Мои заказы</button>
+          <button class="account-tab" data-panel="panel-profile">Профиль</button>
+        </div>
+
+        <div class="account-panel" id="panel-orders">
+          <div id="orders-list"></div>
+        </div>
+
+        <div class="account-panel" id="panel-profile" style="display:none">
+          <form onsubmit="saveProfile(event)">
+            <div class="form-group">
+              <label>Имя</label>
+              <input type="text" id="profile-name" placeholder="Ваше имя">
+            </div>
+            <div class="form-group">
+              <label>Телефон</label>
+              <input type="tel" id="profile-phone" placeholder="+7 (___) ___-__-__">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="profile-email" placeholder="email@example.com">
+            </div>
+            <button type="submit" class="btn btn--primary">Сохранить</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Dish modal -->
+  <div class="modal-overlay" id="dish-modal">
+    <div class="modal modal--dish">
+      <div class="modal__header">
+        <h2 class="modal__title" id="dish-modal-name">Блюдо</h2>
+        <button class="modal__close" data-close="dish-modal" aria-label="Закрыть">×</button>
+      </div>
+      <div class="modal__body dish-modal__body">
+        <img id="dish-modal-img" class="dish-modal__img" src="" alt="">
+        <p class="dish-modal__meta" id="dish-modal-meta"></p>
+        <p class="dish-modal__desc" id="dish-modal-desc"></p>
+        <button type="button" class="btn btn--gold btn--lg" id="dish-modal-add" style="width:100%;margin-top:12px">В корзину</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data/menu.js"></script>
+  <script src="js/data/menu-meta.js"></script>
+  <script src="js/app.js?v=1"></script>
+</body>
+</html>

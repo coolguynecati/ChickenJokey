@@ -1,0 +1,21 @@
+{
+  "name": "Re:BRO — гриль-бар",
+  "short_name": "Re:BRO",
+  "description": "Шашлык, люля-кебаб, шаурма и гарниры на мангале. Новосибирск, Тюменская ул., 2А.",
+  "icons": [
+    {
+      "src": "images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0d0d0d",
+  "background_color": "#0d0d0d",
+  "display": "standalone",
+  "lang": "ru"
+}
